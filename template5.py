@@ -64,6 +64,11 @@ class Template5(TemplateBaseClass):
     
 
     def get_score(self,triple):
+        '''
+        Returns template score for given triple
+        Iterates over all e1,r depending on flag of use_hard_triple_scoring
+        '''
+
         score=0;
         e2=triple[2]
 
@@ -74,7 +79,7 @@ class Template5(TemplateBaseClass):
             for e1 in entities:
                 for r in relations:
                     entity_simi=self.base_model.get_entity_similarity(e1,triple[0])
-                    relation_simi=self.base_model.get_relation_similarity(e1,triple[1])                    
+                    relation_simi=self.base_model.get_relation_similarity(r,triple[1])                    
                     model_score=self.base_model.get_score(e1,r,e2)
                     score=max(score,entity_simi*relation_simi*model_score)
 
@@ -84,7 +89,7 @@ class Template5(TemplateBaseClass):
 
             for (e1,r) in self.dict_e2:
                 entity_simi=self.base_model.get_entity_similarity(e1,triple[0])
-                relation_simi=self.base_model.get_relation_similarity(e1,triple[1])
+                relation_simi=self.base_model.get_relation_similarity(r,triple[1])
                 score=max(score,entity_simi*relation_simi)
 
         return score
