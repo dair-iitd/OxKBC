@@ -7,18 +7,23 @@ class TemplateBaseClass(ABC):
     
     @abstractmethod
     def process_data(self):
+
         pass
 
     @abstractmethod
     def build_table(self):
         pass
-    
+
     @abstractmethod
-    def load_table(self):
+    def dump_data(self,filename):
         pass
     
     @abstractmethod
-    def get_score(self):
+    def load_table(self,filename):
+        pass
+    
+    @abstractmethod
+    def get_score(self,tuple):
         pass
        
     
