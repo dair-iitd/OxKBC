@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
 
 class TemplateBaseClass(ABC):
+    """ 
+    This is an abstract class for all the templates. 
+    """
  
     def __init__(self):
         super().__init__()
