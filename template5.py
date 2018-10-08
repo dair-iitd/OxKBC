@@ -21,7 +21,6 @@ class Template5(TemplateBaseClass):
             self.load_table(load_table)
 
     def process_data(self):
-
         #maps e2 to all (e1,r) in data
         self.dict_e2={}
         #stores unique e1_r for building table
@@ -35,9 +34,7 @@ class Template5(TemplateBaseClass):
             if((facts[0],facts[1]) not in self.unique_e1_r):
                 self.unique_e1_r[(facts[0],facts[1])]=len(self.unique_e1_r)
 
-    @abstractmethod
     def build_table(self):
-
         entities=len(self.kb.entity_map)
         self.table=[]
 
@@ -65,13 +62,12 @@ class Template5(TemplateBaseClass):
         self.unique_e1_r=dump_dict['unique_e1_r']
         self.table=dump_dict['table']
     
-    @abstractmethod
-    def get_score(self,triple):
 
+    def get_score(self,triple):
         score=0;
         e2=triple[2]
 
-        if(use_hard_triple_scoring==False):
+        if(self.use_hard_triple_scoring==False):
             entities=len(self.kb.entity_map)
             relations=len(self.kb.relation_map)
 
