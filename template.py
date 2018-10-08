@@ -26,7 +26,7 @@ class TemplateBaseClass(ABC):
         pass
     
     @abstractmethod
-    def get_score(self,tuple):
+    def compute_score(self,tuple):
         pass
        
     
