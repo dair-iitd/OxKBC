@@ -2,9 +2,9 @@ from template import TemplateBaseClass
 import pickle
 
 class Template5(TemplateBaseClass):
-"""
-Template: e1~e' ^ r~r' ^ e'r'e2
-"""
+    """
+    Template: e1~e' ^ r~r' ^ e'r'e2
+    """
  
     def __init__(self,kb,base_model,use_hard_triple_scoring=True,load_table=None,dump_file=None):
         super().__init__()
