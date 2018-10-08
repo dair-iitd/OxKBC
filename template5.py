@@ -21,9 +21,11 @@ class Template5(TemplateBaseClass):
             self.load_table(load_table)
 
     def process_data(self):
-        #maps e2 to all (e1,r) in data
+        """
+        maps e2 to all (e1,r) in data
+        stores unique e1_r for building table
+        """
         self.dict_e2={}
-        #stores unique e1_r for building table
         self.unique_e1_r={}
 
         for facts in self.kb.facts:
@@ -35,12 +37,15 @@ class Template5(TemplateBaseClass):
                 self.unique_e1_r[(facts[0],facts[1])]=len(self.unique_e1_r)
 
     def build_table(self):
+        """
+        a table for each unique (e1,r)
+        """
         entities=len(self.kb.entity_map)
         self.table=[]
 
-        for e1,r in self.unique_e1_r:
+        for e1,r in self.unique_e1_r.keys():
             score_lis=[]
-            for u in entities:
+            for u in range(entities):
                 score_lis.append(self.get_score((e1,r,u)))
 
             self.table.append(score_lis)
@@ -53,7 +58,7 @@ class Template5(TemplateBaseClass):
         dump_dict['table']=self.table
 
         with open(filename,'wb')  as inputfile:
-            pickle.dump(dump_dir,inputfile)
+            pickle.dump(dump_dict,inputfile)
     
     def load_table(self,filename):
         with open(filename,"rb") as f:
@@ -76,8 +81,8 @@ class Template5(TemplateBaseClass):
             entities=len(self.kb.entity_map)
             relations=len(self.kb.relation_map)
 
-            for e1 in entities:
-                for r in relations:
+            for e1 in range(entities):
+                for r in range(relations):
                     entity_simi=self.base_model.get_entity_similarity(e1,triple[0])
                     relation_simi=self.base_model.get_relation_similarity(r,triple[1])                    
                     model_score=self.base_model.get_score(e1,r,e2)
