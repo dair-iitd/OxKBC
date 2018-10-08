@@ -1,9 +1,9 @@
 from template import TemplateBaseClass
 import pickle
 
-class Template5(TemplateBaseClass):
+class Template4(TemplateBaseClass):
     """
-    Template: e1~e' ^ r~r' ^ e'r'e2
+    Template: e1~e' ^ e'r e2
     """
  
     def __init__(self,kb,base_model,use_hard_triple_scoring=True,load_table=None,dump_file=None):
@@ -22,16 +22,17 @@ class Template5(TemplateBaseClass):
 
     def process_data(self):
         """
-        maps e2 to all (e1,r) in data
+        maps (r,e2) to all e1 in data
         stores unique e1_r for building table
         """
-        self.dict_e2={}
+        self.dict_r_e2={}
         self.unique_e1_r={}
 
         for facts in self.kb.facts:
-            if(facts[2] not in self.dict_e2):
-                self.dict_e2[facts[2]]=[]
-            self.dict_e2[facts[2]].append((facts[0],facts[1]))
+            key=(facts[0],facts[1])
+            if(key not in self.dict_r_e2):
+                self.dict_r_e2[key]=[]
+            self.dict_r_e2[key].append(facts[2])
 
             if((facts[0],facts[1]) not in self.unique_e1_r):
                 self.unique_e1_r[(facts[0],facts[1])]=len(self.unique_e1_r)
@@ -53,7 +54,7 @@ class Template5(TemplateBaseClass):
 
     def dump_data(self,filename):
         dump_dict={}
-        dump_dict['dict_e2']=self.dict_e2
+        dump_dict['dict_r_e2']=self.dict_r_e2
         dump_dict['unique_e1_r']=self.unique_e1_r
         dump_dict['table']=self.table
 
@@ -63,7 +64,7 @@ class Template5(TemplateBaseClass):
     def load_table(self,filename):
         with open(filename,"rb") as f:
             dump_dict=pickle.load(f)
-        self.dict_e2=dump_dict['dict_e2']
+        self.dict_r_e2=dump_dict['dict_r_e2']
         self.unique_e1_r=dump_dict['unique_e1_r']
         self.table=dump_dict['table']
     
@@ -76,25 +77,23 @@ class Template5(TemplateBaseClass):
 
         score=0
         e2=triple[2]
+        r=triple[1]
 
         if(self.use_hard_triple_scoring==False):
             entities=len(self.kb.entity_map)
-            relations=len(self.kb.relation_map)
 
             for e1 in range(entities):
-                for r in range(relations):
-                    entity_simi=self.base_model.get_entity_similarity(e1,triple[0])
-                    relation_simi=self.base_model.get_relation_similarity(r,triple[1])                    
-                    model_score=self.base_model.compute_score(e1,r,e2)
-                    score=max(score,entity_simi*relation_simi*model_score)
+                entity_simi=self.base_model.get_entity_similarity(e1,triple[0])
+                model_score=self.base_model.compute_score(e1,r,e2)
+                score=max(score,entity_simi*model_score)
 
         else:
-            if(e2 not in self.dict_e2):
+            key=(r,e2)
+            if(key not in self.dict_r_e2):
                 score=0
 
-            for (e1,r) in self.dict_e2[e2]:
+            for e1 in self.dict_r_e2[key]:
                 entity_simi=self.base_model.get_entity_similarity(e1,triple[0])
-                relation_simi=self.base_model.get_relation_similarity(r,triple[1])
-                score=max(score,entity_simi*relation_simi)
+                score=max(score,entity_simi)
 
         return score
