@@ -1,10 +1,10 @@
 from template import TemplateBaseClass
-
-'''
-Template: e1~e' ^ r~r' ^ e'r'e2
-'''
+import pickle
 
 class Template5(TemplateBaseClass):
+"""
+Template: e1~e' ^ r~r' ^ e'r'e2
+"""
  
     def __init__(self,kb,base_model,use_hard_triple_scoring=True,load_table=None,dump_file=None):
         super().__init__()
@@ -69,7 +69,7 @@ class Template5(TemplateBaseClass):
         Iterates over all e1,r depending on flag of use_hard_triple_scoring
         '''
 
-        score=0;
+        score=0
         e2=triple[2]
 
         if(self.use_hard_triple_scoring==False):
