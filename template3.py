@@ -93,9 +93,9 @@ class Template3(TemplateBaseClass):
             key=(e1,e2)
             if(key not in self.dict_e1_e2):
                 score=0
-
-            for r in self.dict_e1_e2[key]:
-                relation_simi = self.base_model.get_relation_similarity(r, triple[1])
-                score = max(score, relation_simi)
+            else:
+                for r in self.dict_e1_e2[key]:
+                    relation_simi = self.base_model.get_relation_similarity(r, triple[1])
+                    score = max(score, relation_simi)
 
         return score

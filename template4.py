@@ -93,9 +93,9 @@ class Template4(TemplateBaseClass):
             key=(r,e2)
             if(key not in self.dict_r_e2):
                 score=0
-
-            for e1 in self.dict_r_e2[key]:
-                entity_simi=self.base_model.get_entity_similarity(e1,triple[0])
-                score=max(score,entity_simi)
+            else:
+                for e1 in self.dict_r_e2[key]:
+                    entity_simi=self.base_model.get_entity_similarity(e1,triple[0])
+                    score=max(score,entity_simi)
 
         return score

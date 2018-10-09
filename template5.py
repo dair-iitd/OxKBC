@@ -92,10 +92,10 @@ class Template5(TemplateBaseClass):
         else:
             if(e2 not in self.dict_e2):
                 score=0
-
-            for (e1,r) in self.dict_e2[e2]:
-                entity_simi=self.base_model.get_entity_similarity(e1,triple[0])
-                relation_simi=self.base_model.get_relation_similarity(r,triple[1])
-                score=max(score,entity_simi*relation_simi)
+            else:
+                for (e1,r) in self.dict_e2[e2]:
+                    entity_simi=self.base_model.get_entity_similarity(e1,triple[0])
+                    relation_simi=self.base_model.get_relation_similarity(r,triple[1])
+                    score=max(score,entity_simi*relation_simi)
 
         return score

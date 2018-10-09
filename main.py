@@ -48,6 +48,6 @@ if __name__ == "__main__":
                         required=False, default='data')
     args = parser.parse_args()
 
-    dataset_root = os.path.join(args.data_repository_root, args.d)
-    main(dataset_root, args.model_weight_file, args.template_load_dir,
-         args.template_save_dir, args.model_type, args.t_ids, args.v)
+    dataset_root = os.path.join(args.data_repository_root, args.dataset)
+    main(dataset_root, args.model_weights, args.template_load_dir,
+         args.template_save_dir, args.model_type, args.t_ids, args.oov_entity)

@@ -53,7 +53,7 @@ class KnowledgeBase():
                               self.entity_map.get(l[2], len(self.entity_map)-1)])
         self.facts = np.array(facts, dtype='int64')
         print("Loaded %d facts from file %s\n" %
-              (self.facts.shape, facts_filename))
+              (len(self.facts), facts_filename))
 
 
 def union(kb_list):
