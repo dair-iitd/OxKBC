@@ -1,10 +1,10 @@
 import pickle
 import numpy as np
-import math
+import utils
 
 class TypedDM():
     
-    def init(self,pickle_dump_file):
+    def __init__(self,pickle_dump_file):
         with open(pickle_dump_file, "rb") as f:
             self.dump = pickle.load(f)
     
@@ -22,9 +22,6 @@ class TypedDM():
             self.dump['tail_rel_type'][r1], self.dump['tail_rel_type'][r2])
         return relation_similarity*type_compatibility_head*type_compatibility_tail
     
-    def sigmoid(self,x):
-        return 1/(1+math.exp(-x))
-
     def compute_score(self,e1,r,e2):
         score=self.dump['entity_real'][e1]*self.dump['rel_real'][r]*self.dump['entity_real'][e2]
         head_type_compatibility = self.dump['entity_type'][e1]*self.dump['head_rel_type']
@@ -32,8 +29,7 @@ class TypedDM():
         score=np.sum(score)
         head_type_compatibility=np.sum(head_type_compatibility)
         tail_type_compatibility=np.sum(tail_type_compatibility)
-        return self.sigmoid(score)*self.sigmoid(head_type_compatibility)*self.sigmoid(tail_type_compatibility)
-
+        return utils.sigmoid(score)*utils.sigmoid(head_type_compatibility)*utils.sigmoid(tail_type_compatibility)
 
 class TypedComplex():
 
@@ -57,9 +53,6 @@ class TypedComplex():
             self.dump['tail_rel_type'][r1], self.dump['tail_rel_type'][r2])
         return relation_similarity*type_compatibility_head*type_compatibility_tail
 
-    def sigmoid(self, x):
-        return 1/(1+math.exp(-x))
-
     def compute_score(self, e1, r, e2):
         s_re = self.dump['entity_real'][e1]
         s_im = self.dump['entity_im'][e1]
@@ -76,4 +69,4 @@ class TypedComplex():
         score = np.sum(score)
         head_type_compatibility = np.sum(head_type_compatibility)
         tail_type_compatibility = np.sum(tail_type_compatibility)
-        return self.sigmoid(score)*self.sigmoid(head_type_compatibility)*self.sigmoid(tail_type_compatibility)
+        return utils.sigmoid(score)*utils.sigmoid(head_type_compatibility)*utils.sigmoid(tail_type_compatibility)

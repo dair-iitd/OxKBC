@@ -13,8 +13,7 @@ class Template1(TemplateBaseClass):
         super().__init__()
         self.kb = kb
         self.base_model = base_model
-        assert (use_hard_triple_scoring), "Hard Scoring is necessary for this template"
-        self.use_hard_triple_scoring = use_hard_triple_scoring
+        self.use_hard_triple_scoring = True
 
         if(load_table == None):
             self.process_data()
@@ -49,7 +48,7 @@ class Template1(TemplateBaseClass):
         for rel in self.relation_map:
             score_lis = []
             for u in range(nentities):
-                score_lis.append(self.get_score((None, rel, u)))
+                score_lis.append(self.compute_score((None, rel, u)))
             self.table[rel] = score_lis
 
     def dump_data(self, filename):

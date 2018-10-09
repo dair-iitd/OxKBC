@@ -1,12 +1,11 @@
 import os
+import types
 
 import template1
 import template2
 import template3
 import template4
 import template5
-
-import types
 
 
 def build_template(template_id, kb, base_model, use_hard_scoring=True,
@@ -18,9 +17,6 @@ def build_template(template_id, kb, base_model, use_hard_scoring=True,
     """
     assert ((load_dir != None) or (dump_dir != None)
             ), "Atleast load_dir or dump_dir should be not None"
-
-    assert ((template_id != 1 and template_id != 2)
-            or use_hard_scoring), "Template 1 and 2 works only with hard scoring"
 
     obj = getattr(globals()['template'+str(template_id)], 'Template'+str(
         template_id))(
