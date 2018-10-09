@@ -75,6 +75,8 @@ class Template4(TemplateBaseClass):
         Iterates over all e1,r depending on flag of use_hard_triple_scoring
         '''
 
+        assert (len(triple) == 3), "Triple must contain three elements"
+
         score=0
         e2=triple[2]
         r=triple[1]
