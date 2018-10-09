@@ -1,0 +1,46 @@
+import os
+
+import template1
+import template2
+import template3
+import template4
+import template5
+
+import types
+
+
+def build_template(template_id, kb, base_model, use_hard_scoring=True,
+                   load_dir=None, dump_dir=None):
+    """
+    Builds a template object of a given id. Loads from
+    "load_dir/<template_id>.pkl" if load_dir is not None. If it is None, then
+    dump_dir should be not None. Saves table to "dump_dir/<template_id>.pkl"
+    """
+    assert ((load_dir != None) or (dump_dir != None)
+            ), "Atleast load_dir or dump_dir should be not None"
+
+    assert ((template_id != 1 and template_id != 2)
+            or use_hard_scoring), "Template 1 and 2 works only with hard scoring"
+
+    obj = getattr(globals()['template'+str(template_id)], 'Template'+str(
+        template_id))(
+            kb, base_model, use_hard_scoring,
+            os.path.join(load_dir, str(template_id)+".pkl"),
+            os.path.join(dump_dir, str(template_id)+".pkl"))
+    return obj
+
+
+def build_templates(idlist, kb, base_model, use_hard_scoring=True,
+                    load_dir=None, dump_dir=None):
+    """
+    Builds a template object of a given idlist. Loads from
+    "load_dir/<template_id>.pkl" if load_dir is not None. If it is None, then
+    dump_dir should be not None. Saves table to "dump_dir/<template_id>.pkl"
+    """
+
+    assert isinstance(idlist, list), "Need a list"
+
+    obj_list = [build_template(
+        el, kb, base_model, use_hard_scoring, load_dir, dump_dir) for el in idlist]
+
+    return obj_list
