@@ -10,7 +10,6 @@ class TemplateBaseClass(ABC):
     
     @abstractmethod
     def process_data(self):
-
         pass
 
     @abstractmethod
@@ -26,7 +25,7 @@ class TemplateBaseClass(ABC):
         pass
     
     @abstractmethod
-    def compute_score(self,tuple):
+    def compute_score(self,triple):
         pass
        
     
