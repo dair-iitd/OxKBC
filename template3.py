@@ -13,10 +13,15 @@ class Template3(TemplateBaseClass):
         self.use_hard_triple_scoring=use_hard_triple_scoring
 
         if(load_table==None):
+            print("Load table is None, so beginning process_data")
             self.process_data()
+            print("Process_data done")
+            print("Begin Build table")
             self.build_table()
+            print("END Build table")
+            print("Begin dump data")
             self.dump_data(dump_file)
-
+            print("END dump table")
         else:
             self.load_table(load_table)
 
@@ -43,13 +48,20 @@ class Template3(TemplateBaseClass):
         """
         entities=len(self.kb.entity_map)
         self.table={}
-
+        total_els = len(self.unique_e1_r.keys())
+        ctr = 0
         for (e1,r) in self.unique_e1_r.keys():
-            score_lis=[]
+            if ctr%250==0:
+                print("Processed %d"%(ctr))
+            score_dict={}
             for u in range(entities):
-                score_lis.append(self.compute_score((e1,r,u)))
+            	sc,be = self.compute_score((e1,r,u))
+            	if(sc!=0):
+            		score_dict[u] = (sc,be)
 
-            self.table[(e1,r)]=score_lis
+            self.table[(e1,r)]=score_dict
+            ctr+=1            
+
 
 
     def dump_data(self,filename):
@@ -78,6 +90,7 @@ class Template3(TemplateBaseClass):
         assert (len(triple) == 3), "Triple must contain three elements"
 
         score=0
+        best=-1
         e2=triple[2]
         e1=triple[0]
 
@@ -87,7 +100,9 @@ class Template3(TemplateBaseClass):
             for r in range(relations):
                 relation_simi = self.base_model.get_relation_similarity(r, triple[1])
                 model_score=self.base_model.compute_score(e1,r,e2)
-                score=max(score,relation_simi*model_score)
+                if(score<relation_simi*model_score):
+                    score=relation_simi*model_score
+                    best=r
 
         else:
             key=(e1,e2)
@@ -96,6 +111,11 @@ class Template3(TemplateBaseClass):
             else:
                 for r in self.dict_e1_e2[key]:
                     relation_simi = self.base_model.get_relation_similarity(r, triple[1])
-                    score = max(score, relation_simi)
+                    if(score<relation_simi):
+                        score=relation_simi
+                        best=r
+        return (score,best)
 
-        return score
+
+    # def get_input(fact):
+

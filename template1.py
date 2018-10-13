@@ -46,10 +46,12 @@ class Template1(TemplateBaseClass):
         self.table = {}
 
         for rel in self.relation_map:
-            score_lis = []
+            score_dict = {}
             for u in range(nentities):
-                score_lis.append(self.compute_score((None, rel, u)))
-            self.table[rel] = score_lis
+                sc = self.compute_score((None, rel, u))
+                if(sc!=0):
+                    score_dict[u] = sc
+            self.table[rel] = score_dict
 
     def dump_data(self, filename):
         dump_dict = {}

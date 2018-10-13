@@ -44,10 +44,12 @@ class Template2(TemplateBaseClass):
         self.table = {}
 
         for e1 in self.entity_map:
-            score_lis = []
+            score_dict = {}
             for u in range(nentities):
-                score_lis.append(self.compute_score((e1, None, u)))
-            self.table[e1] = score_lis
+                sc = self.compute_score((e1, None, u))
+                if(sc!=0):
+                    score_dict[u] = sc
+            self.table[e1] = score_dict
 
     def dump_data(self, filename):
         dump_dict = {}
