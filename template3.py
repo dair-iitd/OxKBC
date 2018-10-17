@@ -1,6 +1,6 @@
 from template import TemplateBaseClass
 import pickle
-import utils
+from sm import utils
 
 class Template3(TemplateBaseClass):
     """
@@ -123,11 +123,12 @@ class Template3(TemplateBaseClass):
     	features=[0,0,0,0]
 
     	if(key in self.table.keys()):
-			max_score=max(self.table[key])
+            val_list=list(self.table[key].values)
+			max_score=max(val_list)
 			my_score=self.table[key][fact[2]][0]
-			index_max=self.table[key].index(max_score)
-			simi=self.base_model.get_entity_similarity(fact[2],index_max)
-			rank=utils.get_rank(self.table[key],my_score)
+			index_max=val_list.index(max_score)
+			simi=self.base_model.get_entity_similarity(fact[2],self.table[key].keys()[index_max])
+			rank=utils.get_rank(val_list,my_score)
 			features=[my_score,max_score,simi,rank]
 
 		return features
