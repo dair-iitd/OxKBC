@@ -118,7 +118,7 @@ class Template3(TemplateBaseClass):
         return (score,best)
 
 
-    def get_input(fact):
+    def get_input(self,fact):
     	key=(fact[0],fact[2])
     	features=[0,0,0,0]
 

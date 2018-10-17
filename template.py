@@ -27,6 +27,8 @@ class TemplateBaseClass(ABC):
     @abstractmethod
     def compute_score(self,triple):
         pass
+    @abstractmethod
+    def get_input(self,fact):
        
     
 

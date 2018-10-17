@@ -117,7 +117,7 @@ class Template4(TemplateBaseClass):
                         best=e1
         return (score,best)
 
-    def get_input(fact):
+    def get_input(self,fact):
         key=(fact[1],fact[2])
         features=[0,0,0,0]
 
