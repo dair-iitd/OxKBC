@@ -74,3 +74,12 @@ class Map(dict):
     def __delitem__(self, key):
         super(Map, self).__delitem__(key)
         del self.__dict__[key]
+
+def get_rank(array,val):
+    count=0
+
+    for elem in array:
+        if(elem>val):
+            count+=1
+
+    return count
