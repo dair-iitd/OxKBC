@@ -28,6 +28,8 @@ def main(dataset_root, model_weight_file, template_load_dir, template_save_dir,
     templates_obj = builder.build_templates(templates_idlist, ktrain, base_model,
                                             use_hard_scoring, template_load_dir, template_save_dir)
 
+    return (kvalid,templates_obj)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

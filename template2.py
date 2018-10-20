@@ -2,6 +2,7 @@ from template import TemplateBaseClass
 import pickle
 from collections import Counter
 import numpy as np
+from sm import utils
 
 
 class Template2(TemplateBaseClass):
@@ -77,15 +78,15 @@ class Template2(TemplateBaseClass):
         else:
             return self.entity_map[e1]["cts"].get(e2, 0)*1.0/self.entity_map[e1]["len"]
 
-     def get_input(self,fact):
-    	key = fact[0]
-    	features = [0,0,0,0]
+    def get_input(self,fact):
+        key = fact[0]
+        features = [0,0,0,0]
 
-    	if(key in self.table.keys()):
-			index_max = np.argmax(self.table[key].values())
-			max_score = list(self.table[key].values)[index_max]
-			my_score = self.table[key].get(fact[2],0)
-			simi = self.base_model.get_entity_similarity(fact[2],index_max)
-			rank = utils.get_rank(self.table[key].values(),my_score)
-			features = [my_score,max_score,simi,rank]
-		return features
+        if(key in self.table.keys()):
+            index_max = np.argmax(self.table[key].values())
+            max_score = list(self.table[key].values)[index_max]
+            my_score = self.table[key].get(fact[2],0)
+            simi = self.base_model.get_entity_similarity(fact[2],index_max)
+            rank = utils.get_rank(self.table[key].values(),my_score)
+            features = [my_score,max_score,simi,rank]
+        return features

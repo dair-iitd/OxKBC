@@ -1,6 +1,7 @@
 from template import TemplateBaseClass
 import pickle
 from sm import utils
+
 class Template4(TemplateBaseClass):
     """
     Template: e1~e' ^ e'r e2

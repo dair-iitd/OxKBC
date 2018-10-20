@@ -29,7 +29,4 @@ class TemplateBaseClass(ABC):
         pass
     @abstractmethod
     def get_input(self,fact):
-       
-    
-
-    
+        pass

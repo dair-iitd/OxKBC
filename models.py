@@ -1,6 +1,6 @@
 import pickle
 import numpy as np
-import utils
+from sm import utils
 
 class TypedDM():
     

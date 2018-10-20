@@ -168,3 +168,6 @@ class Template5(TemplateBaseClass):
                 score = sim_scores[idx]
                 best = (self.dict_e2[e2]["e1"][idx],self.dict_e2[e2]["r"][idx])
         return (score,best)
+
+    def get_input(self,fact):
+        return [0,0,0,0]

@@ -1,13 +1,12 @@
-
 from __future__ import print_function
 from IPython.core.debugger import Pdb
 import torch
 import shutil
 from datetime import datetime as dt
 import settings
+import math
 
 CONSOLE_FILE = 'IPYTHON_CONSOLE'
-
 
 def log(s, file=None):
     print('{},{}'.format(dt.now().strftime('%Y%m%d%H%M%S'), s), file=file)
@@ -33,12 +32,13 @@ def save_checkpoint(state, epoch, isBest, checkpoint_file, best_file):
         shutil.copyfile(checkpoint_file,
                         best_file)
 
-
 def log_sum_exp(x,dim = -1):
     max_score, _ = torch.max(x, dim)
     max_score_broadcast = max_score.unsqueeze(dim).expand_as(x)
     return max_score + torch.log(torch.sum(torch.exp(x - max_score_broadcast), dim))
 
+def sigmoid(x):
+        return 1/(1+math.exp(-x))
 
 class Map(dict):
     """

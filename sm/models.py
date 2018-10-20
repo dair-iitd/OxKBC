@@ -12,9 +12,6 @@ import settings
 def select_model(args):
     return SelectionModule(args.input_size,args.output_size, args.hidden_unit_list)
     
-
-
-
 class SelectionModule(nn.Module):
     def __init__(self,input_size, output_size, hidden_unit_list): 
         super(SelectionModule, self).__init__()

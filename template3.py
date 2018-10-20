@@ -49,7 +49,6 @@ class Template3(TemplateBaseClass):
         """
         entities=len(self.kb.entity_map)
         self.table={}
-        total_els = len(self.unique_e1_r.keys())
         ctr = 0
         for (e1,r) in self.unique_e1_r.keys():
             if ctr%250==0:
@@ -119,17 +118,15 @@ class Template3(TemplateBaseClass):
 
 
     def get_input(self,fact):
-    	key=(fact[0],fact[2])
-    	features=[0,0,0,0]
+        key=(fact[0],fact[2])
+        features=[0,0,0,0]
 
-    	if(key in self.table.keys()):
+        if(key in self.table.keys()):
             val_list=list(self.table[key].values)
-			max_score=max(val_list)
-			my_score=self.table[key][fact[2]][0]
-			index_max=val_list.index(max_score)
-			simi=self.base_model.get_entity_similarity(fact[2],self.table[key].keys()[index_max])
-			rank=utils.get_rank(val_list,my_score)
-			features=[my_score,max_score,simi,rank]
-
-		return features
-
+            max_score=max(val_list)
+            my_score=self.table[key][fact[2]][0]
+            index_max=val_list.index(max_score)
+            simi=self.base_model.get_entity_similarity(fact[2],self.table[key].keys()[index_max])
+            rank=utils.get_rank(val_list,my_score)
+            features=[my_score,max_score,simi,rank]
+        return features
