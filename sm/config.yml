@@ -1,0 +1,5 @@
+hidden_unit_list: [10,20]
+rho: 0.5
+mil_reward: 1
+pos_reward: 1
+neg_reward: 1

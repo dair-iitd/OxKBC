@@ -23,22 +23,10 @@ def complete_paths(config):
     #
 
 def main(args):
-
-
-    utils.log('done loading vocab')
-
-    args.input_size = 15
-    args.output_size = 5
-    args.hidden_unit_list = [10,20]
-
-    (train_loader, val_loader) = dataset.get_data_loaders(args, vocabs)
-
+    train_loader = dataset.get_data_loaders(args)
     model = models.select_model(args)
-    
     my_eval_fn = compute.get_evaluation_function(args)
 
-    # TODO - other optimizers?
-    optimizer = {}
     if args.optim == 'sgd':
         optimizer = optim.SGD(filter(lambda p: p.requires_grad, model.parameters(
         )), momentum=args.momentum, lr=args.lr, weight_decay=args.decay)
@@ -46,8 +34,8 @@ def main(args):
         optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr,
                                weight_decay=args.decay)
 
-    my_lr_scheduler = scheduler.CustomReduceLROnPlateau(optimizer, {'mode': args.mode, 'factor': args.factor, 'patience': args.patience, 'verbose': True, 'threshold': args.threshold,
-                                                                    'threshold_mode': args.threshold_mode, 'cooldown': args.cooldown, 'min_lr': args.min_lr, 'eps': args.eps}, maxPatienceToStopTraining=args.max_patience)
+    #my_lr_scheduler = scheduler.CustomReduceLROnPlateau(optimizer, {'mode': args.mode, 'factor': args.factor, 'patience': args.patience, 'verbose': True, 'threshold': args.threshold,
+    #                                                                'threshold_mode': args.threshold_mode, 'cooldown': args.cooldown, 'min_lr': args.min_lr, 'eps': args.eps}, maxPatienceToStopTraining=args.max_patience)
 
     exp_name = args.exp_name
     if args.debug:
@@ -78,7 +66,6 @@ def main(args):
     # Load checkpoint if present in input arguments TODO - be careful so as not to overwrite any checkpoints
     if args.checkpoint != '':
         utils.log('start from checkpoint: {}'.format(args.checkpoint))
-        load_checkpoint_file = args.checkpoint
         cp = torch.load(os.path.join(args.output_path, args.checkpoint))
         start_epoch = cp['epoch'] + 1
         model.load_state_dict(cp['model'])
@@ -95,22 +82,19 @@ def main(args):
         pass
         #val_loader = train_loader
 
-
-
     # Start TRAINING
     
     lr = utils.get_learning_rate(optimizer)
-    rec, i = compute.compute(-1, model, val_loader, None, 'eval', tfh,
-                                 args.backprop_batch_size, [lr, exp_name], eval_fn=my_eval_fn, debug=args.debug)
-
     
     for epoch in range(start_epoch, num_epochs):
         lr = utils.get_learning_rate(optimizer)
         # Pdb().set_trace()
-        compute.compute(epoch, model, train_loader, optimizer, 'train', tfh,
-                        args.backprop_batch_size, [lr, exp_name], eval_fn=my_eval_fn, debug=args.debug)
-        rec, i = compute.compute(epoch, model, val_loader, None, 'eval', tfh,
-                                 args.backprop_batch_size, [lr, exp_name], eval_fn=my_eval_fn, debug=args.debug)
+        rec, i = compute.compute(epoch, model, train_loader, optimizer, 'train', tfh,
+                         [lr, exp_name], eval_fn=my_eval_fn, args=args)
+
+        
+        #rec, i = compute.compute(epoch, model, val_loader, None, 'eval', tfh,
+        #                          [lr, exp_name], eval_fn=my_eval_fn, args=args)
 
         is_best = False
         utils.log('best score: {}, this score: {}'.format(best_score, rec[i]))
@@ -120,9 +104,9 @@ def main(args):
             is_best = True
         #
 
-        utils.log('input to scheduler : {}'.format(1.0-1.0*rec[i]))
-        my_lr_scheduler.step(1.0-1.0*rec[i], epoch=epoch)
-
+        #utils.log('input to scheduler : {}'.format(1.0-1.0*rec[i]))
+        #my_lr_scheduler.step(1.0-1.0*rec[i], epoch=epoch)
+        
         utils.save_checkpoint({
             'epoch': epoch,
             'best_score': best_score,
@@ -132,11 +116,6 @@ def main(args):
         }, epoch, is_best, checkpoint_file, best_checkpoint_file)
 
     #
-        if (my_lr_scheduler.shouldStopTraining()):
-            print("Stop training as no improvement in accuracy - no of unconstrainedBadEopchs: {0} > {1}".format(
-                my_lr_scheduler.unconstrainedBadEpochs, my_lr_scheduler.maxPatienceToStopTraining))
-            break
-
     tfh.close()
 
 
@@ -146,20 +125,34 @@ if __name__ == '__main__':
     parser.add_argument('--exp_name', help='exp name',
                         type=str, default='unary')
     parser.add_argument('--output_path', type=str)
-    parser.add_argument('--sample_folder', help='Sample size', type=str)
+
+    #model parameters
+    parser.add_argument('--input_size', help='Input size', type=int, default=15)
+    parser.add_argument('--output_size', help='output size', type=int, default=5)
+
+
+    parser.add_argument('--num_epochs', help='epochs', type=int, default=100)
+
+    #optim params
+    parser.add_argument('--optim', type=str, default = 'sgd')
+    parser.add_argument('--lr', help='lr', type=float, default=0.01)
+    parser.add_argument('--decay', help='lr', type=float, default=0)
+    parser.add_argument('--momentum', help='lr', type=float, default=0.9)
+
+
     parser.add_argument(
         '--debug', help='just load args and dont run main', action='store_true')
+    
+
+    parser.add_argument('--checkpoint', help='f***o*',type=str,default  = '')
+    
     parser.add_argument('--config', help='yaml config file',
-                        type=str, default='../config/conll03.yml')
+                        type=str, default='default_config.yml')
+
     parser.add_argument('--cuda', help='if cuda available, use it or not?',
                         action='store_true', default='true')
 
-    parser.add_argument('--model', type=str, default='crf')
-    parser.add_argument('--pretrained_wts', type=str, default='')
-
-    parser.add_argument('--loss', type=str, default='nll')
-    # parser.add_argument('--vocab_path',help='path to vocabulary', type=str, default = "../data/conll2003/vocab1.pkl")
-
+    
     args = parser.parse_args()
     config = {}
     if os.path.exists(os.path.expanduser(args.config)):
