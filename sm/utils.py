@@ -3,8 +3,9 @@ from IPython.core.debugger import Pdb
 import torch
 import shutil
 from datetime import datetime as dt
-import settings
+#from . import settings
 import math
+import settings
 
 CONSOLE_FILE = 'IPYTHON_CONSOLE'
 

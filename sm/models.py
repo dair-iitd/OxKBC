@@ -26,10 +26,17 @@ class SelectionModule(nn.Module):
 
         module_list.append(nn.Sequential(nn.Linear(prev,output_size)))
         self.mlp=nn.ModuleList(module_list)
+        self.softmax = nn.Softmax(dim=1)
 
         if settings.cuda:
             self = self.cuda()
         
 
     def forward(self,x):
-        return self.mlp(x)
+        x = x.float()
+        # print(x)
+        # exit(0)
+        for layer in self.mlp:
+            x = layer(x)
+        return self.softmax(x)
+        # return self.mlp(x)

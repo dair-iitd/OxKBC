@@ -89,8 +89,7 @@ def main(args):
     for epoch in range(start_epoch, num_epochs):
         lr = utils.get_learning_rate(optimizer)
         # Pdb().set_trace()
-        rec, i = compute.compute(epoch, model, train_loader, optimizer, 'train', tfh,
-                         [lr, exp_name], eval_fn=my_eval_fn, args=args)
+        rec, i = compute.compute(epoch, model, train_loader, optimizer, 'train', tfh, [lr, exp_name], eval_fn=my_eval_fn, args=args)
 
         
         #rec, i = compute.compute(epoch, model, val_loader, None, 'eval', tfh,
@@ -99,7 +98,7 @@ def main(args):
         is_best = False
         utils.log('best score: {}, this score: {}'.format(best_score, rec[i]))
         # Early stopping
-        if rec[i] > best_score:
+        if rec[i] < best_score:
             best_score = rec[i]
             is_best = True
         #
@@ -122,9 +121,13 @@ def main(args):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
+    parser.add_argument('--training_data_path',type=str,help="Data Path")
     parser.add_argument('--exp_name', help='exp name',
                         type=str, default='unary')
     parser.add_argument('--output_path', type=str)
+
+    parser.add_argument('--log_after', help='log after samples', type=int, default=10000)
+
 
     #model parameters
     parser.add_argument('--input_size', help='Input size', type=int, default=15)
@@ -132,10 +135,11 @@ if __name__ == '__main__':
 
 
     parser.add_argument('--num_epochs', help='epochs', type=int, default=100)
+    parser.add_argument('--batch_size', help='batch size', type=int, default=256)
 
     #optim params
     parser.add_argument('--optim', type=str, default = 'sgd')
-    parser.add_argument('--lr', help='lr', type=float, default=0.01)
+    parser.add_argument('--lr', help='lr', type=float, default=0.001)
     parser.add_argument('--decay', help='lr', type=float, default=0)
     parser.add_argument('--momentum', help='lr', type=float, default=0.9)
 
@@ -144,13 +148,13 @@ if __name__ == '__main__':
         '--debug', help='just load args and dont run main', action='store_true')
     
 
-    parser.add_argument('--checkpoint', help='f***o*',type=str,default  = '')
+    parser.add_argument('--checkpoint', help='checkpoint path',type=str,default  = '')
     
     parser.add_argument('--config', help='yaml config file',
                         type=str, default='default_config.yml')
 
     parser.add_argument('--cuda', help='if cuda available, use it or not?',
-                        action='store_true', default='true')
+                        action='store_true', default = False)
 
     
     args = parser.parse_args()

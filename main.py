@@ -5,7 +5,7 @@ import argparse
 import os
 import datetime
 import json
-import utils
+from sm import utils
 
 
 def main(dataset_root, model_weight_file, template_load_dir, template_save_dir,

@@ -50,7 +50,6 @@ class Template4(TemplateBaseClass):
         """
         entities=len(self.kb.entity_map)
         self.table={}
-        total_els = len(self.unique_e1_r.keys())
         ctr = 0
         for (e1,r) in self.unique_e1_r.keys():
             if ctr%250==0:
@@ -60,8 +59,8 @@ class Template4(TemplateBaseClass):
                 sc,be = self.compute_score((e1,r,u))
                 if(sc!=0):
                     score_dict[u] = (sc,be)
-
-            self.table[(e1,r)]=score_dict
+            if(len(score_dict.keys()) > 0):
+                self.table[(e1,r)] = score_dict
             ctr+=1
 
 
@@ -100,6 +99,8 @@ class Template4(TemplateBaseClass):
             entities=len(self.kb.entity_map)
 
             for e1 in range(entities):
+                if(e1==triple[0]):
+                    continue
                 entity_simi=self.base_model.get_entity_similarity(e1,triple[0])
                 model_score=self.base_model.compute_score(e1,r,e2)
                 if(score<entity_simi*model_score):
@@ -112,6 +113,8 @@ class Template4(TemplateBaseClass):
                 score=0
             else:
                 for e1 in self.dict_r_e2[key]:
+                    if(e1==triple[0]):
+                        continue
                     entity_simi=self.base_model.get_entity_similarity(e1,triple[0])
                     if(score<entity_simi):
                         score=entity_simi
@@ -119,16 +122,17 @@ class Template4(TemplateBaseClass):
         return (score,best)
 
     def get_input(self,fact):
-        key=(fact[1],fact[2])
+        key=(fact[0],fact[1])
         features=[0,0,0,0]
 
         if(key in self.table.keys()):
-            val_list=list(self.table[key].values)
-            max_score=max(val_list)
-            my_score=self.table[key][fact[2]][0]
-            index_max=val_list.index(max_score)
-            simi=self.base_model.get_entity_similarity(fact[2],self.table[key].keys()[index_max])
-            rank=utils.get_rank(val_list,my_score)
-            features=[my_score,max_score,simi,rank]
+            val_list= [ x[0] for x in self.table[key].values()]
+            if (len(val_list) != 0):
+                max_score=max(val_list)
+                my_score = self.table[key].get(fact[2],(0,-1))[0]
+                index_max=val_list.index(max_score)
+                simi=self.base_model.get_entity_similarity(fact[2],list(self.table[key].keys())[index_max])
+                rank=utils.get_rank(val_list,my_score)
+                features=[my_score,max_score,simi,rank]
 
         return features

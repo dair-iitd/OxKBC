@@ -107,3 +107,4 @@ venv.bak/
 .vscode/
 
 logs/
+selection_module.data

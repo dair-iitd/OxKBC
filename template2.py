@@ -84,7 +84,7 @@ class Template2(TemplateBaseClass):
 
         if(key in self.table.keys()):
             index_max = np.argmax(self.table[key].values())
-            max_score = list(self.table[key].values)[index_max]
+            max_score = list(self.table[key].values())[index_max]
             my_score = self.table[key].get(fact[2],0)
             simi = self.base_model.get_entity_similarity(fact[2],index_max)
             rank = utils.get_rank(self.table[key].values(),my_score)

@@ -2,22 +2,25 @@ import os
 import sys
 import pickle
 import kb
-import settings
+# import settings
 import numpy as np
 import argparse
 
 def get_input(fact,y,template_obj_list):
     x=[]
+    # print(fact)
+    # print(fact)
     for template in template_obj_list:
+        # print(template.get_input(fact))
+        # print("aman")
         x.extend(template.get_input(fact))
     
     x.append(y)
+    # print(x,"**xxx***")
     return x
 
 #TODO write both txt and pickle file 
 def preprocess(kb,template_obj_list,negative_count=10):
-
-    template_obj_list=[]
 
     # for file in range(settings.templates):
     #     filepath=os.path.join(pickle_file_path,str(file)+'.pkl')
@@ -25,8 +28,13 @@ def preprocess(kb,template_obj_list,negative_count=10):
 
 
     new_facts=[]
+
+    ctr = 0
         
     for facts in kb.facts:
+        ctr += 1
+        if(ctr%100==0):
+            print("Processed ",ctr)
         ns = np.random.randint(0, len(kb.entity_map), negative_count)
         no = np.random.randint(0, len(kb.entity_map), negative_count)
 
@@ -37,7 +45,8 @@ def preprocess(kb,template_obj_list,negative_count=10):
             new_facts.append(get_input(new_fact,0,template_obj_list))
             new_fact=(facts[0],facts[1],no[neg_facts])
             new_facts.append(get_input(new_fact,0,template_obj_list))
-            
+    
+    # print(new_facts)
 
     dump=open('selection_module.data','w')
 
@@ -69,5 +78,7 @@ if __name__ == "__main__":
     kvalid,template_objs = main.main(dataset_root, args.model_weights, args.template_load_dir,
          None, args.model_type, args.t_ids, args.oov_entity)
 
+    print("Objs is ",template_objs)
+    # exit(0)
     preprocess(kvalid,template_objs)
         
