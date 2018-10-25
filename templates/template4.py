@@ -3,6 +3,7 @@ import pickle
 import numpy as np
 
 import utils
+import logging
 from templates.template import TemplateBaseClass
 
 
@@ -18,15 +19,15 @@ class Template4(TemplateBaseClass):
         self.use_hard_triple_scoring=use_hard_triple_scoring
 
         if(load_table==None):
-            print("Load table is None, so beginning process_data")
+            logging.info("Load table is None, so beginning process_data")
             self.process_data()
-            print("Process_data done")
-            print("Begin Build table")
+            logging.info("Process_data done")
+            logging.info("Begin Build table")
             self.build_table()
-            print("END Build table")
-            print("Begin dump data")
+            logging.info("END Build table")
+            logging.info("Begin dump data")
             self.dump_data(dump_file)
-            print("END dump table")
+            logging.info("END dump table")
 
         else:
             self.load_table(load_table)
@@ -57,7 +58,7 @@ class Template4(TemplateBaseClass):
         ctr = 0
         for (e1,r) in self.unique_e1_r.keys():
             if ctr%250==0:
-                print("Processed %d"%(ctr))
+                logging.info("Processed %d"%(ctr))
             score_dict={}
             for u in range(entities):
                 sc,be = self.compute_score((e1,r,u))
@@ -116,13 +117,14 @@ class Template4(TemplateBaseClass):
             if(key not in self.dict_r_e2):
                 score=0
             else:
-                ent_lis = list(
+                ent_list = list(
                     filter(lambda x: x != triple[0], self.dict_r_e2[key]))
-                sim_scores = self.base_model.get_entity_similarity_list(
-                    triple[0], ent_lis)
-                idx = np.argmax(sim_scores)
-                score = sim_scores[idx]
-                best = ent_lis[idx]
+                if(len(ent_list)!=0):
+                    sim_scores = self.base_model.get_entity_similarity_list(
+                        triple[0], ent_list)
+                    idx = np.argmax(sim_scores)
+                    score = sim_scores[idx]
+                    best = ent_list[idx]
 
         return (score,best)
 

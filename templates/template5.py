@@ -3,6 +3,7 @@ import random
 import time
 
 import numpy as np
+import logging
 
 import utils
 from templates.template import TemplateBaseClass
@@ -18,19 +19,19 @@ class Template5(TemplateBaseClass):
         self.kb=kb
         self.base_model=base_model
         self.use_hard_triple_scoring=use_hard_triple_scoring
-        self.subsample_constant=20
-        self.subsample_proportion=2
+        self.subsample_constant=50
+        self.subsample_proportion=5
 
         if(load_table==None):
-            print("Load table is None, so beginning process_data")
+            logging.info("Load table is None, so beginning process_data")
             self.process_data()
-            print("Process_data done")
-            print("Begin Build table")
+            logging.info("Process_data done")
+            logging.info("Begin Build table")
             self.build_table()
-            print("END Build table")
-            print("Begin dump data")
+            logging.info("END Build table")
+            logging.info("Begin dump data")
             self.dump_data(dump_file)
-            print("END dump table")
+            logging.info("END dump table")
 
         else:
             self.load_table(load_table)
@@ -66,7 +67,7 @@ class Template5(TemplateBaseClass):
         start_time = time.time()
         for (e1,r) in self.unique_e1_r.keys():
             if ctr%250==0:
-                print("Processed %d in %f seconds"%(ctr,time.time()-start_time))
+                logging.info("Processed %d in %f seconds"%(ctr,time.time()-start_time))
                 start_time = time.time()
 
             subsample_size=self.subsample_proportion*self.unique_e1_r[(e1,r)]+self.subsample_constant
@@ -142,12 +143,13 @@ class Template5(TemplateBaseClass):
                 (head_entity_list, relation_list) = utils.delete_from_list(
                     self.dict_e2[e2],(triple[0],triple[1]))
 
-                e_sim_scores = self.base_model.get_entity_similarity_list(triple[0],head_entity_list)
-                r_sim_scores = self.base_model.get_relation_similarity_list(triple[1],relation_list)
-                sim_scores = e_sim_scores*r_sim_scores
-                idx = np.argmax(sim_scores)
-                score = sim_scores[idx]
-                best = (head_entity_list[idx],relation_list[idx])
+                if(len(head_entity_list)!=0):
+                    e_sim_scores = self.base_model.get_entity_similarity_list(triple[0],head_entity_list)
+                    r_sim_scores = self.base_model.get_relation_similarity_list(triple[1],relation_list)
+                    sim_scores = e_sim_scores*r_sim_scores
+                    idx = np.argmax(sim_scores)
+                    score = sim_scores[idx]
+                    best = (head_entity_list[idx],relation_list[idx])
         return (score,best)
 
 

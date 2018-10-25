@@ -72,16 +72,3 @@ class Map(dict):
     def __delitem__(self, key):
         super(Map, self).__delitem__(key)
         del self.__dict__[key]
-
-def delete_from_list(lis,val):
-    new_lis1=[]
-    new_lis2=[]
-    for elem in lis:
-        if(elem[0]==val[0]):
-            continue
-        if(elem[1]==val[1]):
-            continue
-        new_lis1.append(elem[0])
-        new_lis2.append(elem[1])
-    
-    return (new_lis1,new_lis2)
