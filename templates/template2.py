@@ -1,8 +1,10 @@
-from template import TemplateBaseClass
 import pickle
 from collections import Counter
+
 import numpy as np
-from sm import utils
+
+import utils
+from templates.template import TemplateBaseClass
 
 
 class Template2(TemplateBaseClass):

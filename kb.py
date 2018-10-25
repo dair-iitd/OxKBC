@@ -1,3 +1,4 @@
+import logging
 import pickle
 
 import numpy as np
@@ -52,8 +53,7 @@ class KnowledgeBase():
                                   l[1], len(self.relation_map)-1),
                               self.entity_map.get(l[2], len(self.entity_map)-1)])
         self.facts = np.array(facts, dtype='int64')
-        print("Loaded %d facts from file %s\n" %
-              (len(self.facts), facts_filename))
+        logging.info("Loaded {0} facts from file {1}\n".format(len(self.facts), facts_filename))
 
 
 def union(kb_list):
@@ -65,8 +65,7 @@ def union(kb_list):
     l = [k.facts for k in kb_list]
     k = KnowledgeBase(None, kb_list[0].entity_map, kb_list[0].relation_map)
     k.facts = np.concatenate(l, axis=0)
-    print("Created a union of %d kbs. Total facts in union = %d\n" %
-          (len(kb_list), len(k.facts)))
+    logging.info("Created a union of {0} kbs. Total facts in union = {1}\n".format(len(kb_list), len(k.facts)))
     return k
 
 
@@ -82,4 +81,5 @@ def dump_kb_mappings(kb, kb_name):
     dump_dict["relation_map"] = kb.relation_map
     with open(kb_name+".ids.pkl", "wb") as f:
         pickle.dump(dump_dict, f)
-    print("Dumped entity and relation maps to %s\n" % (kb_name))
+    logging.info("Dumped entity and relation maps to {0}\n".format(kb_name))
+    

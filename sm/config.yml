@@ -1,5 +1,7 @@
-hidden_unit_list: [10,20]
-rho: -0.01
+hidden_unit_list: [30,15]
+rho: 0.05
 mil_reward: 1
 pos_reward: 1
 neg_reward: -1
+class_imbalance: 20
+num_templates: 4

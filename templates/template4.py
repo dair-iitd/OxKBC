@@ -1,6 +1,10 @@
-from template import TemplateBaseClass
 import pickle
-from sm import utils
+
+import numpy as np
+
+import utils
+from templates.template import TemplateBaseClass
+
 
 class Template4(TemplateBaseClass):
     """
@@ -112,13 +116,14 @@ class Template4(TemplateBaseClass):
             if(key not in self.dict_r_e2):
                 score=0
             else:
-                for e1 in self.dict_r_e2[key]:
-                    if(e1==triple[0]):
-                        continue
-                    entity_simi=self.base_model.get_entity_similarity(e1,triple[0])
-                    if(score<entity_simi):
-                        score=entity_simi
-                        best=e1
+                ent_lis = list(
+                    filter(lambda x: x != triple[0], self.dict_r_e2[key]))
+                sim_scores = self.base_model.get_entity_similarity_list(
+                    triple[0], ent_lis)
+                idx = np.argmax(sim_scores)
+                score = sim_scores[idx]
+                best = ent_lis[idx]
+
         return (score,best)
 
     def get_input(self,fact):

@@ -1,11 +1,12 @@
+import logging
 import os
 import types
 
-import template1
-import template2
-import template3
-import template4
-import template5
+import templates.template1
+import templates.template2
+import templates.template3
+import templates.template4
+import templates.template5
 
 
 def build_template(template_id, kb, base_model, use_hard_scoring=True,
@@ -25,7 +26,7 @@ def build_template(template_id, kb, base_model, use_hard_scoring=True,
         template_id))(
             kb, base_model, use_hard_scoring,
             load_file,save_file)
-    print("Created Template of id %d\n" %(template_id))
+    logging.info("Created Template of id {0}".format(template_id))
     return obj
 
 
@@ -36,8 +37,11 @@ def build_templates(idlist, kb, base_model, use_hard_scoring=True,
     "load_dir/<template_id>.pkl" if load_dir is not None. If it is None, then
     dump_dir should be not None. Saves table to "dump_dir/<template_id>.pkl"
     """
-
-    assert isinstance(idlist, list), "Need a list"
+    try:
+        assert isinstance(idlist, list), "Need a list"
+    except AssertionError as err:
+        logging.exception("idlist should be a list")
+        raise err
 
     obj_list = [build_template(
         el, kb, base_model, use_hard_scoring, load_dir, dump_dir) for el in idlist]

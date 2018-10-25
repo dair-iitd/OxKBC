@@ -22,15 +22,20 @@ from collections import Counter
 import math
 
 
-cuda = settings.cuda
-
-
 def get_evaluation_function(args):
     return Loss(args) 
 
 class Loss(object):
     def __init__(self,args):
         self.args = args
+        self.criterion = nn.NLLLoss(weight = torch.Tensor([1.0,20.0]))
+
+        l = [args.mil_reward for i in range(args.output_size-1)]
+        l.append(args.rho)
+        self.weights = Variable(torch.Tensor(l).unsqueeze(0),requires_grad=False)
+        if settings.cuda:
+            self.criterion.cuda()
+            self.weights = self.weights.cuda()
         
     #var is a list of variables returned by dataloader.
     #Convention- var[0] - data
@@ -41,28 +46,30 @@ class Loss(object):
         # Pdb.set_trace()
         args = self.args
         x = var[0]
-        y = var[1].squeeze()
+        y = var[1].squeeze().long()
         template_score = model(x)
         #batch_size x (num_templates + 1)
         max_score,arg_max_score = torch.max(template_score,dim=1)
         # loss_tensor  = (y == 1).float()*(arg_max_score == template_score.size(1)-1).float()*max_score*args.rho + (y == 1).float()*(arg_max_score != template_score.size(1)-1).float()*max_score*args.mil_reward + (y == 0).float()*(arg_max_score != template_score.size(1)-1).float()*args.neg_reward + (y == 0).float()*(arg_max_score == template_score.size(1)-1).float()*args.pos_reward
-        loss_tensor  = (y == 1).float()*(arg_max_score == ((template_score.size(1)-1))).float()*max_score*args.rho + (y == 1).float()*(arg_max_score != (template_score.size(1)-1)).float()*max_score*args.mil_reward + (y == 0).float()*(arg_max_score != (template_score.size(1)-1)).float()*args.neg_reward + (y == 0).float()*(arg_max_score == (template_score.size(1)-1)).float()*args.pos_reward
+        #reward_tensor  = (y == 1).float()*(arg_max_score == ((template_score.size(1)-1))).float()*max_score*args.rho + (y == 1).float()*(arg_max_score != (template_score.size(1)-1)).float()*max_score*args.mil_reward + (y == 0).float()*(arg_max_score != (template_score.size(1)-1)).float()*args.neg_reward + (y == 0).float()*(arg_max_score == (template_score.size(1)-1)).float()*args.pos_reward
+        #template_score[:,-1] = template_score[:,-1]*args.rho
+        #rho = Variable(, )
+        #template_score = template_score*rho
+        template_score = template_score*self.weights
+        reward_tensor = args.class_imbalance*y.float()*torch.max(template_score,dim=1)[0] + (1.0-y.float())*( (template_score[:,-1]*args.pos_reward/args.rho) +  torch.max(template_score[:,:-1],dim=1)[0]*args.neg_reward/args.mil_reward)
 
         # print((template_score.size(1)-1))
-
-        loss = -1*loss_tensor.mean()
+        # loss = self.criterion(template_score,y)
+        loss = -1.0*reward_tensor.mean()
         # print(loss_tensor)
         # print(loss)
         # print("Loss is ------> ",loss)
         # exit(0)
-        if(math.isnan(loss)):
-            print(loss_tensor)
-            exit(0)
         return loss, arg_max_score, y  
 
 
 def compute(epoch, model, loader, optimizer, mode, fh, tolog, eval_fn, args):
-    global cuda
+    
     t1 = time.time()
     
     if mode == 'train':
@@ -88,13 +95,14 @@ def compute(epoch, model, loader, optimizer, mode, fh, tolog, eval_fn, args):
         var = list(var)
         idx = var[-1]
         count += len(idx)
+        # print('IDX: ',len(idx))
         volatile = True
         if mode == 'train':
             volatile = False
 
         for index in range(len(var)-1):
             var[index] = Variable(var[index], volatile = volatile)
-            if cuda:
+            if settings.cuda:
                 var[index] = var[index].cuda()
 
         loss, arg_max_score, y   = eval_fn(var, model, mode)
@@ -113,7 +121,7 @@ def compute(epoch, model, loader, optimizer, mode, fh, tolog, eval_fn, args):
 
 
         if (count - last_print) >= args.log_after:
-            print("Counts--> ", Counter(arg_max_score.data.numpy())) 
+            print("Counts--> ", Counter(arg_max_score.data.cpu().numpy())) 
             last_print = count 
             rec = [epoch, mode, 1.0 * cum_loss / cum_count, cum_count, len(loader.dataset), time.time() - t1]
             utils.log(','.join([str(round(x, 6)) if isinstance(

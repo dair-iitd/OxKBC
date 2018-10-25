@@ -62,7 +62,7 @@ def main(args):
 
     tfh = open(os.path.join(args.output_path, log_file), 'a')
     start_epoch = 0
-    best_score = -9999999
+    best_score = 9999999
     # Load checkpoint if present in input arguments TODO - be careful so as not to overwrite any checkpoints
     if args.checkpoint != '':
         utils.log('start from checkpoint: {}'.format(args.checkpoint))
@@ -132,10 +132,12 @@ if __name__ == '__main__':
     #model parameters
     parser.add_argument('--input_size', help='Input size', type=int, default=15)
     parser.add_argument('--output_size', help='output size', type=int, default=5)
-
-
     parser.add_argument('--num_epochs', help='epochs', type=int, default=100)
     parser.add_argument('--batch_size', help='batch size', type=int, default=256)
+    parser.add_argument('--mil', help='which model mil ?',
+                            action='store_true', default = False)
+    parser.add_argument('--each_input_size', help='input size of each template', type=int,default=4)
+    parser.add_argument('--num_templates', help='# templates', type=int,default=4)
 
     #optim params
     parser.add_argument('--optim', type=str, default = 'sgd')

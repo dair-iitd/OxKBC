@@ -12,6 +12,7 @@ import numpy as np
 import itertools
 
 def get_data_loaders(args):
+    print("batch size -->",args.batch_size)
     return DataLoader(SelectionModuleDataset(args.training_data_path),batch_size=args.batch_size,shuffle=True)
 
 
