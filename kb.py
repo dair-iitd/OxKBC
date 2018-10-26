@@ -52,7 +52,7 @@ class KnowledgeBase():
                               self.relation_map.get(
                                   l[1], len(self.relation_map)-1),
                               self.entity_map.get(l[2], len(self.entity_map)-1)])
-        self.facts = np.array(facts, dtype='int64')
+        self.facts = np.array(facts, dtype='int32')
         logging.info("Loaded {0} facts from file {1}".format(len(self.facts), facts_filename))
 
 

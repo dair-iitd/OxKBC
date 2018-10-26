@@ -4,4 +4,3 @@ mil_reward: 1
 pos_reward: 1
 neg_reward: -1
 class_imbalance: 20
-num_templates: 4

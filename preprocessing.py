@@ -46,7 +46,7 @@ def write_to_file(facts, fileprefix):
     with open(fileprefix+".pkl", "wb") as f:
         pickle.dump(facts, f)
     logging.info("Written data to {0}".format(fileprefix+".txt"))
-    np.savetxt(fileprefix+".txt", facts, delimiter=',')
+    np.savetxt(fileprefix+".txt", facts, delimiter=',',fmt='%.6e')
     logging.info("Written data to {0}".format(fileprefix+".pkl"))
 
 

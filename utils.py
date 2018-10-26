@@ -3,6 +3,7 @@ import argparse
 import math
 
 _LOG_LEVEL_STRINGS = ['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG']
+EPSILON=0.0000001
 
 def _log_level_string_to_int(log_level_string):
     if not log_level_string in _LOG_LEVEL_STRINGS:

@@ -143,3 +143,34 @@ class Template4(TemplateBaseClass):
                 features=[my_score,max_score,simi,rank]
 
         return features
+
+    def get_explanation(self, fact):
+        """
+        returns best entity for this fact, score,
+        best answer for (e1,r,?), best_score, best_entity for best answer,
+        zi_score
+        """
+        
+        key = (fact[0], fact[1])
+        features=[-1,-1,-1,-1,-1,-1]
+
+        if(key in self.table.keys()):
+            val_list = [x[0] for x in self.table[key].values()]
+
+            if (len(val_list) != 0):
+                my_score = self.table[key].get(fact[2], (0, -1))[0]
+                my_best = self.table[key].get(fact[2], (0, -1))[1]
+
+                index_max = np.argmax(val_list)
+                best_score = val_list[index_max]
+                best_answer=list(self.table[key].keys())[index_max]
+                best_answer_relation=self.table[key].get(best_answer, (0, -1))[1]
+
+                mean=np.mean(val_list)
+                std=np.std(val_list)
+
+                z_score=(my_score-mean)/(std+utils.EPSILON)
+
+                features = [my_score,my_best,best_score,best_answer,best_answer_relation,z_score]
+
+        return features

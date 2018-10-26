@@ -94,3 +94,4 @@ class Template1(TemplateBaseClass):
             rank = utils.get_rank(self.table[key].values(),my_score)
             features = [my_score,max_score,simi,rank]
         return features
+
