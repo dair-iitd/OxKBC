@@ -30,3 +30,6 @@ class TemplateBaseClass(ABC):
     @abstractmethod
     def get_input(self,fact):
         pass
+    @abstractmethod
+    def get_explanation(self, fact):
+        pass

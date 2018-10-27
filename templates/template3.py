@@ -6,6 +6,7 @@ import logging
 import utils
 from templates.template import TemplateBaseClass
 
+
 class Template3(TemplateBaseClass):
     """
     Template: r~r' ^ e1 r' e2
@@ -113,9 +114,11 @@ class Template3(TemplateBaseClass):
             if(key not in self.dict_e1_e2):
                 score = 0
             else:
-                rel_list = list(filter(lambda x:x!=triple[1],self.dict_e1_e2[key]))
-                if(len(rel_list)!=0):
-                    sim_scores=self.base_model.get_relation_similarity_list(triple[1],rel_list)
+                rel_list = list(
+                    filter(lambda x: x != triple[1], self.dict_e1_e2[key]))
+                if(len(rel_list) != 0):
+                    sim_scores = self.base_model.get_relation_similarity_list(
+                        triple[1], rel_list)
                     logging.debug(sim_scores)
                     idx = np.argmax(sim_scores)
                     score = sim_scores[idx]
@@ -139,15 +142,14 @@ class Template3(TemplateBaseClass):
                 features = [my_score, max_score, simi, rank]
         return features
 
-
     def get_explanation(self, fact):
-    	"""
-    	returns best relation for this fact, score,
-    	best answer for (e1,r,?), best_score, best_relation for best answer,
-    	zi_score
-    	"""
+        """
+        returns best relation for this fact, score,
+        best answer for (e1,r,?), best_score, best_relation for best answer,
+        zi_score
+        """
         key = (fact[0], fact[1])
-        features=[-1,-1,-1,-1,-1,-1]
+        features = [0, -1, 0, -1, -1, 0]
 
         if(key in self.table.keys()):
             val_list = [x[0] for x in self.table[key].values()]
@@ -158,14 +160,16 @@ class Template3(TemplateBaseClass):
 
                 index_max = np.argmax(val_list)
                 best_score = val_list[index_max]
-                best_answer=list(self.table[key].keys())[index_max]
-                best_answer_relation=self.table[key].get(best_answer, (0, -1))[1]
+                best_answer = list(self.table[key].keys())[index_max]
+                best_answer_relation = self.table[key].get(
+                    best_answer, (0, -1))[1]
 
-                mean=np.mean(val_list)
-                std=np.std(val_list)
+                mean = np.mean(val_list)
+                std = np.std(val_list)
 
-                z_score=(my_score-mean)/(std+utils.EPSILON)
+                z_score = (my_score-mean)/(std+utils.EPSILON)
 
-                features = [my_score,my_best,best_score,best_answer,best_answer_relation,z_score]
+                features = [my_score, my_best, best_score,
+                            best_answer, best_answer_relation, z_score]
 
         return features

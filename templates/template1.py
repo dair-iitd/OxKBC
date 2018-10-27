@@ -53,7 +53,7 @@ class Template1(TemplateBaseClass):
             score_dict = {}
             for u in range(nentities):
                 sc = self.compute_score((None, rel, u))
-                if(sc!=0):
+                if(sc != 0):
                     score_dict[u] = sc
             self.table[rel] = score_dict
 
@@ -82,16 +82,37 @@ class Template1(TemplateBaseClass):
         else:
             return self.relation_map[rel]["cts"].get(e2, 0) * 1.0 / self.relation_map[rel]["len"]
 
-    def get_input(self,fact):
+    def get_input(self, fact):
         key = fact[1]
-        features = [0,0,0,0]
+        features = [0, 0, 0, 0]
 
         if(key in self.table.keys()):
             index_max = np.argmax(self.table[key].values())
             max_score = list(self.table[key].values())[index_max]
-            my_score = self.table[key].get(fact[2],0)
-            simi = self.base_model.get_entity_similarity(fact[2],index_max)
-            rank = utils.get_rank(self.table[key].values(),my_score)
-            features = [my_score,max_score,simi,rank]
+            my_score = self.table[key].get(fact[2], 0)
+            simi = self.base_model.get_entity_similarity(fact[2], index_max)
+            rank = utils.get_rank(self.table[key].values(), my_score)
+            features = [my_score, max_score, simi, rank]
         return features
 
+    def get_explanation(self, fact):
+        """
+        returns score,
+        best answer for (e1,r,?), best_score,
+        zi_score
+        """
+        key = fact[1]
+        features = [0, -1, 0, 0]
+        if(key in self.table):
+            val_list = list(self.table[key].values())
+            if (len(val_list) != 0):
+                my_score = self.table[key].get(fact[2], 0)
+                index_max = np.argmax(val_list)
+                best_score = val_list[index_max]
+                best_answer = list(self.table[key].keys())[index_max]
+                mean = np.mean(val_list)
+                std = np.std(val_list)
+                z_score = (my_score-mean)/(std+utils.EPSILON)
+                features = [my_score, best_score,
+                            best_answer, z_score]
+        return features
