@@ -186,13 +186,14 @@ class Template5(TemplateBaseClass):
             val_list = [x[0] for x in self.table[key].values()]
 
             if (len(val_list) != 0):
-                my_score = self.table[key].get(fact[2], (0, (-1, -1)))[0]
-                my_best = self.table[key].get(fact[2], (0, (-1, -1)))[1]
+                # my_score = self.table[key].get(fact[2], (0, (-1, -1)))[0]
+                # my_best = self.table[key].get(fact[2], (0, (-1, -1)))[1]
+                (my_score,my_best)=self.compute_score(fact)
 
                 index_max = np.argmax(val_list)
                 best_score = val_list[index_max]
                 best_answer = list(self.table[key].keys())[index_max]
-                best_answer_relation = self.table[key].get(
+                best_answer_entity_relation = self.table[key].get(
                     best_answer, (0, (-1, -1)))[1]
 
                 mean = np.mean(val_list)
@@ -201,6 +202,6 @@ class Template5(TemplateBaseClass):
                 z_score = (my_score-mean)/(std+utils.EPSILON)
 
                 features = [my_score, my_best, best_score,
-                            best_answer, best_answer_relation, z_score]
+                            best_answer, best_answer_entity_relation, z_score]
 
         return features
