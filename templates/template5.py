@@ -14,9 +14,11 @@ class Template5(TemplateBaseClass):
     Template: e1~e' ^ r~r' ^ e'r'e2
     """
 
-    def __init__(self, kb, base_model, use_hard_triple_scoring=True, load_table=None, dump_file=None):
+    def __init__(self, kblist, base_model, use_hard_triple_scoring=True, load_table=None, dump_file=None):
         super().__init__()
-        self.kb = kb
+        self.kb = kblist[0]
+        self.kb_val = kblist[1]
+        self.kb_test = kblist[2]
         self.base_model = base_model
         self.use_hard_triple_scoring = use_hard_triple_scoring
         self.subsample_constant = 100
@@ -54,6 +56,18 @@ class Template5(TemplateBaseClass):
                 self.unique_e1_r[(facts[0], facts[1])] = 0
             self.unique_e1_r[(facts[0], facts[1])] += 1
 
+        for facts in self.kb_val.facts:
+            if((facts[0], facts[1]) not in self.unique_e1_r):
+                self.unique_e1_r[(facts[0], facts[1])] = 0
+            self.unique_e1_r[(facts[0], facts[1])] += 1
+
+
+        for facts in self.kb_test.facts:
+            if((facts[0], facts[1]) not in self.unique_e1_r):
+                self.unique_e1_r[(facts[0], facts[1])] = 0
+            self.unique_e1_r[(facts[0], facts[1])] += 1
+
+
     def build_table(self):
         """
         a table for each unique (e1,r): value for key is occurences of e2 in data
@@ -61,8 +75,8 @@ class Template5(TemplateBaseClass):
         """
         entities = len(self.kb.entity_map)
         self.table = {}
+        self.stat_table = {}
         ctr = 0
-
         start_time = time.time()
         for (e1, r) in self.unique_e1_r.keys():
             if ctr % 250 == 0:
@@ -88,6 +102,16 @@ class Template5(TemplateBaseClass):
                     score_dict[u] = (sc, be)
                     subsample_size -= 1
             self.table[(e1, r)] = score_dict
+            val_list = [x[0] for x in self.table[(e1, r)].values()]
+            mean = np.mean(val_list)
+            std = np.std(val_list)
+            max_score = max(val_list)
+            index_max = val_list.index(max_score)
+            simi_index = list(self.table[(e1, r)].keys())[index_max]
+            stat = {mean: mean, std: std, max_score: max_score,
+                    index_max: index_max, simi_index: simi_index}
+            self.stat_table[(e1, r)] = stat
+
             ctr += 1
 
     def dump_data(self, filename):
@@ -157,18 +181,21 @@ class Template5(TemplateBaseClass):
 
     def get_input(self, fact):
         key = (fact[0], fact[1])
-        features = [0, 0, 0, 0]
+        features = [0, 0, 0, 0, 0, 0, 0]
 
         if(key in self.table.keys()):
             val_list = [x[0] for x in self.table[key].values()]
             if (len(val_list) != 0):
-                max_score = max(val_list)
+                max_score = self.stat_table[key]['max_score']
                 my_score = self.compute_score(fact)[0]
-                index_max = val_list.index(max_score)
                 simi = self.base_model.get_entity_similarity(
-                    fact[2], list(self.table[key].keys())[index_max])
+                    fact[2], self.stat_table[key]['simi_index'])
                 rank = utils.get_rank(val_list, my_score)
-                features = [my_score, max_score, simi, rank]
+                conditional_rank = rank*1.0/len(val_list)
+                mean = self.stat_table[key]['mean']
+                std = self.stat_table[key]['std']
+                features = [my_score, max_score, simi,
+                            rank, conditional_rank, mean, std]
 
         return features
 
@@ -180,7 +207,7 @@ class Template5(TemplateBaseClass):
         """
 
         key = (fact[0], fact[1])
-        features = [0, (-1,-1), 0, -1, (-1,-1), 0]
+        features = [0, (-1, -1), 0, -1, (-1, -1), 0]
 
         if(key in self.table.keys()):
             val_list = [x[0] for x in self.table[key].values()]
@@ -188,7 +215,7 @@ class Template5(TemplateBaseClass):
             if (len(val_list) != 0):
                 # my_score = self.table[key].get(fact[2], (0, (-1, -1)))[0]
                 # my_best = self.table[key].get(fact[2], (0, (-1, -1)))[1]
-                (my_score,my_best)=self.compute_score(fact)
+                (my_score, my_best) = self.compute_score(fact)
 
                 index_max = np.argmax(val_list)
                 best_score = val_list[index_max]

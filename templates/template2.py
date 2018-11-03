@@ -1,7 +1,8 @@
 import pickle
 from collections import Counter
-
+import logging
 import numpy as np
+import time
 
 import utils
 from templates.template import TemplateBaseClass
@@ -12,9 +13,9 @@ class Template2(TemplateBaseClass):
     Template: Most frequent for this head entity
     """
 
-    def __init__(self, kb, base_model, use_hard_triple_scoring=True, load_table=None, dump_file=None):
+    def __init__(self, kblist, base_model, use_hard_triple_scoring=True, load_table=None, dump_file=None):
         super().__init__()
-        self.kb = kb
+        self.kb = kblist[0]
         self.base_model = base_model
         self.use_hard_triple_scoring = True
 
@@ -46,19 +47,37 @@ class Template2(TemplateBaseClass):
     def build_table(self):
         nentities = len(self.kb.entity_map)
         self.table = {}
-
+        self.stat_table = {}
+        start_time = time.time()
+        ctr = 0
         for e1 in self.entity_map:
+            if ctr % 250 == 0:
+                logging.info("Processed %d in %f seconds" %
+                             (ctr, time.time()-start_time))
+                start_time = time.time()
             score_dict = {}
             for u in range(nentities):
                 sc = self.compute_score((e1, None, u))
                 if(sc != 0):
                     score_dict[u] = sc
-            self.table[e1] = score_dict
+            if(len(score_dict.keys()) > 0):
+                self.table[e1] = score_dict
+                val_list = [x for x in score_dict.values()]
+                mean = np.mean(val_list)
+                std = np.std(val_list)
+                max_score = max(val_list)
+                index_max = val_list.index(max_score)
+                simi_index = list(score_dict.keys())[index_max]
+                stat = {"mean": mean, "std": std, "max_score": max_score,
+                        "index_max": index_max, "simi_index": simi_index}
+                self.stat_table[e1] = stat
+            ctr += 1
 
     def dump_data(self, filename):
         dump_dict = {}
         dump_dict['entity_map'] = self.entity_map
         dump_dict['table'] = self.table
+        dump_dict['stat_table'] = self.stat_table
         with open(filename, 'wb') as outfile:
             pickle.dump(dump_dict, outfile)
 
@@ -67,6 +86,7 @@ class Template2(TemplateBaseClass):
             dump_dict = pickle.load(f)
         self.entity_map = dump_dict['entity_map']
         self.table = dump_dict['table']
+        self.stat_table = dump_dict['stat_table']
 
     def compute_score(self, triple):
         '''
@@ -82,15 +102,19 @@ class Template2(TemplateBaseClass):
 
     def get_input(self, fact):
         key = fact[0]
-        features = [0, 0, 0, 0]
+        features = [0, 0, 0, 0, 0,0,0]
 
         if(key in self.table.keys()):
-            index_max = np.argmax(self.table[key].values())
-            max_score = list(self.table[key].values())[index_max]
+            max_score = self.stat_table[key]['max_score']
             my_score = self.table[key].get(fact[2], 0)
-            simi = self.base_model.get_entity_similarity(fact[2], index_max)
+            simi = self.base_model.get_entity_similarity(
+                fact[2], self.stat_table[key]['simi_index'])
             rank = utils.get_rank(self.table[key].values(), my_score)
-            features = [my_score, max_score, simi, rank]
+            conditional_rank = rank*1.0/len(self.table[key].values())
+            mean = self.stat_table[key]['mean']
+            std = self.stat_table[key]['std']
+            features = [my_score, max_score, simi,
+                        rank, conditional_rank, mean, std]
         return features
 
     def get_explanation(self, fact):

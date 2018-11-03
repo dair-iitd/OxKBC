@@ -76,7 +76,7 @@ class SelectionModuleMIL(nn.Module):
 
         others_score = self.mlp(self.others_template_parameters)
         template_scores = torch.cat(ts ,dim=1)
-        template_scores = torch.cat((template_scores, others_score.expand(template_scores.size(0),1)), dim=1)
+        template_scores = torch.cat((others_score.expand(template_scores.size(0),1), template_scores), dim=1)
         # print(x)
         # exit(0)
         #x = self.mlp(x)

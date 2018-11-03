@@ -9,7 +9,7 @@ import templates.template4
 import templates.template5
 
 
-def build_template(template_id, kb, base_model, use_hard_scoring=True,
+def build_template(template_id, kblist, base_model, use_hard_scoring=True,
                    load_dir=None, dump_dir=None):
     """
     Builds a template object of a given id. Loads from
@@ -25,13 +25,13 @@ def build_template(template_id, kb, base_model, use_hard_scoring=True,
         dump_dir, str(template_id)+".pkl")
 
     obj = getattr(getattr(globals()['templates'], 'template'+str(template_id)), 'Template'+str(template_id))(
-        kb, base_model, use_hard_scoring,
+        kblist, base_model, use_hard_scoring,
         load_file, save_file)
     logging.info("Created Template of id {0}".format(template_id))
     return obj
 
 
-def build_templates(idlist, kb, base_model, use_hard_scoring=True,
+def build_templates(idlist, kblist, base_model, use_hard_scoring=True,
                     load_dir=None, dump_dir=None):
     """
     Builds a template object of a given idlist. Loads from
@@ -39,12 +39,13 @@ def build_templates(idlist, kb, base_model, use_hard_scoring=True,
     dump_dir should be not None. Saves table to "dump_dir/<template_id>.pkl"
     """
     try:
-        assert isinstance(idlist, list), "Need a list"
+        assert isinstance(idlist, list), "Need a list for tids"
+        assert isinstance(kblist, list), "Need a list for kbs"
     except AssertionError as err:
         logging.exception("idlist should be a list")
+        logging.exception("kblist should be a list")
         raise err
 
     obj_list = [build_template(
-        el, kb, base_model, use_hard_scoring, load_dir, dump_dir) for el in idlist]
-
+        el, kblist, base_model, use_hard_scoring, load_dir, dump_dir) for el in idlist]
     return obj_list

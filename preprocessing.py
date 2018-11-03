@@ -19,7 +19,7 @@ def get_input(fact, y, template_obj_list):
     return x
 
 
-def preprocess(kb, template_obj_list, negative_count=10):
+def preprocess(kb, template_obj_list, negative_count=1):
 
     new_facts = []
     ctr = 0
@@ -67,6 +67,8 @@ if __name__ == "__main__":
                         help='List of templates to run for')
     parser.add_argument('--data_repo_root',
                         required=False, default='data')
+     parser.add_argument('--negative_count',
+                        required=False, type=int,default=2)
     parser.add_argument('--log_level',
                         default='INFO',
                         dest='log_level',
@@ -82,6 +84,6 @@ if __name__ == "__main__":
     kvalid, template_objs = template_builder.template_obj_builder(dataset_root, args.model_weights, args.template_load_dir,
                                                                   None, args.model_type, args.t_ids, args.oov_entity)
 
-    new_facts = preprocess(kvalid, template_objs)
+    new_facts = preprocess(kvalid, template_objs, args.negative_count)
 
     write_to_file(new_facts, args.sm_data_write)

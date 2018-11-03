@@ -23,7 +23,7 @@ def complete_paths(config):
     #
 
 def main(args):
-    train_loader = dataset.get_data_loaders(args)
+    train_loader, val_loader = dataset.get_data_loaders(args)
     model = models.select_model(args)
     my_eval_fn = compute.get_evaluation_function(args)
 
@@ -38,6 +38,7 @@ def main(args):
     #                                                                'threshold_mode': args.threshold_mode, 'cooldown': args.cooldown, 'min_lr': args.min_lr, 'eps': args.eps}, maxPatienceToStopTraining=args.max_patience)
 
     exp_name = args.exp_name
+    exp_name = '{}_r{}_p{}_n{}_i{}'.format(exp_name,args.rho, args.pos_reward, args.neg_reward, args.class_imbalance)
     if args.debug:
         exp_name = 'd'+args.exp_name
 
@@ -86,14 +87,21 @@ def main(args):
     
     lr = utils.get_learning_rate(optimizer)
     
+    #Pdb().set_trace()
+    if val_loader is not None:
+        compute.compute(-1, model, val_loader, optimizer, 'eval', tfh, [lr, exp_name], eval_fn=my_eval_fn, args=args)
+
+    
+    exit(0)
+    #Pdb().set_trace()
     for epoch in range(start_epoch, num_epochs):
         lr = utils.get_learning_rate(optimizer)
         # Pdb().set_trace()
         rec, i = compute.compute(epoch, model, train_loader, optimizer, 'train', tfh, [lr, exp_name], eval_fn=my_eval_fn, args=args)
 
-        
-        #rec, i = compute.compute(epoch, model, val_loader, None, 'eval', tfh,
-        #                          [lr, exp_name], eval_fn=my_eval_fn, args=args)
+        if val_loader is not None:
+            rec, i = compute.compute(epoch, model, val_loader, None, 'eval', tfh,
+                                  [lr, exp_name], eval_fn=my_eval_fn, args=args)
 
         is_best = False
         utils.log('best score: {}, this score: {}'.format(best_score, rec[i]))
@@ -122,6 +130,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--training_data_path',type=str,help="Data Path")
+    parser.add_argument('--val_data_path',type=str,help="Data Path",default='')
     parser.add_argument('--exp_name', help='exp name',
                         type=str, default='unary')
     parser.add_argument('--output_path', type=str)

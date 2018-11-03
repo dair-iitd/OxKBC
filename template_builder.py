@@ -29,10 +29,9 @@ def template_obj_builder(dataset_root, model_weight_file, template_load_dir, tem
         logging.error(message)
         raise argparse.ArgumentTypeError(message)
 
-    templates_obj = builder.build_templates(templates_idlist, ktrain, base_model,
+    templates_obj = builder.build_templates(templates_idlist, [ktrain,kvalid,ktest], base_model,
                                             use_hard_scoring, template_load_dir, template_save_dir)
-
-    return (kvalid,templates_obj)
+    return templates_obj
 
 
 if __name__ == "__main__":

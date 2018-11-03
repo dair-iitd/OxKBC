@@ -1,7 +1,7 @@
 import pickle
 
 import numpy as np
-
+import time
 import utils
 import logging
 from templates.template import TemplateBaseClass
@@ -12,9 +12,11 @@ class Template4(TemplateBaseClass):
     Template: e1~e' ^ e'r e2
     """
 
-    def __init__(self, kb, base_model, use_hard_triple_scoring=True, load_table=None, dump_file=None):
+    def __init__(self, kblist, base_model, use_hard_triple_scoring=True, load_table=None, dump_file=None):
         super().__init__()
-        self.kb = kb
+        self.kb = kblist[0]
+        self.kb_val = kblist[1]
+        self.kb_test = kblist[2]
         self.base_model = base_model
         self.use_hard_triple_scoring = use_hard_triple_scoring
 
@@ -44,8 +46,16 @@ class Template4(TemplateBaseClass):
             key = (facts[1], facts[2])
             if(key not in self.dict_r_e2):
                 self.dict_r_e2[key] = []
-            self.dict_r_e2[key].append(facts[1])
+            self.dict_r_e2[key].append(facts[0])
 
+            if((facts[0], facts[1]) not in self.unique_e1_r):
+                self.unique_e1_r[(facts[0], facts[1])] = len(self.unique_e1_r)
+
+        for facts in self.kb_val.facts:
+            if((facts[0], facts[1]) not in self.unique_e1_r):
+                self.unique_e1_r[(facts[0], facts[1])] = len(self.unique_e1_r)
+
+        for facts in self.kb_test.facts:
             if((facts[0], facts[1]) not in self.unique_e1_r):
                 self.unique_e1_r[(facts[0], facts[1])] = len(self.unique_e1_r)
 
@@ -55,10 +65,16 @@ class Template4(TemplateBaseClass):
         """
         entities = len(self.kb.entity_map)
         self.table = {}
+        self.stat_table = {}
+
         ctr = 0
+        start_time = time.time()
+
         for (e1, r) in self.unique_e1_r.keys():
             if ctr % 250 == 0:
-                logging.info("Processed %d" % (ctr))
+                logging.info("Processed %d in %f seconds" %
+                             (ctr, time.time()-start_time))
+                start_time = time.time()
             score_dict = {}
             for u in range(entities):
                 sc, be = self.compute_score((e1, r, u))
@@ -66,6 +82,15 @@ class Template4(TemplateBaseClass):
                     score_dict[u] = (sc, be)
             if(len(score_dict.keys()) > 0):
                 self.table[(e1, r)] = score_dict
+                val_list = [x[0] for x in self.table[(e1, r)].values()]
+                mean = np.mean(val_list)
+                std = np.std(val_list)
+                max_score = max(val_list)
+                index_max = val_list.index(max_score)
+                simi_index = list(self.table[(e1, r)].keys())[index_max]
+                stat = {mean: mean, std: std, max_score: max_score,
+                        index_max: index_max, simi_index: simi_index}
+                self.stat_table[(e1, r)] = stat
             ctr += 1
 
     def dump_data(self, filename):
@@ -73,6 +98,7 @@ class Template4(TemplateBaseClass):
         dump_dict['dict_r_e2'] = self.dict_r_e2
         dump_dict['unique_e1_r'] = self.unique_e1_r
         dump_dict['table'] = self.table
+        dump_dict['stat_table'] = self.stat_table
 
         with open(filename, 'wb') as inputfile:
             pickle.dump(dump_dict, inputfile)
@@ -83,6 +109,7 @@ class Template4(TemplateBaseClass):
         self.dict_r_e2 = dump_dict['dict_r_e2']
         self.unique_e1_r = dump_dict['unique_e1_r']
         self.table = dump_dict['table']
+        self.stat_table = dump_dict['stat_table']
 
     def compute_score(self, triple):
         '''
@@ -128,18 +155,21 @@ class Template4(TemplateBaseClass):
 
     def get_input(self, fact):
         key = (fact[0], fact[1])
-        features = [0, 0, 0, 0]
+        features = [0, 0, 0, 0, 0, 0, 0]
 
         if(key in self.table.keys()):
             val_list = [x[0] for x in self.table[key].values()]
             if (len(val_list) != 0):
-                max_score = max(val_list)
+                max_score = self.stat_table[key]['max_score']
                 my_score = self.table[key].get(fact[2], (0, -1))[0]
-                index_max = val_list.index(max_score)
                 simi = self.base_model.get_entity_similarity(
-                    fact[2], list(self.table[key].keys())[index_max])
+                    fact[2], self.stat_table[key]['simi_index'])
                 rank = utils.get_rank(val_list, my_score)
-                features = [my_score, max_score, simi, rank]
+                conditional_rank = rank*1.0/len(val_list)
+                mean = self.stat_table[key]['mean']
+                std = self.stat_table[key]['std']
+                features = [my_score, max_score, simi,
+                            rank, conditional_rank, mean, std]
 
         return features
 
