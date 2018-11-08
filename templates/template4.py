@@ -88,8 +88,8 @@ class Template4(TemplateBaseClass):
                 max_score = max(val_list)
                 index_max = val_list.index(max_score)
                 simi_index = list(self.table[(e1, r)].keys())[index_max]
-                stat = {mean: mean, std: std, max_score: max_score,
-                        index_max: index_max, simi_index: simi_index}
+                stat = {'mean': mean, 'std': std, 'max_score': max_score,
+                        'index_max': index_max,'simi_index': simi_index}
                 self.stat_table[(e1, r)] = stat
             ctr += 1
 

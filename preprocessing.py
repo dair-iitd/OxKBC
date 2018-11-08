@@ -67,7 +67,7 @@ if __name__ == "__main__":
                         help='List of templates to run for')
     parser.add_argument('--data_repo_root',
                         required=False, default='data')
-     parser.add_argument('--negative_count',
+    parser.add_argument('--negative_count',
                         required=False, type=int,default=2)
     parser.add_argument('--log_level',
                         default='INFO',
@@ -81,9 +81,9 @@ if __name__ == "__main__":
                         level=args.log_level, datefmt='%d/%m/%Y %I:%M:%S %p')
 
     dataset_root = os.path.join(args.data_repo_root, args.dataset)
-    kvalid, template_objs = template_builder.template_obj_builder(dataset_root, args.model_weights, args.template_load_dir,
+    template_objs = template_builder.template_obj_builder(dataset_root, args.model_weights, args.template_load_dir,
                                                                   None, args.model_type, args.t_ids, args.oov_entity)
-
-    new_facts = preprocess(kvalid, template_objs, args.negative_count)
+    kbtrain = template_objs[0].kb
+    new_facts = preprocess(kbtrain, template_objs, args.negative_count)
 
     write_to_file(new_facts, args.sm_data_write)
