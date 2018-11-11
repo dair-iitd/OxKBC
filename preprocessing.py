@@ -11,15 +11,18 @@ import template_builder
 import utils
 
 
-def get_input(fact, y, template_obj_list):
-    x = []
+def get_input(fact, y, template_obj_list,add_ids):
+    if (add_ids):
+        x = [fact[0],fact[1],fact[2]]
+    else:
+        x = []
     for template in template_obj_list:
         x.extend(template.get_input(fact))
     x.append(y)
     return x
 
 
-def preprocess(kb, template_obj_list, negative_count=1):
+def preprocess(kb, template_obj_list, negative_count,add_ids):
 
     new_facts = []
     ctr = 0
@@ -31,13 +34,13 @@ def preprocess(kb, template_obj_list, negative_count=1):
         ns = np.random.randint(0, len(kb.entity_map), negative_count)
         no = np.random.randint(0, len(kb.entity_map), negative_count)
 
-        new_facts.append(get_input(facts, 1, template_obj_list))
+        new_facts.append(get_input(facts, 1, template_obj_list,add_ids))
 
         for neg_facts in range(negative_count):
             new_fact = (ns[neg_facts], facts[1], facts[2])
-            new_facts.append(get_input(new_fact, 0, template_obj_list))
+            new_facts.append(get_input(new_fact, 0, template_obj_list,add_ids))
             new_fact = (facts[0], facts[1], no[neg_facts])
-            new_facts.append(get_input(new_fact, 0, template_obj_list))
+            new_facts.append(get_input(new_fact, 0, template_obj_list,add_ids))
 
     return np.array(new_facts)
 
@@ -65,6 +68,8 @@ if __name__ == "__main__":
     parser.add_argument('-v', '--oov_entity', required=False, default=True)
     parser.add_argument('--t_ids', nargs='+', type=int, required=True,
                         help='List of templates to run for')
+    parser.add_argument('--add_ids', action='store_true', required=False,
+                        help='Use the flag to add entity and relation ids to the start of row')
     parser.add_argument('--data_repo_root',
                         required=False, default='data')
     parser.add_argument('--negative_count',
@@ -84,6 +89,6 @@ if __name__ == "__main__":
     template_objs = template_builder.template_obj_builder(dataset_root, args.model_weights, args.template_load_dir,
                                                                   None, args.model_type, args.t_ids, args.oov_entity)
     kbtrain = template_objs[0].kb
-    new_facts = preprocess(kbtrain, template_objs, args.negative_count)
+    new_facts = preprocess(kbtrain, template_objs, args.negative_count, args.add_ids)
 
     write_to_file(new_facts, args.sm_data_write)

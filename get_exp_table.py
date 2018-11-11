@@ -145,7 +145,8 @@ def generate_exp(data, template_obj_list, entity_id_inverse_map, relation_id_inv
             exp_list.append(temp_list)
             ctr += 1
         exp_df = convert_to_pandas(exp_list, header)
-        word_exps[t_type] = exp_df[exp_df.duplicated(['e1','r','e2'])==False]
+        word_exps[t_type] = exp_df[exp_df.duplicated(
+            ['e1', 'r', 'e2']) == False]
 
     return word_exps
 
@@ -155,7 +156,8 @@ def write_word_exps(word_exps, output_root_path):
         word_exps[t_id].to_csv(os.path.join(output_root_path, str(
             t_id)+".txt"), encoding='utf-8', index=False, sep='\t')
     if(len(word_exps.keys()) > 1):
-        result = reduce(lambda left,right: pd.merge(left,right,how='inner',left_on=['e1','r','e2'],right_on=['e1','r','e2']), word_exps.values())
+        result = reduce(lambda left, right: pd.merge(left, right, how='inner', left_on=[
+                        'e1', 'r', 'e2'], right_on=['e1', 'r', 'e2']), word_exps.values())
         result.to_csv(os.path.join(output_root_path, "merged.txt"),
                       encoding='utf-8', index=False, sep='\t')
 
@@ -173,7 +175,8 @@ if __name__ == "__main__":
                         required=True, default=None)
     parser.add_argument('-tf', '--test_file',
                         required=True, default=None)
-    parser.add_argument('--txt', action='store_true', required=False)
+    parser.add_argument('--txt', action='store_true', required=False,
+                        help='Use the flag if the data is not mapped with ids.')
     parser.add_argument('--t_ids', nargs='+', type=int, required=True,
                         help='List of templates to build objects for')
     parser.add_argument('--data_repo_root',
@@ -210,9 +213,11 @@ if __name__ == "__main__":
     entity_inverse_map = get_inverse_dict(distmult_dump['entity_to_id'])
     relation_inverse_map = get_inverse_dict(distmult_dump['relation_to_id'])
 
-    template_objs = template_builder.template_obj_builder(data_root, args.model_weights, args.template_load_dir, None, "distmult", args.t_ids, True)
+    template_objs = template_builder.template_obj_builder(
+        data_root, args.model_weights, args.template_load_dir, None, "distmult", args.t_ids, True)
 
-    word_exps = generate_exp(mapped_data, template_objs,entity_inverse_map, relation_inverse_map, entity_names)
+    word_exps = generate_exp(mapped_data, template_objs,
+                             entity_inverse_map, relation_inverse_map, entity_names)
 
     logging.info("Generated explanations")
     write_word_exps(word_exps, args.output_data_dir)

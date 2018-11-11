@@ -92,7 +92,6 @@ def main(args):
         compute.compute(-1, model, val_loader, optimizer, 'eval', tfh, [lr, exp_name], eval_fn=my_eval_fn, args=args)
 
     
-    exit(0)
     #Pdb().set_trace()
     for epoch in range(start_epoch, num_epochs):
         lr = utils.get_learning_rate(optimizer)
@@ -130,6 +129,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--training_data_path',type=str,help="Data Path")
+    parser.add_argument('--base_model_file',type=str,help="Base model dump",default='')
     parser.add_argument('--val_data_path',type=str,help="Data Path",default='')
     parser.add_argument('--exp_name', help='exp name',
                         type=str, default='unary')
@@ -140,6 +140,8 @@ if __name__ == '__main__':
 
     #model parameters
     parser.add_argument('--input_size', help='Input size', type=int, default=15)
+    parser.add_argument('--embed_size', help='Total Embedd size', type=int, default=0)
+
     parser.add_argument('--output_size', help='output size', type=int, default=5)
     parser.add_argument('--num_epochs', help='epochs', type=int, default=100)
     parser.add_argument('--batch_size', help='batch size', type=int, default=256)

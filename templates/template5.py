@@ -119,7 +119,7 @@ class Template5(TemplateBaseClass):
         dump_dict['dict_e2'] = self.dict_e2
         dump_dict['unique_e1_r'] = self.unique_e1_r
         dump_dict['table'] = self.table
-
+        dump_dict['stat_table'] = self.stat_table
         with open(filename, 'wb') as inputfile:
             pickle.dump(dump_dict, inputfile)
 
@@ -129,6 +129,7 @@ class Template5(TemplateBaseClass):
         self.dict_e2 = dump_dict['dict_e2']
         self.unique_e1_r = dump_dict['unique_e1_r']
         self.table = dump_dict['table']
+        self.stat_table = dump_dict['stat_table'] 
 
     def compute_score(self, triple):
         '''

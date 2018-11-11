@@ -61,7 +61,7 @@ class Loss(object):
         #rho = Variable(, )
         #template_score = template_score*rho
         loss = 0 
-        if mode != 'train':
+        if mode == 'train':
             template_score = template_score*self.weights
             reward_tensor = args.class_imbalance*y.float()*torch.max(template_score,dim=1)[0] + (1.0-y.float())*( (template_score[:,0]*args.pos_reward/args.rho) +  torch.max(template_score[:,1:],dim=1)[0]*args.neg_reward/args.mil_reward)
             loss = -1.0*reward_tensor.mean()
@@ -144,8 +144,9 @@ def compute(epoch, model, loader, optimizer, mode, fh, tolog, eval_fn, args):
 
 
         if (count - last_print) >= args.log_after:
-            print("Counts--> ", Counter(arg_max_score.data.cpu().numpy())) 
-
+            str_ct = str(Counter(arg_max_score.data.cpu().numpy()))
+            utils.log("Counts--> " + str_ct )
+            print("Counts--> " + str_ct )
             last_print = count 
             rec = [epoch, mode, 1.0 * cum_loss / cum_count, cum_count, len(loader.dataset), time.time() - t1]
             utils.log(','.join([str(round(x, 6)) if isinstance(
@@ -160,7 +161,7 @@ def compute(epoch, model, loader, optimizer, mode, fh, tolog, eval_fn, args):
         rec.extend(metric)
         metric_header = eval_fn.header 
     
-    utils.log('epoch,mode,loss,count,count1,time,'+tlh+','+metric_header)
+    utils.log('epoch,mode,loss,count,count1,time,'+tlh+','+' '.join(metric_header))
     utils.log(','.join([str(round(x, 6)) if isinstance(
         x, float) else str(x) for x in rec]), file=fh)
 

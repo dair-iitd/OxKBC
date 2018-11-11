@@ -19,6 +19,8 @@ class Template4(TemplateBaseClass):
         self.kb_test = kblist[2]
         self.base_model = base_model
         self.use_hard_triple_scoring = use_hard_triple_scoring
+        self.subsample_constant = 100
+        self.subsample_proportion = 10
 
         if(load_table == None):
             logging.info("Load table is None, so beginning process_data")
@@ -49,15 +51,20 @@ class Template4(TemplateBaseClass):
             self.dict_r_e2[key].append(facts[0])
 
             if((facts[0], facts[1]) not in self.unique_e1_r):
-                self.unique_e1_r[(facts[0], facts[1])] = len(self.unique_e1_r)
+                self.unique_e1_r[(facts[0], facts[1])] = 0
+            self.unique_e1_r[(facts[0], facts[1])]+= 1
+            
 
         for facts in self.kb_val.facts:
             if((facts[0], facts[1]) not in self.unique_e1_r):
-                self.unique_e1_r[(facts[0], facts[1])] = len(self.unique_e1_r)
+                self.unique_e1_r[(facts[0], facts[1])] = 0
+            self.unique_e1_r[(facts[0], facts[1])]+= 1
 
         for facts in self.kb_test.facts:
             if((facts[0], facts[1]) not in self.unique_e1_r):
-                self.unique_e1_r[(facts[0], facts[1])] = len(self.unique_e1_r)
+                self.unique_e1_r[(facts[0], facts[1])] = 0
+            self.unique_e1_r[(facts[0], facts[1])]+= 1
+
 
     def build_table(self):
         """
@@ -69,14 +76,22 @@ class Template4(TemplateBaseClass):
 
         ctr = 0
         start_time = time.time()
+        random_val=np.arange(entities)
+
 
         for (e1, r) in self.unique_e1_r.keys():
+            np.random.shuffle(random_val)
+            subsample_size = self.subsample_proportion * \
+                self.unique_e1_r[(e1, r)]+self.subsample_constant
+
             if ctr % 250 == 0:
                 logging.info("Processed %d in %f seconds" %
                              (ctr, time.time()-start_time))
                 start_time = time.time()
             score_dict = {}
-            for u in range(entities):
+            subsample_size=min(subsample_size,entities)
+            for ii in range(subsample_size):
+                u=random_val[ii]
                 sc, be = self.compute_score((e1, r, u))
                 if(sc != 0):
                     score_dict[u] = (sc, be)
@@ -161,7 +176,7 @@ class Template4(TemplateBaseClass):
             val_list = [x[0] for x in self.table[key].values()]
             if (len(val_list) != 0):
                 max_score = self.stat_table[key]['max_score']
-                my_score = self.table[key].get(fact[2], (0, -1))[0]
+                my_score = self.compute_score(fact)[0]
                 simi = self.base_model.get_entity_similarity(
                     fact[2], self.stat_table[key]['simi_index'])
                 rank = utils.get_rank(val_list, my_score)
@@ -187,9 +202,10 @@ class Template4(TemplateBaseClass):
             val_list = [x[0] for x in self.table[key].values()]
 
             if (len(val_list) != 0):
-                my_score = self.table[key].get(fact[2], (0, -1))[0]
-                my_best = self.table[key].get(fact[2], (0, -1))[1]
+                # my_score = self.table[key].get(fact[2], (0, -1))[0]
+                # my_best = self.table[key].get(fact[2], (0, -1))[1]
 
+                (my_score, my_best) = self.compute_score(fact)
                 index_max = np.argmax(val_list)
                 best_score = val_list[index_max]
                 best_answer = list(self.table[key].keys())[index_max]
