@@ -2,6 +2,7 @@ import argparse
 import logging
 import os
 import pickle
+import pprint
 import time
 
 import numpy as np
@@ -15,6 +16,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import utils
+
 
 def main(args):
 
@@ -41,7 +43,7 @@ def main(args):
 
     logging.info('Beginning code for experiment {} and storing stuff in {}'.format(
         exp_name, args.output_path))
-    logging.info('Loaded arguments as {}'.format(str(args)))
+    logging.info('Loaded arguments as {}'.format(str(pprint.pformat(args))))
 
     # Begin of main code
 
@@ -138,21 +140,15 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', help='batch size',
                         type=int, default=256)
 
-    # Concatenation Model parameters
-    parser.add_argument('--input_size', help='Input size',
-                        type=int, default=35)
-    parser.add_argument('--output_size', help='output size',
-                        type=int, default=5)
-
-    # MIL Model parameters
-    parser.add_argument('--use_ids', help='Use embeddings of entity and relations while training',
-                        action='store_true', default=False)
-    parser.add_argument('--mil', help='Use MIL model',
-                        action='store_true', default=False)
+    # Model parameters
     parser.add_argument('--each_input_size',
                         help='Input size of each template', type=int, default=7)
     parser.add_argument(
         '--num_templates', help='number of templates excluding other', type=int, default=5)
+    parser.add_argument('--use_ids', help='Use embeddings of entity and relations while training',
+                        action='store_true', default=False)
+    parser.add_argument('--mil', help='Use MIL model',
+                        action='store_true', default=False)
 
     # Optimizer parameters
     parser.add_argument(

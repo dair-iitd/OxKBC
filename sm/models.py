@@ -11,7 +11,7 @@ def select_model(args):
     if args.mil:
         return SelectionModuleMIL(args.each_input_size, args.num_templates, args.hidden_unit_list, args.embed_size, args.use_ids)
     else:
-        return SelectionModule(args.input_size, args.output_size, args.hidden_unit_list, args.embed_size, args.use_ids)
+        return SelectionModule(args.each_input_size*args.num_templates, args.num_templates+1, args.hidden_unit_list, args.embed_size, args.use_ids)
 
 
 class SelectionModule(nn.Module):

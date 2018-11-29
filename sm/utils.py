@@ -33,7 +33,7 @@ def get_embed_size(base_model_file, use_ids):
         ent_embed = d['entity_real'].shape[1] + d['entity_type'].shape[1]
         rel_embed = d['head_rel_type'].shape[1] + \
             d['tail_rel_type'].shape[1] + d['rel_real'].shape[1]
-        return int(ent_embed+rel_embed)
+        return int(2*ent_embed+rel_embed)
     else:
         logging.error(
             'Base Model file not present at {}'.format(base_model_file))
@@ -48,8 +48,6 @@ def get_learning_rate(optimizer):
 def save_checkpoint(state, epoch, isBest, checkpoint_file, best_file):
     torch.save(state, checkpoint_file)
     if isBest:
-        print("isBest True. Epoch: {0}, bestError: {1}".format(
-            state['epoch'], state['best_score']))
         best_file = best_file + str(0)
         shutil.copyfile(checkpoint_file, best_file)
 

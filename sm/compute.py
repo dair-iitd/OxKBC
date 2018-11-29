@@ -22,7 +22,7 @@ class Loss(object):
         self.args = args
         self.criterion = nn.NLLLoss(weight=torch.Tensor([1.0, 20.0]))
 
-        l = [args.mil_reward for i in range(args.output_size-1)]
+        l = [args.mil_reward for i in range(args.num_templates)]
         l.insert(0, args.rho)
         self.weights = Variable(torch.Tensor(
             l).unsqueeze(0), requires_grad=False)
@@ -30,7 +30,7 @@ class Loss(object):
         self.labels = [x+1 for x in range(args.num_templates)]
         self.header = functools.reduce(
             lambda x, y: x+y, [[y+str(x) for y in ['p', 'r', 'f', 's']] for x in self.labels])
-        self.header.extend(['mip', 'mir', 'mif', 'acc'])
+        self.header.extend(['acc','mip', 'mir', 'mif'])
 
         if settings.cuda:
             self.criterion.cuda()
