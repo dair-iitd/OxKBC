@@ -1,4 +1,4 @@
-hidden_unit_list: [300,200,100,50,20]
+hidden_unit_list: [300,100]
 rho: 0.25
 mil_reward: 1
 pos_reward: 1

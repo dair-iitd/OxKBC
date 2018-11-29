@@ -28,7 +28,7 @@ def preprocess(kb, template_obj_list, negative_count,add_ids):
     ctr = 0
     for facts in kb.facts:
         ctr += 1
-        if(ctr % 100 == 0):
+        if(ctr % 500 == 0):
             logging.info("Processed {0} facts out of {1}".format(
                 ctr, len(kb.facts)))
         ns = np.random.randint(0, len(kb.entity_map), negative_count)
@@ -59,6 +59,8 @@ if __name__ == "__main__":
         '-d', '--dataset', help="Name of the dataset as in data folder", required=True)
     parser.add_argument(
         '-m', '--model_type', help="model name. Can be distmult or complex ", required=True)
+    parser.add_argument('-f', '--preprocess_file',
+                        required=True, help="Path of the file which is to be preprocessed")
     parser.add_argument('-s', '--sm_data_write',
                         required=True, default="selection_module.data")
     parser.add_argument('-w', '--model_weights',
@@ -68,8 +70,8 @@ if __name__ == "__main__":
     parser.add_argument('-v', '--oov_entity', required=False, default=True)
     parser.add_argument('--t_ids', nargs='+', type=int, required=True,
                         help='List of templates to run for')
-    parser.add_argument('--add_ids', action='store_true', required=False,
-                        help='Use the flag to add entity and relation ids to the start of row')
+    parser.add_argument('--del_ids', action='store_true', required=False,
+                        help='Use the flag to delete entity and relation ids to the start of row\nDefault behaviour is to add ids in front of each record.')
     parser.add_argument('--data_repo_root',
                         required=False, default='data')
     parser.add_argument('--negative_count',
@@ -88,7 +90,8 @@ if __name__ == "__main__":
     dataset_root = os.path.join(args.data_repo_root, args.dataset)
     template_objs = template_builder.template_obj_builder(dataset_root, args.model_weights, args.template_load_dir,
                                                                   None, args.model_type, args.t_ids, args.oov_entity)
-    kbtrain = template_objs[0].kb
-    new_facts = preprocess(kbtrain, template_objs, args.negative_count, args.add_ids)
+    ktrain = template_objs[0].kb
+    k_preprocess = kb.KnowledgeBase(args.preprocess_file, ktrain.entity_map, ktrain.relation_map,add_unknowns=not args.oov_entity)
+    new_facts = preprocess(k_preprocess, template_objs, args.negative_count, not args.del_ids)
 
     write_to_file(new_facts, args.sm_data_write)

@@ -1,28 +1,50 @@
-
-import torch.optim as optim
-import yaml
-import torch.nn as nn
-import os
-import time
 import argparse
+import logging
+import os
 import pickle
-import torch
-from IPython.core.debugger import Pdb
-from torch.utils.data import Dataset, DataLoader
-import utils
+import time
+
+import numpy as np
+import yaml
+
+import compute
 import dataset
 import models
-import numpy as np
-import compute
 import settings
-
-
-def complete_paths(config):
-    for key in []:
-        config[key] = os.path.expanduser(config[key])
-    #
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import utils
 
 def main(args):
+
+    # Store name of experiment
+    exp_name = args.exp_name
+    exp_name = '{}_r{}_p{}_n{}_i{}'.format(
+        exp_name, args.rho, args.pos_reward, args.neg_reward, args.class_imbalance)
+
+    # Create an directory for output path
+    args.output_path = os.path.join(args.output_path, args.exp_name)
+    os.makedirs(args.output_path, exist_ok=True)
+
+    utils.LOG_FILE = os.path.join(args.output_path, 'log.txt')
+
+    # Set logging
+    logging.basicConfig(filename=utils.LOG_FILE, filemode='a', format='%(levelname)s :: %(asctime)s - %(message)s',
+                        level=args.log_level, datefmt='%d/%m/%Y %I:%M:%S %p')
+    console = logging.StreamHandler()
+    console.setLevel(args.log_level)
+    formatter = logging.Formatter(
+        '%(levelname)s :: %(asctime)s - %(message)s', datefmt='%d/%m/%Y %I:%M:%S %p')
+    console.setFormatter(formatter)
+    logging.getLogger().addHandler(console)
+
+    logging.info('Beginning code for experiment {} and storing stuff in {}'.format(
+        exp_name, args.output_path))
+    logging.info('Loaded arguments as {}'.format(str(args)))
+
+    # Begin of main code
+
     train_loader, val_loader = dataset.get_data_loaders(args)
     model = models.select_model(args)
     my_eval_fn = compute.get_evaluation_function(args)
@@ -31,88 +53,61 @@ def main(args):
         optimizer = optim.SGD(filter(lambda p: p.requires_grad, model.parameters(
         )), momentum=args.momentum, lr=args.lr, weight_decay=args.decay)
     else:
-        optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr,
-                               weight_decay=args.decay)
+        optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters(
+        )), lr=args.lr, weight_decay=args.decay)
 
-    #my_lr_scheduler = scheduler.CustomReduceLROnPlateau(optimizer, {'mode': args.mode, 'factor': args.factor, 'patience': args.patience, 'verbose': True, 'threshold': args.threshold,
-    #                                                                'threshold_mode': args.threshold_mode, 'cooldown': args.cooldown, 'min_lr': args.min_lr, 'eps': args.eps}, maxPatienceToStopTraining=args.max_patience)
-
-    exp_name = args.exp_name
-    exp_name = '{}_r{}_p{}_n{}_i{}'.format(exp_name,args.rho, args.pos_reward, args.neg_reward, args.class_imbalance)
-    if args.debug:
-        exp_name = 'd'+args.exp_name
-
-    args.output_path = os.path.join(args.output_path, args.exp_name)
-    if not os.path.exists(args.output_path):
-        try:
-            os.makedirs(args.output_path)
-        except:
-            # TODO - why pass? Why not exit? Where will we store the results?
-            pass
-
-    utils.CONSOLE_FILE = os.path.join(args.output_path, 'IPYTHON_CONSOLE')
-    utils.log(str(args))
-
-    log_file = '{}.csv'.format(exp_name)
     checkpoint_file = os.path.join(
         args.output_path, '{}_checkpoint.pth'.format(exp_name))
     best_checkpoint_file = os.path.join(
         args.output_path, '{}_best_checkpoint.pth'.format(exp_name))
-    utils.log('save checkpoints at {} and best checkpoint at : {}'.format(
+    logging.info('Saving checkpoints at {} and best checkpoint at : {}'.format(
         checkpoint_file, best_checkpoint_file))
 
-    tfh = open(os.path.join(args.output_path, log_file), 'a')
     start_epoch = 0
-    best_score = 9999999
-    # Load checkpoint if present in input arguments TODO - be careful so as not to overwrite any checkpoints
+    best_score = -9999999
+
+    # Load checkpoint if present in input arguments
     if args.checkpoint != '':
-        utils.log('start from checkpoint: {}'.format(args.checkpoint))
-        cp = torch.load(os.path.join(args.output_path, args.checkpoint))
+        logging.info('Starting from checkpoint: {}'.format(args.checkpoint))
+        cp = torch.load(args.checkpoint)
         start_epoch = cp['epoch'] + 1
         model.load_state_dict(cp['model'])
-        # optimizer.load_state_dict(cp['optimizer']) TODO - Why not do this?
+        # optimizer.load_state_dict(cp['optimizer']) TODO: - Why not do this?
         best_score = cp['best_score']
         for param_group in optimizer.param_groups:
             param_group['lr'] = args.lr
             param_group['weight_decay'] = args.decay
 
     num_epochs = args.num_epochs
-    # Pdb().set_trace()
-    utils.log('start train/validate cycle')
-    if args.debug:
-        pass
-        #val_loader = train_loader
+    logging.info('Beginning train/validate cycle')
+
+    if val_loader is not None:
+        compute.compute(-1, model, val_loader, optimizer,
+                        'eval', eval_fn=my_eval_fn, args=args)
+
+    if(args.only_eval):
+        logging.info('Ran only eval mode, now exiting')
+        exit(0)
 
     # Start TRAINING
-    
-    lr = utils.get_learning_rate(optimizer)
-    
-    #Pdb().set_trace()
-    if val_loader is not None:
-        compute.compute(-1, model, val_loader, optimizer, 'eval', tfh, [lr, exp_name], eval_fn=my_eval_fn, args=args)
-
-    
-    #Pdb().set_trace()
     for epoch in range(start_epoch, num_epochs):
-        lr = utils.get_learning_rate(optimizer)
-        # Pdb().set_trace()
-        rec, i = compute.compute(epoch, model, train_loader, optimizer, 'train', tfh, [lr, exp_name], eval_fn=my_eval_fn, args=args)
+        logging.info('Beginning epoch {}'.format(epoch))
+
+        record, metric_idx = compute.compute(
+            epoch, model, train_loader, optimizer, 'train', eval_fn=my_eval_fn, args=args)
 
         if val_loader is not None:
-            rec, i = compute.compute(epoch, model, val_loader, None, 'eval', tfh,
-                                  [lr, exp_name], eval_fn=my_eval_fn, args=args)
+            record, metric_idx = compute.compute(
+                epoch, model, val_loader, None, 'eval', eval_fn=my_eval_fn, args=args)
 
         is_best = False
-        utils.log('best score: {}, this score: {}'.format(best_score, rec[i]))
-        # Early stopping
-        if rec[i] < best_score:
-            best_score = rec[i]
-            is_best = True
-        #
+        logging.info('Best score: {}, This score: {}'.format(
+            best_score, record[metric_idx]))
 
-        #utils.log('input to scheduler : {}'.format(1.0-1.0*rec[i]))
-        #my_lr_scheduler.step(1.0-1.0*rec[i], epoch=epoch)
-        
+        if record[metric_idx] > best_score:
+            best_score = record[metric_idx]
+            is_best = True
+
         utils.save_checkpoint({
             'epoch': epoch,
             'best_score': best_score,
@@ -121,69 +116,73 @@ def main(args):
             'is_best': is_best
         }, epoch, is_best, checkpoint_file, best_checkpoint_file)
 
-    #
-    tfh.close()
-
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--training_data_path',type=str,help="Data Path")
-    parser.add_argument('--base_model_file',type=str,help="Base model dump",default='')
-    parser.add_argument('--val_data_path',type=str,help="Data Path",default='')
-    parser.add_argument('--exp_name', help='exp name',
-                        type=str, default='unary')
-    parser.add_argument('--output_path', type=str)
+    parser.add_argument('--training_data_path',
+                        help="Training data path (pkl file)", type=str)
+    parser.add_argument('--base_model_file',
+                        help="Base model dump for loading embeddings", type=str)
+    parser.add_argument(
+        '--val_data_path', help="Validation data path in the same format as training data", type=str, default='')
+    parser.add_argument('--exp_name', help='Experiment name',
+                        type=str, default='default_exp')
+    parser.add_argument(
+        '--output_path', help='Output path to store models, and logs', type=str)
 
-    parser.add_argument('--log_after', help='log after samples', type=int, default=10000)
-
-
-    #model parameters
-    parser.add_argument('--input_size', help='Input size', type=int, default=15)
-    parser.add_argument('--embed_size', help='Total Embedd size', type=int, default=0)
-
-    parser.add_argument('--output_size', help='output size', type=int, default=5)
+    # Training parameters
     parser.add_argument('--num_epochs', help='epochs', type=int, default=100)
-    parser.add_argument('--batch_size', help='batch size', type=int, default=256)
-    parser.add_argument('--mil', help='which model mil ?',
-                            action='store_true', default = False)
-    parser.add_argument('--each_input_size', help='input size of each template', type=int,default=4)
-    parser.add_argument('--num_templates', help='# templates', type=int,default=4)
+    parser.add_argument(
+        '--log_after', help='Log after samples', type=int, default=100000)
+    parser.add_argument('--batch_size', help='batch size',
+                        type=int, default=256)
 
-    #optim params
-    parser.add_argument('--optim', type=str, default = 'sgd')
+    # Concatenation Model parameters
+    parser.add_argument('--input_size', help='Input size',
+                        type=int, default=35)
+    parser.add_argument('--output_size', help='output size',
+                        type=int, default=5)
+
+    # MIL Model parameters
+    parser.add_argument('--use_ids', help='Use embeddings of entity and relations while training',
+                        action='store_true', default=False)
+    parser.add_argument('--mil', help='Use MIL model',
+                        action='store_true', default=False)
+    parser.add_argument('--each_input_size',
+                        help='Input size of each template', type=int, default=7)
+    parser.add_argument(
+        '--num_templates', help='number of templates excluding other', type=int, default=5)
+
+    # Optimizer parameters
+    parser.add_argument(
+        '--optim', help='type of optimizer to use: sgd or adam', type=str, default='sgd')
     parser.add_argument('--lr', help='lr', type=float, default=0.001)
     parser.add_argument('--decay', help='lr', type=float, default=0)
     parser.add_argument('--momentum', help='lr', type=float, default=0.9)
 
-
     parser.add_argument(
-        '--debug', help='just load args and dont run main', action='store_true')
-    
-
-    parser.add_argument('--checkpoint', help='checkpoint path',type=str,default  = '')
-    
+        '--checkpoint', help='checkpoint path for loading model', type=str, default='')
     parser.add_argument('--config', help='yaml config file',
                         type=str, default='default_config.yml')
-
     parser.add_argument('--cuda', help='if cuda available, use it or not?',
-                        action='store_true', default = False)
+                        action='store_true', default=False)
 
-    
+    parser.add_argument('--only_eval', help='Only evaluate?',
+                        action='store_true', default=False)
+
+    parser.add_argument('--log_level', help='Set the logging output level. {0}'.format(
+        utils._LOG_LEVEL_STRINGS), default='INFO', type=utils._log_level_string_to_int, nargs='?')
+
     args = parser.parse_args()
     config = {}
     if os.path.exists(os.path.expanduser(args.config)):
         config = yaml.load(open(os.path.expanduser(args.config)))
-    
+
     config.update(vars(args))
+    config.update({'embed_size': utils.get_embed_size(
+        args.base_model_file, args.use_ids)})
     args = utils.Map(config)
     settings.set_settings(args)
-    if not args.debug:
-        # pass
-        main(args)
 
-
-
-
-
-
+    main(args)

@@ -1,23 +1,44 @@
-from __future__ import print_function
-from IPython.core.debugger import Pdb
-import torch
+import argparse
+import logging
+import os
+import pickle
 import shutil
-from datetime import datetime as dt
-#from . import settings
-import math
+
 import settings
+import torch
 
-CONSOLE_FILE = 'IPYTHON_CONSOLE'
+LOG_FILE = 'log.txt'
 
-def log(s, file=None):
-    print('{},{}'.format(dt.now().strftime('%Y%m%d%H%M%S'), s), file=file)
-    if file is not None:
-        print('{},{}'.format(dt.now().strftime('%Y%m%d%H%M%S'), s), file=None)
-    #
-    print('{},{}'.format(dt.now().strftime('%Y%m%d%H%M%S'), s),
-          file=open(CONSOLE_FILE, 'a'))
-    if file is not None:
-        file.flush()
+_LOG_LEVEL_STRINGS = ['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG']
+EPSILON = 0.0000001
+
+
+def _log_level_string_to_int(log_level_string):
+    if not log_level_string in _LOG_LEVEL_STRINGS:
+        message = 'invalid choice: {0} (choose from {1})'.format(
+            log_level_string, _LOG_LEVEL_STRINGS)
+        raise argparse.ArgumentTypeError(message)
+
+    log_level_int = getattr(logging, log_level_string, logging.INFO)
+    # check the logging log_level_choices have not changed from our expected values
+    assert isinstance(log_level_int, int)
+    return log_level_int
+
+
+def get_embed_size(base_model_file, use_ids):
+    if not use_ids:
+        return 0
+    if os.path.exists(base_model_file):
+        d = pickle.load(open(base_model_file, 'rb'))
+        ent_embed = d['entity_real'].shape[1] + d['entity_type'].shape[1]
+        rel_embed = d['head_rel_type'].shape[1] + \
+            d['tail_rel_type'].shape[1] + d['rel_real'].shape[1]
+        return int(ent_embed+rel_embed)
+    else:
+        logging.error(
+            'Base Model file not present at {}'.format(base_model_file))
+        raise Exception('Base Model file not present')
+
 
 def get_learning_rate(optimizer):
     for param_group in optimizer.param_groups:
@@ -30,30 +51,32 @@ def save_checkpoint(state, epoch, isBest, checkpoint_file, best_file):
         print("isBest True. Epoch: {0}, bestError: {1}".format(
             state['epoch'], state['best_score']))
         best_file = best_file + str(0)
-        shutil.copyfile(checkpoint_file,
-                        best_file)
+        shutil.copyfile(checkpoint_file, best_file)
 
-def log_sum_exp(x,dim = -1):
+    logging.info('Saving checkpoint to {}'.format(checkpoint_file))
+
+
+def log_sum_exp(x, dim=-1):
     max_score, _ = torch.max(x, dim)
     max_score_broadcast = max_score.unsqueeze(dim).expand_as(x)
     return max_score + torch.log(torch.sum(torch.exp(x - max_score_broadcast), dim))
+
 
 class Map(dict):
     """
     Example:
     m = Map({'first_name': 'Eduardo'}, last_name='Pool', age=24, sports=['Soccer'])
     """
+
     def __init__(self, *args, **kwargs):
         super(Map, self).__init__(*args, **kwargs)
         for arg in args:
             # If arg is a dict,add all the elements of that dict to self
-            # print(args)
             if isinstance(arg, dict):
                 for k, v in arg.items():  # Python2 - for k, v in arg.iteritems():
                     self[k] = v
-
         if kwargs:
-            for k, v in kwargs.iteritems():
+            for k, v in kwargs.items():
                 self[k] = v
 
     def __getattr__(self, attr):

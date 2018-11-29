@@ -1,0 +1,6 @@
+hidden_unit_list: [30,20]
+rho: 0.25
+mil_reward: 1
+pos_reward: 1
+neg_reward: -1
+class_imbalance: 4
