@@ -24,9 +24,9 @@ class Loss(object):
 
         l = [args.mil_reward for i in range(args.num_templates)]
         l.insert(0, args.rho)
-        self.weights = Variable(torch.Tensor(
-            l).unsqueeze(0), requires_grad=False)
-
+        #self.weights = Variable(torch.Tensor(
+        #    l).unsqueeze(0), requires_grad=False)
+        self.weights =  Variable(torch.Tensor(l), requires_grad=False)
         self.labels = [x+1 for x in range(args.num_templates)]
         self.header = functools.reduce(
             lambda x, y: x+y, [[y+str(x) for y in ['p', 'r', 'f', 's']] for x in self.labels])
@@ -47,12 +47,11 @@ class Loss(object):
         template_score = model(x)
 
         max_score, ypred = torch.max(template_score, dim=1)
-
+        
         loss = Variable(torch.Tensor([0]))
         if mode == 'train':
-            template_score = template_score * self.weights
-            reward_tensor = self.args.class_imbalance*y.float()*torch.max(template_score, dim=1)[0] + (1.0-y.float())*(
-                (template_score[:, 0]*self.args.pos_reward/self.args.rho) + torch.max(template_score[:, 1:], dim=1)[0]*self.args.neg_reward/self.args.mil_reward)
+            #template_score = template_score * self.weights
+            reward_tensor = (self.args.class_imbalance*y.float()*(template_score[:, 0]*self.weights[0]+torch.max(template_score[:, 1:], dim=1)[0])) + (1.0-y.float())*((template_score[:, 0]*self.args.pos_reward) + torch.sum(template_score[:, 1:], dim=1)[0]*self.args.neg_reward)
             loss = -1.0*reward_tensor.mean()
 
         return loss, ypred, y
@@ -69,6 +68,16 @@ class Loss(object):
         accuracy = metrics.accuracy_score(ycpu, ypred_cpu)
         metric = functools.reduce(lambda x, y: x+y, map(list, zip(p, r, f, s)))
         metric.extend([accuracy, micro_p, micro_r, micro_f])
+
+        str_ct = str(Counter(ypred_cpu))
+        str_ct_y = str(Counter(ycpu))
+        logging.info(' Predicted counts val: {}'.format(str_ct))
+        logging.info(' True counts val: {}'.format(str_ct_y))
+        
+        cf = metrics.confusion_matrix(ycpu,ypred_cpu,labels=[0,1,2,3,4,5])
+        logging.info('Confusion Matrix:\n {}'.format(cf))
+        logging.info('Classification Report\n'+metrics.classification_report(ycpu,ypred_cpu,labels=[0,1,2,3,4,5]))
+
         return metric
 
 
@@ -130,6 +139,8 @@ def compute(epoch, model, loader, optimizer, mode, eval_fn, args):
     if mode != 'train':
         np.savetxt(os.path.join(args.output_path,
                                 'predictions_valid.txt'), predictions)
+        if(args.raw):
+            loader.save_raw_data(os.path.join(args.output_path,'valid_raw_data.txt'),predictions)
         metric = eval_fn.calculate_accuracies(ground_truth, predictions)
         rec.extend(metric)
         metric_header = eval_fn.header
