@@ -16,7 +16,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import utils
-
+from IPython.core.debugger import Pdb
 
 def main(args):
 
@@ -167,6 +167,9 @@ if __name__ == '__main__':
     parser.add_argument('--only_eval', help='Only evaluate?',
                         action='store_true', default=False)
 
+    parser.add_argument('--raw', help='Save raw x normalized and unonrmalized',
+                        action='store_true', default=False)
+
     parser.add_argument('--log_level', help='Set the logging output level. {0}'.format(
         utils._LOG_LEVEL_STRINGS), default='INFO', type=utils._log_level_string_to_int, nargs='?')
 
@@ -174,7 +177,7 @@ if __name__ == '__main__':
     config = {}
     if os.path.exists(os.path.expanduser(args.config)):
         config = yaml.load(open(os.path.expanduser(args.config)))
-
+    # Pdb().set_trace()
     config.update(vars(args))
     config.update({'embed_size': utils.get_embed_size(
         args.base_model_file, args.use_ids)})

@@ -40,13 +40,16 @@ class SelectionModuleDataset(torch.utils.data.Dataset):
         self.use_ids = use_ids
         self.start_idx = 3
 
+        self.raw_data = data.copy()
+
         if stats_file_path is None or (not os.path.exists(stats_file_path)):
             means = np.mean(data[:, self.start_idx:-1], axis=0).reshape(1, -1)
             stds = np.std(data[:, self.start_idx:-1], axis=0).reshape(1, -1)
-            for i in range((means.shape[1]-self.start_idx)//each_input_size):
-                idx = i*each_input_size + self.start_idx
-                temp = np.concatenate(
-                    (data[:, idx], data[:, idx+1])).reshape(-1)
+            for i in range(means.shape[1]//each_input_size):
+                idx = i*each_input_size
+                #temp = np.concatenate(
+                #    (data[:, idx], data[:, idx+1])).reshape(-1)
+                temp = data[:,self.start_idx + idx].reshape(-1)
                 new_mean = np.mean(temp)
                 new_std = np.std(temp)
                 # Normalizing my_score and max_score using same distribution
@@ -78,14 +81,24 @@ class SelectionModuleDataset(torch.utils.data.Dataset):
             raise Exception(
                 'Please provide base model file path - {}', str(base_model_file))
 
+        logging.info('means: {} '.format( means))
+        logging.info('stds: {} '.format( stds))
         data[:, self.start_idx:-1] = (data[:, self.start_idx:-1]-means)/stds
         self.data = data
+
+        if mode != 'train':
+            raw = np.concatenate((self.raw_data[:,self.start_idx:],self.data[:,self.start_idx:-1],self.raw_data[:,:self.start_idx]),axis=1)
+
 
         logging.info('Normalized and successfully loaded data. Size of dataset = {}'.format(
             self.data.shape))
 
     def __len__(self):
         return len(self.data)
+
+    # def save_raw_data(self,fh,predictions):
+        
+
 
     def __getitem__(self, idx):
         if(self.use_ids):
