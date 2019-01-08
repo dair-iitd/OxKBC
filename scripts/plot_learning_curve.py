@@ -2,6 +2,7 @@ import os
 import pprint
 import sys
 import matplotlib
+matplotlib.use('agg')
 import numpy as np
 import matplotlib.pyplot as plt
 
