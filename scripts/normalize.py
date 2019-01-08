@@ -6,7 +6,7 @@ import sys
 import copy
 import sklearn.preprocessing
 
-MODEL_TYPE='yago_inv'
+MODEL_TYPE='../dumps/fb15k237'
 
 def normalize(X):
     return sklearn.preprocessing.normalize(X)

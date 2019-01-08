@@ -22,10 +22,10 @@ import numpy as np
 #     file.close()
 
 
-orig = pd.read_csv('../../03-11-2108-1400_without_inv/exp_words/merged.txt',sep='\t')
-inv = pd.read_csv('merged.txt',sep='\t')
+orig = pd.read_csv('../logs/yago/exp_words/merged.txt',sep='\t')
+inv = pd.read_csv('../logs/yago-inv/exp_words/merged.txt',sep='\t')
 
 inv_corr = pd.merge(orig,inv,how='left',on=['e1','r','e2'])
 
 inv_corr_new = inv_corr.drop([inv_corr.columns[i] for i in range(3,31)],axis=1)
-inv_corr_new.to_csv('merged_corr.csv',sep='\t')
+inv_corr_new.to_csv('merged_corr.csv',sep='\t',index=False)

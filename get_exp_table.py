@@ -15,7 +15,7 @@ import utils
 
 def read_data(path):
     data = []
-    with open(path, "r") as infile:
+    with open(path, "r",errors='ignore',encoding='ascii') as infile:
         lines = infile.readlines()
         data = [line.strip().split() for line in lines]
     return data
@@ -24,19 +24,21 @@ def read_data(path):
 def map_data(data, mapped_entity, mapped_relation):
     mapped_data = []
     for line in data:
-        mapped_data.append(
-            [mapped_entity[line[0]], mapped_relation[line[1]], mapped_entity[line[2]]])
+        try:
+            mapped_data.append([mapped_entity[line[0]], mapped_relation[line[1]], mapped_entity[line[2]]])
+        except KeyError as e:
+            logging.warn('Got Key Error for line %s' % (' '.join(line)))
     return mapped_data
 
 
 def read_entity_names(path):
     entity_names = {}
-    with open(path, "r") as f:
+    with open(path, "r",errors='ignore',encoding='ascii') as f:
         lines = f.readlines()
         for line in lines:
             content = line.split()
             if content[0] in entity_names:
-                raise "Entity duplicated"
+                logging.warn('Duplicate Entity found %s in line %s' % (content[0],' '.join(line)))
             entity_names[content[0]] = ' '.join(content[1:-2])
     return entity_names
 
@@ -136,9 +138,9 @@ def generate_exp(data, template_obj_list, entity_id_inverse_map, relation_id_inv
             if '__INV' in relation_id_inverse_map[triple[1]]:
                 continue
             temp_list = []
-            temp_list.append(entity_name_map[entity_id_inverse_map[triple[0]]])
+            temp_list.append(entity_name_map.get(entity_id_inverse_map[triple[0]],"None"))
             temp_list.append(relation_id_inverse_map[triple[1]])
-            temp_list.append(entity_name_map[entity_id_inverse_map[triple[2]]])
+            temp_list.append(entity_name_map.get(entity_id_inverse_map[triple[2]],"None"))
             exp = t.get_explanation(triple)
             temp_list.extend(get_word_exp(
                 exp, t_type, entity_id_inverse_map, relation_id_inverse_map, entity_name_map))

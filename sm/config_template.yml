@@ -1,4 +1,3 @@
-hidden_unit_list: [30,20]
 class_imbalance: 4
 mil_reward: 1
 pos_reward: 1

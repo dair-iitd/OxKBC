@@ -44,10 +44,10 @@ def write_table(result,write_path):
 
 
 if len(sys.argv) != 2:
-    print('Usage is '+sys.argv[0] +' dataset_name')
+    print('Usage is '+sys.argv[0] +' <folder_path>')
     exit(-1)
 
-path = '../sm/grid_search_2/grid_search_'+sys.argv[1]
+path = ''+sys.argv[1]
 result = {}
 for (dirpath, dirnames, filenames) in os.walk(path):
     for filename in filenames:
