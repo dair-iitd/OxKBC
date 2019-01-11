@@ -24,7 +24,7 @@ def make_graph(data,output_file):
     plt.yticks(np.arange(min_y,max_y+1,(max_y+1-min_y)/20.0))
     for key in data.keys():
         if(key!='nepochs'):
-            plt.plot(x,data[key],label=key)
+            plt.plot(x,data[key],'-.',label=key)
     plt.legend()
     plt.savefig(output_file,format="pdf",bbox_inches='tight')
 
