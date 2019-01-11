@@ -12,6 +12,7 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 
+import torch.nn.functional as F 
 
 def get_evaluation_function(args):
     return Loss(args)
@@ -49,10 +50,20 @@ class Loss(object):
         max_score, ypred = torch.max(template_score, dim=1)
         
         loss = Variable(torch.Tensor([0]))
-        if mode == 'train':
-            #template_score = template_score * self.weights
-            reward_tensor = (self.args.class_imbalance*y.float()*(template_score[:, 0]*self.weights[0]+torch.max(template_score[:, 1:], dim=1)[0])) + (1.0-y.float())*((template_score[:, 0]*self.args.pos_reward) + torch.sum(template_score[:, 1:], dim=1)[0]*self.args.neg_reward)
-            loss = -1.0*reward_tensor.mean()
+        if 'train' in mode:
+            if mode == 'train_un':
+                #convert template score into probabilites
+                template_score = F.softmax(template_score, dim=1)
+                #template_score = template_score * self.weights
+                reward_tensor = (self.args.class_imbalance*y.float()*(template_score[:, 0]*self.weights[0]+torch.max(template_score[:, 1:], dim=1)[0])) + (1.0-y.float())*((template_score[:, 0]*self.args.pos_reward) + torch.sum(template_score[:, 1:], dim=1)[0]*self.args.neg_reward)
+                loss = -1.0*reward_tensor.mean()
+            elif mode == 'train_sup':
+                #template_score = F.softmax(template_score, dim=1)
+                #template_score = template_score * self.weights
+                loss = F.cross_entropy(template_score,y)
+            else:
+                raise 
+                 
 
         return loss, ypred, y
 
@@ -81,7 +92,7 @@ class Loss(object):
         return metric
 
 
-def compute(epoch, model, loader, optimizer, mode, eval_fn, args):
+def compute(epoch, model, loader, optimizer, mode, eval_fn, args, labelled_train_loader=None,calc_acc=True):
 
     start_time = time.time()
     last_print = 0
@@ -89,8 +100,9 @@ def compute(epoch, model, loader, optimizer, mode, eval_fn, args):
     cum_loss = 0
     cum_count = 0
 
-    if mode == 'train':
-        logging.info('Setting model mode to train')
+    if 'train' in mode:
+        if calc_acc:
+            logging.info('Setting model mode to train')
         model.train()
         optimizer.zero_grad()
     else:
@@ -106,7 +118,7 @@ def compute(epoch, model, loader, optimizer, mode, eval_fn, args):
         idx = var[-1]
         count = len(idx)
 
-        volatile = False if mode == 'train' else True
+        volatile = False if 'train' in mode else True
         for index in range(len(var)-1):
             var[index] = Variable(var[index], volatile=volatile)
             if settings.cuda:
@@ -117,9 +129,10 @@ def compute(epoch, model, loader, optimizer, mode, eval_fn, args):
         ground_truth[idx] = ytrue.squeeze().data.cpu().numpy()
 
         cum_loss = cum_loss + loss.data[0]*ytrue.size(0)
+        #cum_loss = cum_loss + loss.data.item()*ytrue.size(0)
         cum_count += count
 
-        if mode == 'train':
+        if 'train' in mode:
             loss.backward()
             optimizer.step()
             optimizer.zero_grad()
@@ -132,11 +145,17 @@ def compute(epoch, model, loader, optimizer, mode, eval_fn, args):
             logging.info(
                 ','.join([str(round(x, 6)) if isinstance(x, float) else str(x) for x in rec]))
 
+        #run sup training here
+        if labelled_train_loader is not None:
+            _ = compute(
+                epoch, model, labelled_train_loader, optimizer, 'train_sup', eval_fn=eval_fn, args=args,calc_acc = False)
+
+
     rec = [epoch, mode, cum_loss/cum_count, cum_count,
            len(loader.dataset), time.time() - start_time]
 
     metric_header = []
-    if mode != 'train':
+    if mode != 'train_un' and calc_acc:
         np.savetxt(os.path.join(args.output_path,
                                 'predictions_valid.txt'), predictions)
         if(args.raw):
@@ -145,13 +164,21 @@ def compute(epoch, model, loader, optimizer, mode, eval_fn, args):
         rec.extend(metric)
         metric_header = eval_fn.header
 
-    logging.info('epoch,mode,loss,count,dataset_size,time,' +
+    header = 'epoch,mode,loss,count,dataset_size,time'.split(',') + metric_header 
+    if calc_acc:
+        logging.info('epoch,mode,loss,count,dataset_size,time,' +
                  ','.join(metric_header))
-    logging.info(
+        logging.info(
         ','.join([str(round(x, 6)) if isinstance(x, float) else str(x) for x in rec]))
 
-    if mode == 'train':
-        return (rec, 3)
+        print('epoch,mode,loss,count,dataset_size,time,' +
+                     ','.join(metric_header), file = args.lpf)
+
+        print(','.join([str(round(x, 6)) if isinstance(x, float) else str(x) for x in rec]),
+                file=args.lpf)
+            
+    if mode == 'train_un':
+        return (rec, 3, header)
     else:
         # Presently optimizing micro_f score
-        return (rec, -1)
+        return (rec, -1, header)
