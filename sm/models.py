@@ -56,7 +56,7 @@ class SelectionModuleMIL(nn.Module):
         self.others_template_parameters = nn.Parameter(
             torch.randn(self.input_size))
 
-        self.softmax = nn.Softmax(dim=1)
+        #self.softmax = nn.Softmax(dim=1)
         
         if settings.cuda:
             self = self.cuda()
@@ -85,5 +85,5 @@ class SelectionModuleMIL(nn.Module):
         template_scores = torch.cat((others_score.expand(
             template_scores.size(0), 1), template_scores), dim=1)
 
-        template_scores = self.softmax(template_scores)
+        #template_scores = self.softmax(template_scores)
         return template_scores

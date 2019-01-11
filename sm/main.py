@@ -30,7 +30,10 @@ def main(args):
     os.makedirs(args.output_path, exist_ok=True)
 
     utils.LOG_FILE = os.path.join(args.output_path, 'log.txt')
-
+    
+    LEARNING_PROFILE_FILE = os.path.join(args.output_path, 'learning_curve.txt')
+    lpf = open(LEARNING_PROFILE_FILE, 'w')
+    args.lpf = lpf
     # Set logging
     logging.basicConfig(filename=utils.LOG_FILE, filemode='a', format='%(levelname)s :: %(asctime)s - %(message)s',
                         level=args.log_level, datefmt='%d/%m/%Y %I:%M:%S %p')
@@ -47,7 +50,7 @@ def main(args):
 
     # Begin of main code
 
-    train_loader, val_loader = dataset.get_data_loaders(args)
+    train_loader, val_loader, labelled_train_loader = dataset.get_data_loaders(args)
     model = models.select_model(args)
     my_eval_fn = compute.get_evaluation_function(args)
 
@@ -84,9 +87,14 @@ def main(args):
     logging.info('Beginning train/validate cycle')
 
     if val_loader is not None:
-        compute.compute(-1, model, val_loader, optimizer,
+        record, metric_idx, headers =compute.compute(start_epoch-1, model, val_loader, optimizer,
                         'eval', eval_fn=my_eval_fn, args=args)
+        if(args.log_eval is not None):
+            handler=open(args.log_eval,"a")
 
+            print(','.join([str(round(x, 6)) if isinstance(x, float) else str(x) for x in record]),
+                file=handler)            
+            handler.close()
     if(args.only_eval):
         logging.info('Ran only eval mode, now exiting')
         exit(0)
@@ -95,11 +103,18 @@ def main(args):
     for epoch in range(start_epoch, num_epochs):
         logging.info('Beginning epoch {}'.format(epoch))
 
-        record, metric_idx = compute.compute(
-            epoch, model, train_loader, optimizer, 'train', eval_fn=my_eval_fn, args=args)
+
+        if labelled_train_loader is not None:
+            record, metric_idx,_ = compute.compute(
+                epoch, model, labelled_train_loader, optimizer, 'train_sup', eval_fn=my_eval_fn, args=args)
+
+
+        if train_loader is not None:
+            record, metric_idx,_ = compute.compute(
+                epoch, model, train_loader, optimizer, 'train_un', eval_fn=my_eval_fn, args=args,labelled_train_loader = labelled_train_loader)
 
         if val_loader is not None:
-            record, metric_idx = compute.compute(
+            record, metric_idx,_ = compute.compute(
                 epoch, model, val_loader, None, 'eval', eval_fn=my_eval_fn, args=args)
 
         is_best = False
@@ -118,20 +133,26 @@ def main(args):
             'is_best': is_best
         }, epoch, is_best, checkpoint_file, best_checkpoint_file)
 
+    args.lpf.close()
+
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--training_data_path',
                         help="Training data path (pkl file)", type=str)
+
+    parser.add_argument('--labelled_training_data_path',
+                        help="Labelled Training data path (pkl file)", type=str)
+
     parser.add_argument('--base_model_file',
-                        help="Base model dump for loading embeddings", type=str)
+                        help="Base model dump for loading embeddings", type=str, default='')
     parser.add_argument(
         '--val_data_path', help="Validation data path in the same format as training data", type=str, default='')
     parser.add_argument('--exp_name', help='Experiment name',
                         type=str, default='default_exp')
     parser.add_argument(
-        '--output_path', help='Output path to store models, and logs', type=str)
+        '--output_path', help='Output path to store models, and logs', type=str,required=True)
 
     # Training parameters
     parser.add_argument('--num_epochs', help='epochs', type=int, default=100)
@@ -166,12 +187,17 @@ if __name__ == '__main__':
 
     parser.add_argument('--only_eval', help='Only evaluate?',
                         action='store_true', default=False)
+    parser.add_argument('--log_eval',help="logs eval accuracies",default=None,type=str)
 
     parser.add_argument('--raw', help='Save raw x normalized and unonrmalized',
                         action='store_true', default=False)
 
     parser.add_argument('--log_level', help='Set the logging output level. {0}'.format(
         utils._LOG_LEVEL_STRINGS), default='INFO', type=utils._log_level_string_to_int, nargs='?')
+
+    parser.add_argument('--supervision', help='possible values - un, semi, sup',
+                        type=str, default='un')
+
 
     args = parser.parse_args()
     config = {}

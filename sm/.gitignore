@@ -4,3 +4,5 @@ cross_val*
 !cross_validation.py
 semi_sup/
 test/
+fb15*
+test_cross
