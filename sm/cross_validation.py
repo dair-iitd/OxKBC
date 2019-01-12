@@ -47,7 +47,7 @@ def main(args):
         directory=os.path.join(args.dir,exp_name)
         create_dir(directory)
 
-        command="python main.py --training_data_path "+args.unlabelled_training_data_path+" --val_data_path "+val_data_path+" --exp_name "+exp_name+" "
+        command="/home/cse/btech/cs1150210/anaconda3/bin/python3 main.py --training_data_path "+args.unlabelled_training_data_path+" --val_data_path "+val_data_path+" --exp_name "+exp_name+" "
         command+="--labelled_training_data_path "+train_data_path+" --output_path "+args.dir+" "
         command+="--num_epochs "+str(args.num_epochs)+" --batch_size "+str(args.batch_size)+" --each_input_size "+str(args.each_input_size)+" "
         command+="--num_templates "+str(args.num_templates)+" --mil --config "+args.config+" --cuda "
@@ -66,7 +66,7 @@ def main(args):
             continue
         
         checkpoint_path=os.path.join(directory,filename)
-        command="python main.py --training_data_path "+args.unlabelled_training_data_path+" --val_data_path "+val_data_path+" --exp_name "+exp_name+" "
+        command="/home/cse/btech/cs1150210/anaconda3/bin/python3 main.py --training_data_path "+args.unlabelled_training_data_path+" --val_data_path "+val_data_path+" --exp_name "+exp_name+" "
         command+="--labelled_training_data_path "+train_data_path+" --output_path "+args.dir+" "
         command+="--num_epochs "+str(args.num_epochs)+" --batch_size "+str(args.batch_size)+" --each_input_size "+str(args.each_input_size)+" "
         command+="--num_templates "+str(args.num_templates)+" --mil --config "+args.config+" --cuda "
@@ -75,7 +75,7 @@ def main(args):
         os.system(command)
         # print(command)
 
-        command="python main.py --training_data_path "+args.unlabelled_training_data_path+" --val_data_path "+test_data_path+" --exp_name "+exp_name+" "
+        command="/home/cse/btech/cs1150210/anaconda3/bin/python3 main.py --training_data_path "+args.unlabelled_training_data_path+" --val_data_path "+test_data_path+" --exp_name "+exp_name+" "
         command+="--labelled_training_data_path "+train_data_path+" --output_path "+args.dir+" "
         command+="--num_epochs "+str(args.num_epochs)+" --batch_size "+str(args.batch_size)+" --each_input_size "+str(args.each_input_size)+" "
         command+="--num_templates "+str(args.num_templates)+" --mil --config "+args.config+" --cuda "
