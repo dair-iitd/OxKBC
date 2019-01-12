@@ -91,9 +91,7 @@ def main(args):
                         'eval', eval_fn=my_eval_fn, args=args)
         if(args.log_eval is not None):
             handler=open(args.log_eval,"a")
-
-            print(','.join([str(round(x, 6)) if isinstance(x, float) else str(x) for x in record]),
-                file=handler)            
+            print(','.join([str(round(x, 6)) if isinstance(x, float) else str(x) for x in record]),file=handler)
             handler.close()
     if(args.only_eval):
         logging.info('Ran only eval mode, now exiting')
