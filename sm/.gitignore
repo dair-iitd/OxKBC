@@ -3,6 +3,6 @@ grid_search_*
 cross_val*
 !cross_validation.py
 semi_sup/
-test/
+test*
 fb15*
 test_cross
