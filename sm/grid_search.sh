@@ -9,7 +9,7 @@ RHO=(-5 -2 -1 -0.25 -0.125 -0.05 -0.01 0 0.01 0.05 0.125 0.25 0.5)
 
 dataset='fb15k'
 hidden_unit_list="[90,40]"
-logs='grid_search/grid_search_'${dataset}'_90_40_robust'
+logs='grid_search_dataset/grid_search_'${dataset}'_90_40_robust'
 mkdir -p $logs
 training_data_path='../logs/'${dataset}'/sm_with_id.data.pkl'
 labelled_training_data_path='../logs/'${dataset}'/exp_words/sm_sup_train_with_id.pkl'

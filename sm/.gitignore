@@ -1,9 +1,9 @@
-grid_search_*
+grid_search*
+ignore/
 !*.sh
-*_logs
+*logs*
 cross_val*
-!cross_validation.py
-semi_sup/
+!*.py
 test*
 fb15*
 test_cross
