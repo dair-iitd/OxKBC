@@ -1,4 +1,5 @@
 grid_search_*
+!*.sh
 *_logs
 cross_val*
 !cross_validation.py
