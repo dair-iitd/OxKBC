@@ -178,7 +178,7 @@ def compute(epoch, model, loader, optimizer, mode, eval_fn, args, labelled_train
                 file=args.lpf)
             
     if mode == 'train_un':
-        return (rec, 3, header)
+        return (rec, 2, header)
     else:
         # Presently optimizing micro_f score
         return (rec, -1, header)
