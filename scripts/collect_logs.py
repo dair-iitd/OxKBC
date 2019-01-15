@@ -2,16 +2,17 @@ import numpy as np
 import sys,os
 import pandas as pd
 
-
-base_dir = '../sm/cross_val/'
-dataset_name = 'cross_val_yago_90_40/'
+# base_dir = '../sm/cross_val/'
+# dataset_name = 'cross_val_yago_90_40/'
+dataset_dir=sys.argv[1]
 test_or_val = 'test'
-exps = os.listdir(os.path.join(base_dir,dataset_name))
+# exps = os.listdir(os.path.join(base_dir,dataset_name))
+exps = os.listdir(dataset_dir)
 
 flist = []
 for exp in exps:
-    if os.path.isdir(os.path.join(base_dir,dataset_name, exp)):
-        fname = os.path.join(base_dir,dataset_name,exp,test_or_val)
+    if os.path.isdir(os.path.join(dataset_dir, exp)):
+        fname = os.path.join(dataset_dir,exp,test_or_val)
         if os.path.exists(fname):
             flist.append(fname)
         else:
@@ -50,7 +51,7 @@ a4 = summ.pivot_table(columns = 'neg_rew',index='rho', values = 'mif_max', fill_
 a5 = summ.pivot_table(columns = 'neg_rew',index='rho', values = 'count', fill_value = 0)
 
 
-fh = open(os.path.join(base_dir,dataset_name,test_or_val+'_summary.csv'),'w')
+fh = open(os.path.join(dataset_dir,test_or_val+'_summary.csv'),'w')
 
 
 def write_to_file(table,header,f):
