@@ -37,8 +37,8 @@ header.append('exp')
 table = merge_tables(flist)
 table.columns = header 
 s =table['exp'].apply(lambda x: x.split('_'))
-table['neg_rew'] = s.apply(lambda x: x[1])
-table['rho'] = s.apply(lambda x: x[2])
+table['neg_rew'] = s.apply(lambda x: float(x[1]))
+table['rho'] = s.apply(lambda x: float(x[2]))
 
 summ = table.groupby(['neg_rew','rho']).agg({'mif': ['mean','std','min','max'],'epoch':'count'})
 summ.columns = ['mif_mean','mif_std','mif_min','mif_max','count']
