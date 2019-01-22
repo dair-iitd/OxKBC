@@ -155,11 +155,10 @@ def compute(epoch, model, loader, optimizer, mode, eval_fn, args, labelled_train
            len(loader.dataset), time.time() - start_time]
 
     metric_header = []
+    if args.pred_file is not None:
+        np.savetxt(os.path.join(args.output_path,args.pred_file), predictions)
+        logging.info("Written Predictions to {}".format(os.path.join(args.output_path,args.pred_file)))
     if mode != 'train_un' and calc_acc:
-        np.savetxt(os.path.join(args.output_path,
-                                'predictions_valid.txt'), predictions)
-        if(args.raw):
-            loader.save_raw_data(os.path.join(args.output_path,'valid_raw_data.txt'),predictions)
         metric = eval_fn.calculate_accuracies(ground_truth, predictions)
         rec.extend(metric)
         metric_header = eval_fn.header
@@ -172,10 +171,10 @@ def compute(epoch, model, loader, optimizer, mode, eval_fn, args, labelled_train
         ','.join([str(round(x, 6)) if isinstance(x, float) else str(x) for x in rec]))
 
         print('epoch,mode,loss,count,dataset_size,time,' +
-                     ','.join(metric_header), file = args.lpf)
+                     ','.join(metric_header), file = args.lpf,flush=True)
 
         print(','.join([str(round(x, 6)) if isinstance(x, float) else str(x) for x in rec]),
-                file=args.lpf)
+                file=args.lpf,flush=True)
             
     if mode == 'train_un':
         return (rec, 2, header)

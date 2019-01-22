@@ -115,14 +115,10 @@ class SelectionModuleDataset(torch.utils.data.Dataset):
             raise Exception(
                 'Please provide base model file path - {}', str(base_model_file))
 
-        logging.info('means: {} '.format( means))
-        logging.info('stds: {} '.format( stds))
+        logging.debug('means: {} '.format( means))
+        logging.debug('stds: {} '.format( stds))
         data[:, self.start_idx:-1] = (data[:, self.start_idx:-1]-means)/stds
         self.data = data
-
-        if mode != 'train':
-            raw = np.concatenate((self.raw_data[:,self.start_idx:],self.data[:,self.start_idx:-1],self.raw_data[:,:self.start_idx]),axis=1)
-
 
         logging.info('Normalized and successfully loaded data. Size of dataset = {}'.format(
             self.data.shape))
