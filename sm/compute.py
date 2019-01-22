@@ -55,7 +55,7 @@ class Loss(object):
                 #convert template score into probabilites
                 template_score = F.softmax(template_score, dim=1)
                 #template_score = template_score * self.weights
-                reward_tensor = (self.args.class_imbalance*y.float()*(template_score[:, 0]*self.weights[0]+torch.max(template_score[:, 1:], dim=1)[0])) + (1.0-y.float())*((template_score[:, 0]*self.args.pos_reward) + torch.sum(template_score[:, 1:], dim=1)[0]*self.args.neg_reward)
+                reward_tensor = (self.args.class_imbalance*y.float()*(template_score[:, 0]*self.weights[0]+torch.max(template_score[:, 1:], dim=1)[0])) + (1.0-y.float())*((template_score[:, 0]*self.args.pos_reward) + torch.sum(template_score[:, 1:], dim=1)*self.args.neg_reward)
                 loss = -1.0*reward_tensor.mean()
             elif mode == 'train_sup':
                 #template_score = F.softmax(template_score, dim=1)
