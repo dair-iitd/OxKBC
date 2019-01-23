@@ -9,54 +9,6 @@ from sklearn import metrics
 import argparse
 import logging
 
-p = re.compile('Best score: (0.[0-9]*)')
-
-# def exp_one_number(directory,data,folds):
-#     predictions = []
-#     true = []
-#     ctr = 0
-#     for i in range(folds):
-#         if os.path.isfile(os.path.join(directory,'exp_'+str(i),'valid_preds.txt')) and os.path.isfile(os.path.join(directory,'exp_'+str(i),'test_preds.txt')):
-#             true_data = (pickle.load(open(os.path.join(dirname,'test_'+str(i)+'.pkl'),'rb'))[:,-1]).tolist()
-#             pred_data = (np.loadtxt(os.path.join(dirname,'exp_'+str(i),'predictions_valid.txt'))).tolist()
-#             if len(true_data)  != len(pred_data):
-#                 continue
-#             true.extend(true_data)
-#             predictions.extend(pred_data)
-#             ctr += 1
-#     mif = metrics.f1_score(true,predictions,labels=[1,2,3,4,5],average='micro')
-#     #print('Got mif as %f from folder %s with count as %d'.format(mif,dirname,ctr))
-#     print('Got mif as {} from folder {} with count as {}'.format(mif,dirname,ctr))
-#     return mif
-
-def parse_folder(dirname):
-    params = os.path.basename(os.path.normpath(dirname)).split('_')
-    return (float(params[1]),float(params[2]))
-
-
-def write_table(result,write_path):
-    neg_list = sorted(list(result.keys()))
-    print(neg_list)
-    rho_list = sorted(list(result[neg_list[0]].keys()))
-    columns = ['rho/neg']
-    mydata = {'rho/neg':[]}
-    for x in rho_list:
-        mydata['rho/neg'].append(str(x))
-    for x in neg_list:
-        mydata[str(x)] = []
-        columns.append(str(x))
-    
-    for neg in neg_list:
-        for rho in rho_list:
-            mydata[str(neg)].append(result[neg][rho])
-
-    df = pd.DataFrame(mydata, columns=columns)
-    df.to_csv(write_path,sep='\t',index=False)
-
-
-
-
-
 DATA_PREFIX = ['train','val','test']
 
 def load_data(base_dir,folds):
@@ -86,7 +38,6 @@ def get_params(directory):
             rhos.add(rho)
     return (list(sorted(neg_rewards)),list(sorted(rhos)))
 
-
 def check_exp(directory,data,folds):
     for i in range(folds):
         for el in DATA_PREFIX[1:]:
@@ -104,8 +55,6 @@ def check_exp(directory,data,folds):
                 return False
     return True
 
-
-
 def begin_checks(base_dir,folds,runs):
     data_present = check_data(base_dir,folds)
     if not data_present:
@@ -115,8 +64,7 @@ def begin_checks(base_dir,folds,runs):
     data = load_data(base_dir,folds)
     
     cols,rows = get_params(os.path.join(base_dir,"run_1"))
-    print("Rows are {} and columns are {}".format(rows,cols))
-
+    print("Rows are {}\ncolumns are {}".format(rows,cols))
     for run in range(2,runs+1):
         this_cols, this_rows = get_params(os.path.join(base_dir,"run_"+str(run)))
         if not (set(cols) == set(this_cols) and set(rows) == set(this_rows)):
@@ -124,7 +72,6 @@ def begin_checks(base_dir,folds,runs):
             return (False,[])
 
     invalid_exps = []
-
     for run in range(1,runs+1):
         for col in cols:
             for row in rows:
@@ -140,9 +87,26 @@ def begin_checks(base_dir,folds,runs):
         return (False,invalid_exps)
 
 def write_invalid(invalid_exps,fname):
-    with open(fname,'w') as f:
-        for exp in invalid_exps:
-            f.write('/'.join(exp.split('/')[-2:])+'\n')
+    if fname is not None:
+        with open(fname,'w') as f:
+            for exp in invalid_exps:
+                f.write('/'.join(exp.split('/')[-2:])+'\n')
+
+def calc_exp(directory,data,folds):
+    predictions = {'val':[],'test':[]}
+    true = {'val':[],'test':[]}
+    for i in range(folds):
+        for el in DATA_PREFIX[1:]:
+            if el == 'val':
+                preds_fname = os.path.join(directory,'exp_'+str(i),'valid_preds.txt')
+            else:
+                preds_fname = os.path.join(directory,'exp_'+str(i),'test_preds.txt')                
+            pred_data = np.loadtxt(preds_fname).tolist()
+            predictions[el].extend(pred_data)
+            true[el].extend(data[el][i])
+    mif_val = metrics.f1_score(true['val'],predictions['val'],labels=[1,2,3,4,5],average='micro')
+    mif_test = metrics.f1_score(true['test'],predictions['test'],labels=[1,2,3,4,5],average='micro')
+    return (mif_val,mif_test)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -157,10 +121,34 @@ if __name__ == "__main__":
 
     if not ok and len(invalid_exps) > 0:
         write_invalid(invalid_exps,args.ifile)
-     
-
-
     
+
+# def parse_folder(dirname):
+#     params = os.path.basename(os.path.normpath(dirname)).split('_')
+#     return (float(params[1]),float(params[2]))
+
+# def write_table(result,write_path):
+#     neg_list = sorted(list(result.keys()))
+#     print(neg_list)
+#     rho_list = sorted(list(result[neg_list[0]].keys()))
+#     columns = ['rho/neg']
+#     mydata = {'rho/neg':[]}
+#     for x in rho_list:
+#         mydata['rho/neg'].append(str(x))
+#     for x in neg_list:
+#         mydata[str(x)] = []
+#         columns.append(str(x))
+    
+#     for neg in neg_list:
+#         for rho in rho_list:
+#             mydata[str(neg)].append(result[neg][rho])
+
+#     df = pd.DataFrame(mydata, columns=columns)
+#     df.to_csv(write_path,sep='\t',index=False)
+
+
+
+
 
 
 
