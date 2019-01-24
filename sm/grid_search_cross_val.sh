@@ -23,7 +23,7 @@ NTIMES=5
 
 ## Global Variables
 folds=5
-dataset='fb15k'
+dataset='yago'
 hidden_unit_list="hidden_unit_list: [90,40]"
 supervision="semi"
 unlabelled_training_data_path='../logs/'${dataset}'/sm_with_id.data.pkl'
