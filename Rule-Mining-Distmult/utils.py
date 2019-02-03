@@ -1,3 +1,5 @@
+import pickle
+
 def read_data(path):
     data = []
     with open(path, "r") as infile:
@@ -76,3 +78,25 @@ def get_ent_to_rel(data_arr):
             ent_to_rel[pair]=[]
         ent_to_rel[pair].append(data[1])
     return ent_to_rel
+
+def load_pickle(filepath):
+	with open(filepath,"rb") as f:
+		dump=pickle.load(f)
+	return dump
+
+def dump_pickle(dump,filepath):
+	with open(filepath,"wb") as f:
+		pickle.dump(dump,f)
+
+def get_relation_dict(data_arr):
+	relation_dict={}
+	count={}
+
+	for data in data_arr:
+	    if data[1] not in relation_dict:
+	    	relation_dict[data[1]]=[]
+	    	count[data[1]]=0
+	    relation_dict[data[1]].append((data[0],data[2]))
+	    count[data[1]]+=1
+
+	return count,relation_dict    
