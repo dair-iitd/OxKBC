@@ -44,7 +44,7 @@ class TypedDM():
         simi = np.vdot(r1[0:self.first], r2[0:self.first])
         simi *= np.vdot(r1[self.first:self.second], r2[self.first:self.second])
         simi *= np.vdot(r1[self.second:], r2[self.second:])
-        return simi
+        return -simi
 
 
     def get_relation_similarity(self, r1, r2,embed=False):
