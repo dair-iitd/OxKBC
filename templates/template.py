@@ -33,3 +33,7 @@ class TemplateBaseClass(ABC):
     @abstractmethod
     def get_explanation(self, fact):
         pass
+    @abstractmethod
+    def get_english_explanation(self, fact, enum_to_id, rnum_to_id, eid_to_name, rid_to_name):
+        pass
+    

@@ -6,7 +6,7 @@ import time
 
 import utils
 from templates.template import TemplateBaseClass
-
+import string
 
 class Template2(TemplateBaseClass):
     """
@@ -18,6 +18,7 @@ class Template2(TemplateBaseClass):
         self.kb = kblist[0]
         self.base_model = base_model
         self.use_hard_triple_scoring = True
+        self.exp_template = 'Since, $e2 is most frequently occuring entity for the entity $e1, so I can say ($e1, $r, $e2)'
 
         if(load_table == None):
             self.process_data()
@@ -138,3 +139,8 @@ class Template2(TemplateBaseClass):
                 features = [my_score, best_score,
                             best_answer, z_score]
         return features
+    
+    def get_english_explanation(self, fact, enum_to_id, rnum_to_id, eid_to_name, rid_to_name):
+        mapped_fact = utils.map_fact(fact, enum_to_id, rnum_to_id)
+        mapped_fact_name = utils.map_fact(mapped_fact, eid_to_name, rid_to_name)
+        return string.Template(self.exp_template).substitute(e1=mapped_fact_name[0], r=mapped_fact_name[1], e2=mapped_fact_name[2])

@@ -5,7 +5,7 @@ import time
 import utils
 import logging
 from templates.template import TemplateBaseClass
-
+import string
 
 class Template4(TemplateBaseClass):
     """
@@ -21,6 +21,9 @@ class Template4(TemplateBaseClass):
         self.use_hard_triple_scoring = use_hard_triple_scoring
         self.subsample_constant = 100
         self.subsample_proportion = 10
+
+        self.exp_template = 'Since, $eprime is similar to entity $e1 and I know that ($eprime, $r, $e2) , so I can say ($e1, $r, $e2)'
+
 
         if(load_table == None):
             logging.info("Load table is None, so beginning process_data")
@@ -221,3 +224,10 @@ class Template4(TemplateBaseClass):
                             best_answer, best_answer_relation, z_score]
 
         return features
+
+    def get_english_explanation(self, fact, enum_to_id, rnum_to_id, eid_to_name, rid_to_name):
+        mapped_fact = utils.map_fact(fact, enum_to_id, rnum_to_id)
+        mapped_fact_name = utils.map_fact(mapped_fact, eid_to_name, rid_to_name)
+        eprime_id = enum_to_id[self.get_explanation(fact)[1]]
+        eprime = eid_to_name.get(eprime_id,eprime_id)
+        return string.Template(self.exp_template).substitute(e1=mapped_fact_name[0],r=mapped_fact_name[1],e2=mapped_fact_name[2],eprime=eprime)
