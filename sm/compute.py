@@ -68,6 +68,12 @@ class Loss(object):
         return loss, ypred, y
 
     def calculate_accuracies(self, ycpu, ypred_cpu):
+        if len(ycpu.shape) > 1 and ycpu.shape[1] > 1:
+            logging.info("Multi task evaluation")
+            ypred_cpu = np.ravel(ypred_cpu)
+            correct_count = ycpu[np.arange(ycpu.shape[0]),ypred_cpu.astype(int)].sum()
+            return [correct_count*1.0/len(ypred_cpu)]
+
         p, r, f, s = metrics.precision_recall_fscore_support(
             ycpu, ypred_cpu, labels=self.labels)
         micro_p = metrics.precision_score(
@@ -110,7 +116,10 @@ def compute(epoch, model, loader, optimizer, mode, eval_fn, args, labelled_train
         model.eval()
 
     predictions = np.zeros(len(loader.dataset))
-    ground_truth = np.zeros(len(loader.dataset))
+    if loader.dataset.Y is not None:
+        ground_truth = np.zeros(loader.dataset.Y.shape)
+    else:
+        ground_truth = np.zeros(len(loader.dataset))
 
     # var is a list of - data, y and idx
     for var in loader:

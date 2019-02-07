@@ -7,6 +7,7 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader, Dataset
 
+import scipy.sparse as sp
 
 def get_data_loaders(args):
     stats_file = os.path.join(args.output_path,'stats')
@@ -18,7 +19,7 @@ def get_data_loaders(args):
                     each_input_size=args.each_input_size, 
                     use_ids=args.use_ids, mode='train', 
                     stats_file_path=stats_file)
-
+                    
     train_loader = DataLoader(train_ds,batch_size=args.batch_size, shuffle=True)
 
     val_loader = None
@@ -27,6 +28,8 @@ def get_data_loaders(args):
                     base_model_file=args.base_model_file, 
                     each_input_size=args.each_input_size,
                     use_ids=args.use_ids, mode='eval', 
+                    labels_file_path=args.val_labels_path,
+                    num_labels = args.num_templates + 1,
                     stats_file_path=stats_file)
 
         val_loader = DataLoader(val_ds, batch_size=args.batch_size, shuffle=False)
@@ -54,7 +57,7 @@ def get_data_loaders(args):
     
 
 class SelectionModuleDataset(torch.utils.data.Dataset):
-    def __init__(self, input_file_path, base_model_file, each_input_size=7, use_ids=False, mode='train', stats_file_path=None):
+    def __init__(self, input_file_path, base_model_file, each_input_size=7, use_ids=False, mode='train', stats_file_path=None, labels_file_path=None, num_labels = 0):
         if '.txt' in input_file_path:
             logging.info("Input file {} is a txt file".format(input_file_path))
             data = np.loadtxt(input_file_path, delimiter=',', dtype=float)
@@ -123,10 +126,39 @@ class SelectionModuleDataset(torch.utils.data.Dataset):
         logging.info('Normalized and successfully loaded data. Size of dataset = {}'.format(
             self.data.shape))
 
+        self.Y = None 
+        if labels_file_path is not None:
+            logging.info("Multi-label evaluation on. Labels in : {}".format(labels_file_path))
+            fh = open(labels_file_path,'r')
+            lines = fh.readlines()
+            lines = [list(map(int,line.strip().strip(',').split(','))) for line in lines]
+            row_idx, col_idx, val_idx = [], [], []
+            for i,l_list in enumerate(lines):
+                l_list = list(set(l_list)) # remove duplicates
+                for y in l_list:
+                    row_idx.append(i)
+                    col_idx.append(y)
+                    val_idx.append(1)
+            m = max(row_idx) + 1 
+            n = max(col_idx) + 1 
+            n = max(n,num_labels)
+            self.Y = sp.csr_matrix((val_idx, (row_idx, col_idx)), shape=(m, n))
+            assert(m == len(self.data))
+
+        
+
+
+
     def __len__(self):
         return len(self.data)
 
     def __getitem__(self, idx):
+        if self.Y is not None:
+            #multilabel evaluation
+            y = np.ravel(self.Y[idx].todense())
+        else:
+            y = self.data[idx][-1]
+        #
         if(self.use_ids):
             e1_embed = np.concatenate((self.bm['entity_real'][int(
                 self.data[idx][0])], self.bm['entity_type'][int(self.data[idx][0])]))
@@ -134,6 +166,6 @@ class SelectionModuleDataset(torch.utils.data.Dataset):
                 self.data[idx][2])], self.bm['entity_type'][int(self.data[idx][2])]))
             r_embed = np.concatenate((self.bm['rel_real'][int(self.data[idx][1])], self.bm['head_rel_type'][int(
                 self.data[idx][1])], self.bm['tail_rel_type'][int(self.data[idx][1])]))
-            return (np.concatenate((e1_embed, r_embed, e2_embed, self.data[idx][self.start_idx:-1])), self.data[idx][-1], idx)
+            return (np.concatenate((e1_embed, r_embed, e2_embed, self.data[idx][self.start_idx:-1])), y, idx)
         else:
-            return (self.data[idx][self.start_idx:-1], self.data[idx][-1], idx)
+            return (self.data[idx][self.start_idx:-1], y, idx)

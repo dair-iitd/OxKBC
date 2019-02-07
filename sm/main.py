@@ -149,6 +149,10 @@ if __name__ == '__main__':
                         help="Base model dump for loading embeddings", type=str, default='')
     parser.add_argument(
         '--val_data_path', help="Validation data path in the same format as training data", type=str, default='')
+    parser.add_argument(
+        '--val_labels_path', help="Validation data Labels path for multi-label evaluation", type=str, default=None)
+
+
     parser.add_argument('--exp_name', help='Experiment name',
                         type=str, default='default_exp')
     parser.add_argument(
