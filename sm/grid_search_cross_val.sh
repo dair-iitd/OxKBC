@@ -16,7 +16,8 @@ fi
 
 ## Parameters to search for
 NEG_REWARD=(0 -0.05 -0.125 -0.25 -0.5 -1 -1.5 -2 -4 -8)
-RHO=(0 0.01 0.05 0.1 0.125 0.2 0.25 0.35 0.4 0.5 0.75)
+#RHO=(0 0.01 0.05 0.1 0.125 0.2 0.25 0.35 0.4 0.5 0.75)
+RHO=(0 0.01 0.05 0.1 0.125)
 
 ## Repeat the cross-validation NTIMES times
 NTIMES=5
@@ -25,7 +26,7 @@ NTIMES=5
 folds=5
 dataset='yago'
 hidden_unit_list="hidden_unit_list: [90,40]"
-supervision="semi"
+supervision="un"
 unlabelled_training_data_path='../logs/'${dataset}'/sm_with_id.data.pkl'
 labelled_training_data_path='../logs/'${dataset}'/exp_words/sm_valid_with_id.pkl'
 base_model_file='../dumps/'${dataset}'_distmult_dump_norm.pkl'
@@ -34,7 +35,7 @@ mkdir -p $base_logs
 if [ "$rerun" = false ]
 then
 	echo "Genearating Data"
-	# /home/cse/btech/cs1150210/anaconda3/bin/python3 cross_validation.py --folds ${folds} --dir ${base_logs} --labelled_training_data_path $labelled_training_data_path --supervision ${supervision} --gen_data
+	 #/home/cse/btech/cs1150210/anaconda3/bin/python3 cross_validation.py --folds ${folds} --dir ${base_logs} --labelled_training_data_path $labelled_training_data_path --supervision ${supervision} --gen_data
 fi
 for run in $(seq 1 $NTIMES); do
 	logs=${base_logs}"/run_"${run}

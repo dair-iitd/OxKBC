@@ -146,3 +146,9 @@ def get_r1r2_e1e2_dict(data_arr, index_head):
 
     return count_r1_r2
 
+def read_data(path):
+    data = []
+    with open(path, "r",errors='ignore',encoding='ascii') as infile:
+        lines = infile.readlines()
+        data = [line.strip().split() for line in lines]
+    return data
