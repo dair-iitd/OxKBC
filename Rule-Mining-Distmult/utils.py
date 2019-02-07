@@ -19,17 +19,6 @@ def map_triple(triple,dump):
     l = [dump['entity_to_id'][el[0]], dump['relation_to_id'][el[1]], dump['entity_to_id'][el[2]]]
     return l    
 
-# def dump_new_complex(dump,MODEL_TYPE):
-#     dump_norm = {}
-#     for key in dump:
-#         if(key == 'relation_to_id' or key=='entity_to_id'):
-#             dump_norm[key] = copy.deepcopy(dump[key])
-#         else:
-#             dump_norm[key] = copy.deepcopy(normalize(dump[key]))
-#     with open(MODEL_TYPE+"_dump_norm.pkl","wb") as f:
-#         pickle.dump(dump_norm,f)
-
-
 def get_head_index(data_arr):
     index_head = {}
 
@@ -61,6 +50,29 @@ def get_r1r2_count(data_arr,index_head,get_set=False):
                 set_r1_r2[pair].add((data[0],tail))
     return count_r1_r2,set_r1_r2
 
+
+def get_r1r2r3_count(data_arr, index_head, get_set=False):
+
+    count_r1_r2_r3 = {}
+    set_r1_r2_r3 = {}
+
+    for r1r2 in data_arr:
+        for e1e2 in data_arr[r1r2]:
+            if e1e2[1] not in index_head:
+                continue
+            rel_tail_list = index_head[e1e2[1]]
+            for rel_tail in rel_tail_list:
+                rel = rel_tail[0]
+                tail = rel_tail[1]
+                body = (r1r2[0],r1r2[1],rel)
+                if(body not in count_r1_r2_r3):
+                    count_r1_r2_r3[body] = 0
+                    if(get_set):
+                        set_r1_r2_r3[body] = set()
+                count_r1_r2_r3[body] += 1
+                if(get_set):
+                    set_r1_r2_r3[body].add((e1e2[0], tail))
+    return count_r1_r2_r3, set_r1_r2_r3
 
 def get_rel_entset(data_arr):
     rel={}
@@ -133,3 +145,4 @@ def get_r1r2_e1e2_dict(data_arr, index_head):
                 count_r1_r2[pair][ent_pair]=data[2]
 
     return count_r1_r2
+
