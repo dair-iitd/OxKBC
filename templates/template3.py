@@ -24,9 +24,11 @@ class Template3(TemplateBaseClass):
         self.use_hard_triple_scoring = use_hard_triple_scoring
 
         # self.exp_template = 'Since, $rprime is similar to the relation $r and I know that ($e1, $rprime, $e2) , so I can say ($e1, $r, $e2)'
-        self.exp_template = 'Since, <b>$rprime</b> is similar to the relation <b>$r</b> and AI knows that <b>($e1, $rprime, $e2)</b> , so AI can say <b>($e1, $r, $e2)</b>'
+        # self.exp_template = 'Since, <b>$rprime</b> is similar to the relation <b>$r</b> and AI knows that <b>($e1, $rprime, $e2)</b> , so AI can say <b>($e1, $r, $e2)</b>'
 
-
+        # self.exp_template = '<b>$e1 $r $e2</b> because <b>$e1 $rprime $e2</b> and <b>\"$r\"</b> is similar to <b>\"$rprime\"</b>'
+        self.exp_template = 'because <b>$e1 $rprime $e2</b> and <b>\"$r\"</b> is similar to <b>\"$rprime\"</b>'
+                    
         if(load_table == None):
             logging.info("Load table is None, so beginning process_data")
             self.process_data()

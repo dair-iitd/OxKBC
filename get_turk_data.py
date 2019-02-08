@@ -11,13 +11,13 @@ import pandas as pd
 import template_builder
 import utils
 
-NO_EXPLANATION = "Sorry, AI has no explanation for the fact"
+NO_EXPLANATION = "No explanation for this fact"
 
 
 def english_exp_rules(mapped_data, predictions, entity_inverse_map, relation_inverse_map, entity_names, relation_names):
 
     def english_from_fact(fact, enum_to_id, rnum_to_id, eid_to_name, rid_to_name):
-        exp_template = '<b>($e1 $r $e2)</b>'
+        exp_template = '<b>$e1 $r $e2</b>'
         mapped_fact = utils.map_fact(fact, enum_to_id, rnum_to_id)
         mapped_fact_name = utils.map_fact(
             mapped_fact, eid_to_name, rid_to_name)
@@ -39,16 +39,16 @@ def english_exp_rules(mapped_data, predictions, entity_inverse_map, relation_inv
                 explaining_fact = (
                     mapped_data[itr][0], pred[0], mapped_data[itr][2])
                 explaining_fact = lambda_english_from_fact(explaining_fact)
-                explanations.append(
-                    to_explain+" because AI knows "+explaining_fact)
+                # explanations.append(to_explain+" because "+explaining_fact)
+                explanations.append("because "+explaining_fact)
         else:
             to_explain = lambda_english_from_fact(fact)
             explaining_fact1 = (mapped_data[itr][0], pred[0][0], pred[1])
             explaining_fact2 = (pred[1], pred[0][1], mapped_data[itr][2])
             explaining_fact1 = lambda_english_from_fact(explaining_fact1)
             explaining_fact2 = lambda_english_from_fact(explaining_fact2)
-            explanations.append(to_explain+" because because AI knows " +
-                                explaining_fact+" and "+explaining_fact2)
+            # explanations.append(to_explain+" because because AI knows " +explaining_fact+" and "+explaining_fact2)
+            explanations.append("because " +explaining_fact1+" and "+explaining_fact2)
     return explanations
 
 
@@ -63,15 +63,19 @@ def english_exp_template(mapped_data, predictions, template_objs, entity_inverse
     return explanations
 
 
-def write_english_exps(named_data, template_exps, rule_exps, output_file):
+def write_english_exps(named_data, template_exps, rule_exps, output_file,num_per_hit):
     csv_data = []
     for fact, t_exp, r_exp in zip(named_data, template_exps, rule_exps):
+        if(t_exp == NO_EXPLANATION and r_exp == NO_EXPLANATION):
+            continue
         row = [' '.join(fact), t_exp, r_exp]
         csv_data.append(row)
-    csv_data = np.array(csv_data)
-    csv_data = csv_data.reshape((-1, 15))
+    
+    reqd = int(len(csv_data)/num_per_hit)*num_per_hit
+    csv_data = np.array(csv_data[:reqd])
+    csv_data = csv_data.reshape((-1, 3*num_per_hit))
     columns = []
-    for i in range(1, 6):
+    for i in range(1, num_per_hit+1):
         columns.extend(['fact_'+str(i), 'exp_A_'+str(i), 'exp_B_'+str(i)])
     df = pd.DataFrame(csv_data, columns=columns)
     df.to_csv(output_file+".csv", index=False, sep=',')
@@ -98,6 +102,7 @@ if __name__ == "__main__":
                         help='List of rules predicted for data', default=None)
     parser.add_argument('--data_repo_root',
                         required=False, default='data')
+    parser.add_argument('--num',help='Number of samples for one HIT',default=5,type=int)
     parser.add_argument('--log_level',
                         default='INFO',
                         dest='log_level',
@@ -116,6 +121,11 @@ if __name__ == "__main__":
     logging.info("Read Model Dump")
 
     data = utils.read_data(args.test_file)
+
+    if(len(data)%args.num != 0):
+        logging.error('Number of examples per hit is not a factor of length of data')
+        exit(-1)
+
     mapped_data = np.array(utils.map_data(
         data, distmult_dump['entity_to_id'], distmult_dump['relation_to_id'])).astype(np.int32)
     logging.info("Loaded test file from %s" % (args.test_file))
@@ -138,7 +148,7 @@ if __name__ == "__main__":
             exit(-1)
 
     entity_names = utils.read_entity_names(os.path.join(
-        data_root, "entity_mid_name_type_typeid.txt"))
+        data_root, "mid2wikipedia_cleaned.tsv"),add_wiki=True)
     relation_names = utils.read_relation_names(
         os.path.join(data_root, "relation_name.txt"))
 
@@ -163,7 +173,12 @@ if __name__ == "__main__":
 
     logging.info("Generated explanations")
 
+    if(len(rule_exps) != len(template_exps)):
+        logging.error("Invalid length of explanations {} and {}".format(len(rule_exps),len(template_exps)))
+        exit(-1)
+
+
     named_data = utils.map_data(data, entity_names, relation_names)
     write_english_exps(named_data, template_exps,
-                       rule_exps, args.output_filename)
+                       rule_exps, args.output_filename,args.num)
     logging.info("Written explanations to %s" % (args.output_filename))

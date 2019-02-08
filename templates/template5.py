@@ -26,7 +26,7 @@ class Template5(TemplateBaseClass):
         self.subsample_proportion = 6
 
         # self.exp_template = 'Since, $eprime is similar to entity $e1 and $rprime is similar to relation $r and I know that ($eprime, $rprime, $e2) , so I can say ($e1, $r, $e2)'
-        self.exp_template = 'Since, <b>$eprime</b> is quite similar to <b>$e1</b> and <b>$rprime</b> is similar to relation <b>$r</b> and AI knows that <b>($eprime, $rprime, $e2)</b> so AI can say <b>($e1, $r, $e2)</b>'
+        self.exp_template = '<b>\"$e1\"</b> is similar to <b>\"$eprime\"</b> and <b>\"$r\"</b> is similar to relation <b>\"$rprime\"</b> and <b>$eprime $rprime $e2</b> hence <b>$e1 $r $e2</b>'
 
         if(load_table == None):
             logging.info("Load table is None, so beginning process_data")

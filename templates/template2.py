@@ -19,7 +19,8 @@ class Template2(TemplateBaseClass):
         self.base_model = base_model
         self.use_hard_triple_scoring = True
         # self.exp_template = 'Since, $e2 is most frequently occuring entity for the entity $e1, so I can say ($e1, $r, $e2)'
-        self.exp_template = 'Since, <b>$e2</b> is seen quite frequently with <b>$e1</b>, so AI can say <b>($e1, $r, $e2)</b>'
+        # self.exp_template = 'Since, <b>$e2</b> is seen quite frequently with <b>$e1</b>, so AI can say <b>($e1, $r, $e2)</b>'
+        self.exp_template = '<b>$e2</b> is frequently seen with <b>$e1</b> hence <b>$e1 $r $e2</b>'
 
         if(load_table == None):
             self.process_data()

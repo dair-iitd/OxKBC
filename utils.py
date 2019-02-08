@@ -67,15 +67,23 @@ def map_data(data, mapped_entity = None, mapped_relation=None):
         mapped_data.append(map_fact(line,mapped_entity,mapped_relation))
     return mapped_data
 
-def read_entity_names(path):
+def read_entity_names(path,add_wiki=True):
+    WIKI_PREFIX_URL = 'https://en.wikipedia.org/wiki/'
     entity_names = {}
     with open(path, "r",errors='ignore',encoding='ascii') as f:
         lines = f.readlines()
         for line in lines:
-            content = line.split()
+            content_raw = line.split('\t')
+            content = [el.strip() for el in content_raw]
             if content[0] in entity_names:
                 logging.warn('Duplicate Entity found %s in line %s' % (content[0],' '.join(line)))
-            entity_names[content[0]] = ' '.join(content[1:-2])
+            name = content[1]
+            wiki_id = content[2]
+            wiki_link = WIKI_PREFIX_URL+wiki_id
+            if(add_wiki):
+                entity_names[content[0]] = '<a target=\"_blank\" href=\"'+wiki_link+'\">'+name+'</a>'
+            else:
+                entity_names[content[0]] = name
     return entity_names
 
 def read_relation_names(path):
