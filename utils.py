@@ -10,6 +10,8 @@ import pandas as pd
 
 _LOG_LEVEL_STRINGS = ['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG']
 EPSILON=0.0000001
+e1_e2_r=None
+e2_e1_r=None
 
 def _log_level_string_to_int(log_level_string):
     if not log_level_string in _LOG_LEVEL_STRINGS:
@@ -113,6 +115,92 @@ def read_pkl(filename):
 def convert_to_pandas(table, header):
     return pd.DataFrame(table, columns=header)
 
+def get_ent_ent_rel(data_arr):
+    e1_e2_r={}
+    e2_e1_r={}
+    for data in data_arr:
+        e1=data[0]
+        r=data[1]
+        e2=data[2]
+        
+        if e1 not in e1_e2_r:
+            e1_e2_r[e1]={}
+        if e2 not in e2_e1_r:
+            e2_e1_r[e2]={}
+        
+        if e2 not in e1_e2_r[e1]:
+            e1_e2_r[e1][e2]=[]
+        if e1 not in e2_e1_r[e2]:
+            e2_e1_r[e2][e1]=[]
+        
+        e1_e2_r[e1][e2].append(r)
+        e2_e1_r[e2][e1].append(r)
+    return e1_e2_r,e2_e1_r
 
 
+def hard_simi(lis1,lis2):
+    s1=set(lis1)
+    s2=set(lis2)
+    temp=list(s1&s2)
+    temp=[(x,x) for x in temp]
+    return temp
 
+def soft_simi(lis1,lis2,model,thresh=0.5):
+    list_r1r2=[]
+    if (len(lis1)>len(lis2)):
+        lis1,lis2=lis2,lis1
+    for r1 in lis1:
+        best_score=-1
+        best_rel=-1
+        for r2 in lis2:
+            score=model.get_relation_similarity(r1,r2)
+            if(score>best_score):
+                best_score=score
+                best_rel=r2
+        if(best_rel!=-1 and best_score>thresh):
+            list_r1r2.append((r1,best_rel))
+    
+    return list_r1r2
+
+def explain_similarity_aux(e1,e2,model,flip,look_up,hard_match=True):
+    d1=look_up[e1]
+    d2=look_up[e2]
+    relevant_tuple=[]
+    
+    for e in d1:
+        if e not in d2:
+            continue
+        lis1=d1[e]
+        lis2=d2[e]
+        relevant=[]
+        if(hard_match):
+            relevant=hard_simi(lis1,lis2)
+        else:
+            relevant=soft_simi(lis1,lis2,model)
+    
+        for r1r2 in relevant:
+            if flip:
+                relevant_tuple.append(([e,r1r2[0],e1],[e,r1r2[1],e2]))
+            else:
+                relevant_tuple.append(([e1,r1r2[0],e],[e2,r1r2[1],e]))
+    
+    return relevant_tuple       
+
+def explain_similarity(e1,e2,model,hard_match):
+    list1=explain_similarity_aux(e1,e2,model,False,e1_e2_r,hard_match)
+    list2=explain_similarity_aux(e1,e2,model,True,e2_e1_r,hard_match)
+    
+    list1.extend(list2)
+    return list1
+
+def get_why_similar(e1,e2,enum_to_id, rnum_to_id, eid_to_name, rid_to_name,base_model):
+        tuples_similar = explain_similarity(e1,e2,base_model,hard_match=True)
+        string_similar = "<br> ----------------------<br>"
+        for t in tuples_similar:
+            t1_mapped =  map_fact(t[0], enum_to_id, rnum_to_id)
+            t1_mapped_name =  map_fact(t1_mapped, eid_to_name, rid_to_name)
+            t2_mapped =  map_fact(t[1], enum_to_id, rnum_to_id)
+            t2_mapped_name =  map_fact(t2_mapped, eid_to_name, rid_to_name)
+            string_similar += "(" + ','.join(t1_mapped_name) + ') and (' + ','.join(t2_mapped_name)+')<br>'
+        string_similar += "-----------------------<br>"
+        return string_similar

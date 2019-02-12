@@ -159,6 +159,8 @@ if __name__ == "__main__":
     template_objs = template_builder.template_obj_builder(
         data_root, args.model_weights, args.template_load_dir, None, "distmult", [1, 2, 3, 4, 5], True)
 
+    utils.e1_e2_r, utils.e2_e1_r = utils.get_ent_ent_rel(template_objs[0].kb.facts) 
+
     if(args.template_pred is not None):
         template_exps = english_exp_template(mapped_data, template_predictions, template_objs,
                                              entity_inverse_map, relation_inverse_map, entity_names, relation_names)

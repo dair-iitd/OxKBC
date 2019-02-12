@@ -152,3 +152,43 @@ def read_data(path):
         lines = infile.readlines()
         data = [line.strip().split() for line in lines]
     return data
+
+def get_ent_to_relset(data_arr):
+    ent_to_rel={}
+    for data in data_arr:
+        pair=data[0]
+        if pair not in ent_to_rel:
+            ent_to_rel[pair]=set()
+        ent_to_rel[pair].add(data[1])
+    return ent_to_rel
+
+def get_ent_to_entset(data_arr):
+    ent_to_rel={}
+    for data in data_arr:
+        pair=data[0]
+        if pair not in ent_to_rel:
+            ent_to_rel[pair]=set()
+        ent_to_rel[pair].add(data[2])
+    return ent_to_rel
+
+def get_ent_ent_rel(data_arr):
+    e1_e2_r={}
+    e2_e1_r={}
+    for data in data_arr:
+        e1=data[0]
+        r=data[1]
+        e2=data[2]
+        
+        if e1 not in e1_e2_r:
+            e1_e2_r[e1]={}
+        if e2 not in e2_e1_r:
+            e2_e1_r[e2]={}
+        
+        if e2 not in e1_e2_r[e1]:
+            e1_e2_r[e1][e2]=[]
+        if e1 not in e2_e1_r[e2]:
+            e2_e1_r[e2][e1]=[]
+        
+        e1_e2_r[e1][e2].append(r)
+        e2_e1_r[e2][e1].append(r)
+    return e1_e2_r,e2_e1_r

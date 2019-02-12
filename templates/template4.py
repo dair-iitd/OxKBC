@@ -24,7 +24,7 @@ class Template4(TemplateBaseClass):
 
         # self.exp_template = 'Since, $eprime is similar to entity $e1 and I know that ($eprime, $r, $e2) , so I can say ($e1, $r, $e2)'
         # self.exp_template = 'Since, <b>$eprime</b> is quite similar to <b>$e1</b> and AI knows that <b>($eprime, $r, $e2)</b> , so AI can say <b>($e1, $r, $e2)</b>'
-        self.exp_template = '<b>\"$e1\"</b> is similar to <b>\"$eprime\"</b> and <b>$eprime $r $e2</b> so <b>$e1 $r $e2</b>'
+        self.exp_template = '<b>\"$e1\"</b> is similar to <b>\"$eprime\"</b> and <b>$eprime $r $e2</b> so <b>$e1 $r $e2</b>\n and similar because\n $why_similar'
 
 
 
@@ -231,6 +231,9 @@ class Template4(TemplateBaseClass):
     def get_english_explanation(self, fact, enum_to_id, rnum_to_id, eid_to_name, rid_to_name):
         mapped_fact = utils.map_fact(fact, enum_to_id, rnum_to_id)
         mapped_fact_name = utils.map_fact(mapped_fact, eid_to_name, rid_to_name)
-        eprime_id = enum_to_id[self.get_explanation(fact)[1]]
+        eprime_num = self.get_explanation(fact)[1]
+
+        why_similar = utils.get_why_similar(fact[0],eprime_num,enum_to_id, rnum_to_id, eid_to_name, rid_to_name,self.base_model)
+        eprime_id = enum_to_id[eprime_num]
         eprime = eid_to_name.get(eprime_id,eprime_id)
-        return string.Template(self.exp_template).substitute(e1=mapped_fact_name[0],r=mapped_fact_name[1],e2=mapped_fact_name[2],eprime=eprime)
+        return string.Template(self.exp_template).substitute(e1=mapped_fact_name[0],r=mapped_fact_name[1],e2=mapped_fact_name[2],eprime=eprime,why_similar=why_similar)

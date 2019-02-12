@@ -26,7 +26,7 @@ class Template5(TemplateBaseClass):
         self.subsample_proportion = 6
 
         # self.exp_template = 'Since, $eprime is similar to entity $e1 and $rprime is similar to relation $r and I know that ($eprime, $rprime, $e2) , so I can say ($e1, $r, $e2)'
-        self.exp_template = '<b>\"$e1\"</b> is similar to <b>\"$eprime\"</b> and <b>\"$r\"</b> is similar to relation <b>\"$rprime\"</b> and <b>$eprime $rprime $e2</b> hence <b>$e1 $r $e2</b>'
+        self.exp_template = '<b>\"$e1\"</b> is similar to <b>\"$eprime\"</b> and <b>\"$r\"</b> is similar to relation <b>\"$rprime\"</b> and <b>$eprime $rprime $e2</b> hence <b>$e1 $r $e2</b> and similar because\n $why_similar'
 
         if(load_table == None):
             logging.info("Load table is None, so beginning process_data")
@@ -248,4 +248,6 @@ class Template5(TemplateBaseClass):
         eprime = eid_to_name.get(eprime_id,eprime_id)
         rprime = rid_to_name.get(rprime_id,rprime_id)
 
-        return string.Template(self.exp_template).substitute(e1=mapped_fact_name[0],r=mapped_fact_name[1],e2=mapped_fact_name[2],eprime=eprime,rprime=rprime)
+        why_similar = utils.get_why_similar(fact[0],eprime_num,enum_to_id, rnum_to_id, eid_to_name, rid_to_name,self.base_model)
+
+        return string.Template(self.exp_template).substitute(e1=mapped_fact_name[0],r=mapped_fact_name[1],e2=mapped_fact_name[2],eprime=eprime,rprime=rprime,why_similar=why_similar)
