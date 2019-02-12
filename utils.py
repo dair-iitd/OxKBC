@@ -190,17 +190,41 @@ def explain_similarity(e1,e2,model,hard_match):
     list1=explain_similarity_aux(e1,e2,model,False,e1_e2_r,hard_match)
     list2=explain_similarity_aux(e1,e2,model,True,e2_e1_r,hard_match)
     
-    list1.extend(list2)
-    return list1
+    return list1,list2
 
 def get_why_similar(e1,e2,enum_to_id, rnum_to_id, eid_to_name, rid_to_name,base_model):
-        tuples_similar = explain_similarity(e1,e2,base_model,hard_match=True)
-        string_similar = "<br> ----------------------<br>"
-        for t in tuples_similar:
+        tuples_similar_head,tuples_similar_tail = explain_similarity(e1,e2,base_model,hard_match=True)
+        e1_name = eid_to_name.get(enum_to_id[e1],enum_to_id[e1])
+        e2_name = eid_to_name.get(enum_to_id[e2],enum_to_id[e2])
+
+        rel_dir_head = {}
+        for t in tuples_similar_head:
             t1_mapped =  map_fact(t[0], enum_to_id, rnum_to_id)
             t1_mapped_name =  map_fact(t1_mapped, eid_to_name, rid_to_name)
             t2_mapped =  map_fact(t[1], enum_to_id, rnum_to_id)
             t2_mapped_name =  map_fact(t2_mapped, eid_to_name, rid_to_name)
-            string_similar += "(" + ','.join(t1_mapped_name) + ') and (' + ','.join(t2_mapped_name)+')<br>'
+            if t1_mapped_name[1] not in rel_dir_head:
+                rel_dir_head[t1_mapped_name[1]] = []
+            rel_dir_head[t1_mapped_name[1]].append(t1_mapped_name[2])
+        
+        rel_dir_tail = {}
+        for t in tuples_similar_tail:
+            t1_mapped =  map_fact(t[0], enum_to_id, rnum_to_id)
+            t1_mapped_name =  map_fact(t1_mapped, eid_to_name, rid_to_name)
+            t2_mapped =  map_fact(t[1], enum_to_id, rnum_to_id)
+            t2_mapped_name =  map_fact(t2_mapped, eid_to_name, rid_to_name)
+            if t1_mapped_name[1] not in rel_dir_tail:
+                rel_dir_tail[t1_mapped_name[1]] = []
+            rel_dir_tail[t1_mapped_name[1]].append(t1_mapped_name[0])
+
+        string_similar = "<br> ----------------------<br>"
+        for rel in rel_dir_head:
+            string_similar += e1_name + " and " + e2_name + " " + rel + "(" + ",".join(rel_dir_head[rel]) +")<br>"
         string_similar += "-----------------------<br>"
+
+        string_similar += "<br> ----------------------<br>"
+        for rel in rel_dir_tail:
+            string_similar += "(" + ",".join(rel_dir_tail[rel])  + " ) " + rel + "for " + e1_name + " and " + e2_name +"<br>"
+        string_similar += "-----------------------<br>"
+
         return string_similar
