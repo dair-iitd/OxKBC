@@ -24,7 +24,7 @@ class Template4(TemplateBaseClass):
 
         # self.exp_template = 'Since, $eprime is similar to entity $e1 and I know that ($eprime, $r, $e2) , so I can say ($e1, $r, $e2)'
         # self.exp_template = 'Since, <b>$eprime</b> is quite similar to <b>$e1</b> and AI knows that <b>($eprime, $r, $e2)</b> , so AI can say <b>($e1, $r, $e2)</b>'
-        self.exp_template = '<b>\"$e1\"</b> is similar to <b>\"$eprime\"</b> and <b>$eprime $r $e2</b> so <b>$e1 $r $e2</b>\n and similar because\n $why_similar'
+        self.exp_template = '<b>$eprime $r $e2</b> and <b>\"$e1\"</b> is $why_similar to <b>\"$eprime\"</b>'
 
 
 

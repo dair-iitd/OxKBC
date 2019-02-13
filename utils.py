@@ -12,6 +12,7 @@ _LOG_LEVEL_STRINGS = ['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG']
 EPSILON=0.0000001
 e1_e2_r=None
 e2_e1_r=None
+r_e2_e1=None
 
 def _log_level_string_to_int(log_level_string):
     if not log_level_string in _LOG_LEVEL_STRINGS:
@@ -137,6 +138,30 @@ def get_ent_ent_rel(data_arr):
         e2_e1_r[e2][e1].append(r)
     return e1_e2_r,e2_e1_r
 
+def get_most_freq_ind(data_arr):
+    r_e2_e1={}
+    e1_e2_r={}
+
+    for data in data_arr:
+        e1=data[0]
+        r=data[1]
+        e2=data[2]
+        
+        if e1 not in e1_e2_r:
+            e1_e2_r[e1]={}
+        if r not in r_e2_e1:
+            r_e2_e1[r]={}
+        
+        if e2 not in e1_e2_r[e1]:
+            e1_e2_r[e1][e2]=[]
+        if e2 not in r_e2_e1[r]:
+            r_e2_e1[r][e2]=[]
+        
+        e1_e2_r[e1][e2].append(r)
+        r_e2_e1[r][e2].append(e1)
+    return r_e2_e1,e1_e2_r
+
+
 
 def hard_simi(lis1,lis2):
     s1=set(lis1)
@@ -192,6 +217,61 @@ def explain_similarity(e1,e2,model,hard_match):
     
     return list1,list2
 
+def freq_for_relation(r,e2):
+    ans=[]
+    if r in r_e2_e1 and e2 in r_e2_e1[r]:
+        ans=r_e2_e1[r][e2]
+    return ans
+
+def freq_for_entity(e1,e2):
+    ans=[]
+    if e1 in e1_e2_r and e2 in e1_e2_r[e1]:
+        ans=e1_e2_r[e1][e2]
+    return ans
+
+def get_relation_frequent(fact,enum_to_id, rnum_to_id, eid_to_name, rid_to_name):
+    string_frequent = "<div class=\"tooltip\">frequently seen <span class=\"tooltiptext\">"
+    
+    other_part = freq_for_relation(fact[1],fact[2])
+    
+    r_name = rid_to_name.get(rnum_to_id[fact[1]],rnum_to_id[fact[1]])   
+    e2_name = eid_to_name.get(enum_to_id[fact[2]],enum_to_id[fact[2]])
+        
+    other_knowledge = []
+    for el in other_part:
+        other_knowledge.append(eid_to_name.get(enum_to_id[el],enum_to_id[el]))
+
+    cs_string = get_cs_string(other_knowledge)
+    string_frequent += "(" + cs_string  + " ) " + r_name + "  " + e2_name + "<br>"
+    string_frequent += "</span></div>"
+
+    return string_frequent
+
+
+def get_entity_frequent(fact,enum_to_id, rnum_to_id, eid_to_name, rid_to_name):
+    e1_name = eid_to_name.get(enum_to_id[fact[0]],enum_to_id[fact[0]])
+    e2_name = eid_to_name.get(enum_to_id[fact[2]],enum_to_id[fact[2]])
+    
+    other_part = freq_for_entity(fact[0],fact[2])
+    other_knowledge = []
+    for el in other_part:
+        other_knowledge.append(rid_to_name.get(rnum_to_id[el],rnum_to_id[el]))
+
+    string_frequent = "<div class=\"tooltip\">frequently seen <span class=\"tooltiptext\">"
+    cs_string = get_cs_string(other_knowledge)
+    string_frequent += e1_name + " ( " + cs_string  + " ) " + e2_name + "<br>"
+    string_frequent += "</span></div>"
+
+    return string_frequent
+
+
+def get_cs_string(l):
+    if len(l) <= 2:
+        return ' , '.join(l)
+    else:
+        n = len(l) - 2
+        return '{} and {} more...'.format(' , '.join(l[:2]), n)
+
 def get_why_similar(e1,e2,enum_to_id, rnum_to_id, eid_to_name, rid_to_name,base_model):
         tuples_similar_head,tuples_similar_tail = explain_similarity(e1,e2,base_model,hard_match=True)
         e1_name = eid_to_name.get(enum_to_id[e1],enum_to_id[e1])
@@ -217,14 +297,34 @@ def get_why_similar(e1,e2,enum_to_id, rnum_to_id, eid_to_name, rid_to_name,base_
                 rel_dir_tail[t1_mapped_name[1]] = []
             rel_dir_tail[t1_mapped_name[1]].append(t1_mapped_name[0])
 
-        string_similar = "<br> ----------------------<br>"
+        string_similar = "<div class=\"tooltip\">similar <span class=\"tooltiptext\">"
         for rel in rel_dir_head:
-            string_similar += e1_name + " and " + e2_name + " " + rel + "(" + ",".join(rel_dir_head[rel]) +")<br>"
-        string_similar += "-----------------------<br>"
+            cs_string = get_cs_string(rel_dir_head[rel])
+            string_similar += e1_name + " and " + e2_name + " " + rel + " (" + cs_string +" )<br>"
+        string_similar += "<br>"
 
-        string_similar += "<br> ----------------------<br>"
         for rel in rel_dir_tail:
-            string_similar += "(" + ",".join(rel_dir_tail[rel])  + " ) " + rel + "for " + e1_name + " and " + e2_name +"<br>"
-        string_similar += "-----------------------<br>"
+            cs_string = get_cs_string(rel_dir_tail[rel])
+            string_similar += "(" + cs_string  + " ) " + rel + "  " + e1_name + " and " + e2_name +"<br>"
+        string_similar += "<br>"
+        string_similar += "</span></div>"
 
         return string_similar
+
+def heuristic_purge_relations(rel_to_id,rel_to_name):
+    for rel_num in rel_to_id:
+        rel = rel_to_id[rel_num]
+        if rel in rel_to_name:
+            continue
+        parts=rel.split(".")
+        name=""
+        if (len(parts)==1):
+            parts=parts[0].split("/")
+            name=parts[0]+" "+parts[-1]
+        else:
+            name=parts[0].split("/")[-2]+" "+parts[1].split("/")[-1]
+        rel_to_name[rel]=name
+
+
+with open('css_style.css','r') as css:
+    CSS_STYLE = css.read()

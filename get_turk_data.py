@@ -40,7 +40,7 @@ def english_exp_rules(mapped_data, predictions, entity_inverse_map, relation_inv
                     mapped_data[itr][0], pred[0], mapped_data[itr][2])
                 explaining_fact = lambda_english_from_fact(explaining_fact)
                 # explanations.append(to_explain+" because "+explaining_fact)
-                explanations.append("because "+explaining_fact)
+                explanations.append(explaining_fact)
         else:
             to_explain = lambda_english_from_fact(fact)
             explaining_fact1 = (mapped_data[itr][0], pred[0][0], pred[1])
@@ -48,7 +48,7 @@ def english_exp_rules(mapped_data, predictions, entity_inverse_map, relation_inv
             explaining_fact1 = lambda_english_from_fact(explaining_fact1)
             explaining_fact2 = lambda_english_from_fact(explaining_fact2)
             # explanations.append(to_explain+" because because AI knows " +explaining_fact+" and "+explaining_fact2)
-            explanations.append("because " +explaining_fact1+" and "+explaining_fact2)
+            explanations.append(explaining_fact1+" and "+explaining_fact2)
     return explanations
 
 
@@ -80,7 +80,9 @@ def write_english_exps(named_data, template_exps, rule_exps, output_file,num_per
     df = pd.DataFrame(csv_data, columns=columns)
     df.to_csv(output_file+".csv", index=False, sep=',')
     pd.set_option('display.max_colwidth', -1)
-    df.to_html(output_file+".html", escape=False, justify='center')
+    with open(output_file+".html",'w') as html_file:
+        html_file.write(utils.CSS_STYLE+'\n')
+        df.to_html(html_file, escape=False, justify='center')
 
 
 if __name__ == "__main__":
@@ -155,11 +157,13 @@ if __name__ == "__main__":
     entity_inverse_map = utils.get_inverse_dict(distmult_dump['entity_to_id'])
     relation_inverse_map = utils.get_inverse_dict(
         distmult_dump['relation_to_id'])
+    utils.heuristic_purge_relations(relation_inverse_map,relation_names)
 
     template_objs = template_builder.template_obj_builder(
         data_root, args.model_weights, args.template_load_dir, None, "distmult", [1, 2, 3, 4, 5], True)
 
     utils.e1_e2_r, utils.e2_e1_r = utils.get_ent_ent_rel(template_objs[0].kb.facts) 
+    utils.r_e2_e1, utils.e1_e2_r = utils.get_most_freq_ind(template_objs[0].kb.facts) 
 
     if(args.template_pred is not None):
         template_exps = english_exp_template(mapped_data, template_predictions, template_objs,

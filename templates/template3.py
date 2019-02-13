@@ -27,7 +27,8 @@ class Template3(TemplateBaseClass):
         # self.exp_template = 'Since, <b>$rprime</b> is similar to the relation <b>$r</b> and AI knows that <b>($e1, $rprime, $e2)</b> , so AI can say <b>($e1, $r, $e2)</b>'
 
         # self.exp_template = '<b>$e1 $r $e2</b> because <b>$e1 $rprime $e2</b> and <b>\"$r\"</b> is similar to <b>\"$rprime\"</b>'
-        self.exp_template = 'because <b>$e1 $rprime $e2</b> and <b>\"$r\"</b> is similar to <b>\"$rprime\"</b>'
+        # self.exp_template = '<b>$e1 $rprime $e2</b> and <b>\"$r\"</b> is similar to <b>\"$rprime\"</b>'
+        self.exp_template = '<b>$e1 $rprime $e2</b>'
                     
         if(load_table == None):
             logging.info("Load table is None, so beginning process_data")

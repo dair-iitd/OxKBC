@@ -20,7 +20,9 @@ class Template2(TemplateBaseClass):
         self.use_hard_triple_scoring = True
         # self.exp_template = 'Since, $e2 is most frequently occuring entity for the entity $e1, so I can say ($e1, $r, $e2)'
         # self.exp_template = 'Since, <b>$e2</b> is seen quite frequently with <b>$e1</b>, so AI can say <b>($e1, $r, $e2)</b>'
-        self.exp_template = '<b>$e2</b> is frequently seen with <b>$e1</b> hence <b>$e1 $r $e2</b>'
+        # self.exp_template = '<b>$e2</b> is frequently seen with <b>$e1</b> hence <b>$e1 $r $e2</b>'
+        # self.exp_template = '<b>$e2</b> is frequently seen with <b>$e1</b>'
+        self.exp_template = '<b>$e2</b> is $why_frequent with <b>$e1</b>'
 
         if(load_table == None):
             self.process_data()
@@ -143,6 +145,7 @@ class Template2(TemplateBaseClass):
         return features
     
     def get_english_explanation(self, fact, enum_to_id, rnum_to_id, eid_to_name, rid_to_name):
+        why_frequent = utils.get_entity_frequent(fact, enum_to_id, rnum_to_id, eid_to_name, rid_to_name)
         mapped_fact = utils.map_fact(fact, enum_to_id, rnum_to_id)
         mapped_fact_name = utils.map_fact(mapped_fact, eid_to_name, rid_to_name)
-        return string.Template(self.exp_template).substitute(e1=mapped_fact_name[0], r=mapped_fact_name[1], e2=mapped_fact_name[2])
+        return string.Template(self.exp_template).substitute(e1=mapped_fact_name[0], r=mapped_fact_name[1], e2=mapped_fact_name[2],why_frequent=why_frequent)
