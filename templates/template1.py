@@ -23,7 +23,7 @@ class Template1(TemplateBaseClass):
         # self.exp_template = '<b>$e2</b> is frequently seen with the relation <b>\"$r\"</b> hence <b>$e1 $r $e2</b>'
         # self.exp_template = 'Since, $e2 is most frequently occuring entity for the relation $r, so I can say ($e1, $r, $e2)'
         # self.exp_template = '<b>$e2</b> is frequently seen with the relation <b>\"$r\"</b>'
-        self.exp_template = '<b>$e2</b> is $why_frequent with the relation <b>\"$r\"</b>'
+        self.exp_template = '<b><font color="blue">$e2</font></b> is $why_frequent with the relation <b><font color="green">\"$r\"</font></b>'
 
 
         if(load_table == None):

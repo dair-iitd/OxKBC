@@ -22,7 +22,7 @@ class Template2(TemplateBaseClass):
         # self.exp_template = 'Since, <b>$e2</b> is seen quite frequently with <b>$e1</b>, so AI can say <b>($e1, $r, $e2)</b>'
         # self.exp_template = '<b>$e2</b> is frequently seen with <b>$e1</b> hence <b>$e1 $r $e2</b>'
         # self.exp_template = '<b>$e2</b> is frequently seen with <b>$e1</b>'
-        self.exp_template = '<b>$e2</b> is $why_frequent with <b>$e1</b>'
+        self.exp_template = '<b><font color="blue">$e2</font></b> is $why_frequent with <b><font color="blue">$e1</font></b>'
 
         if(load_table == None):
             self.process_data()

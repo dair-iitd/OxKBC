@@ -28,7 +28,7 @@ class Template3(TemplateBaseClass):
 
         # self.exp_template = '<b>$e1 $r $e2</b> because <b>$e1 $rprime $e2</b> and <b>\"$r\"</b> is similar to <b>\"$rprime\"</b>'
         # self.exp_template = '<b>$e1 $rprime $e2</b> and <b>\"$r\"</b> is similar to <b>\"$rprime\"</b>'
-        self.exp_template = '<b>$e1 $rprime $e2</b>'
+        self.exp_template = '<b>(<font color="blue">$e1</font>, <font color="green">$rprime</font>, <font color="blue">$e2</font>)</b>'
                     
         if(load_table == None):
             logging.info("Load table is None, so beginning process_data")
@@ -215,9 +215,12 @@ class Template3(TemplateBaseClass):
         return features
 
     def get_english_explanation(self, fact, enum_to_id, rnum_to_id, eid_to_name, rid_to_name):
-        mapped_fact = utils.map_fact(fact, enum_to_id, rnum_to_id)
-        mapped_fact_name = utils.map_fact(mapped_fact, eid_to_name, rid_to_name)
-        rprime_id = rnum_to_id[self.get_explanation(fact)[1]]
-        rprime = rid_to_name.get(rprime_id,rprime_id)
-        return string.Template(self.exp_template).substitute(e1=mapped_fact_name[0],r=mapped_fact_name[1],e2=mapped_fact_name[2],rprime=rprime)
+        try:
+            mapped_fact = utils.map_fact(fact, enum_to_id, rnum_to_id)
+            mapped_fact_name = utils.map_fact(mapped_fact, eid_to_name, rid_to_name)
+            rprime_id = rnum_to_id[self.get_explanation(fact)[1]]
+            rprime = rid_to_name.get(rprime_id,rprime_id)
+            return string.Template(self.exp_template).substitute(e1=mapped_fact_name[0],r=mapped_fact_name[1],e2=mapped_fact_name[2],rprime=rprime)
+        except:
+            return utils.NO_EXPLANATION
 

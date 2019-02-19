@@ -27,7 +27,7 @@ class Template5(TemplateBaseClass):
 
         # self.exp_template = 'Since, $eprime is similar to entity $e1 and $rprime is similar to relation $r and I know that ($eprime, $rprime, $e2) , so I can say ($e1, $r, $e2)'
         # self.exp_template = '<b>\"$e1\"</b> is similar to <b>\"$eprime\"</b> and <b>\"$r\"</b> is similar to relation <b>\"$rprime\"</b> and <b>$eprime $rprime $e2</b> hence <b>$e1 $r $e2</b> and similar because\n $why_similar'
-        self.exp_template = '<b>$eprime $rprime $e2</b> and <b>\"$e1\"</b> is $why_similar to <b>\"$eprime\"</b>'
+        self.exp_template = '<b>(<font color="blue">$eprime</font>, <font color="green">$rprime</font>, <font color="blue">$e2</font>)</b> and <b><font color="blue">\"$e1\"</font></b> is $why_similar to <b><font color="blue">\"$eprime\"</font></b>'
 
 
         if(load_table == None):
