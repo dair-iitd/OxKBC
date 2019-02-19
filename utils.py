@@ -9,6 +9,7 @@ import pandas as pd
 
 
 _LOG_LEVEL_STRINGS = ['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG']
+NO_EXPLANATION = "No explanation for this fact"
 EPSILON=0.0000001
 e1_e2_r=None
 e2_e1_r=None
@@ -270,7 +271,11 @@ def get_cs_string(l):
         return ' , '.join(l)
     else:
         n = len(l) - 2
-        return '{} and {} more...'.format(' , '.join(l[:2]), n)
+        string_more = '{} and <div class=\"tooltip2\">{} more...<span class=\"tooltiptext2\">'.format(' , '.join(l[:2]), n)
+        for el in l[2:]:
+            string_more += el +"<br>"
+        string_more += "</span></div>"
+    return string_more
 
 def get_why_similar(e1,e2,enum_to_id, rnum_to_id, eid_to_name, rid_to_name,base_model):
         tuples_similar_head,tuples_similar_tail = explain_similarity(e1,e2,base_model,hard_match=True)

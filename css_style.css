@@ -22,4 +22,29 @@
   .tooltip:hover .tooltiptext {
     visibility: visible;
   }
+
+  .tooltip2 {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted rgb(223, 209, 15);
+  }
+  
+  .tooltip2 .tooltiptext2 {
+    visibility: hidden;
+    width: 1000px;
+    background-color: rgba(159, 223, 175, 0.877);
+    color: rgb(10, 1, 1);
+    text-align: left;
+    border-radius: 6px;
+    padding: 5px;
+  
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 2;
+  }
+  
+  .tooltip2:hover .tooltiptext2 {
+    visibility: visible;
+  }
+  /* a { color: #FF0000; } */
 </style>

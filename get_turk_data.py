@@ -7,17 +7,14 @@ import time
 
 import numpy as np
 import pandas as pd
-
+import random
 import template_builder
 import utils
-
-NO_EXPLANATION = "No explanation for this fact"
-
 
 def english_exp_rules(mapped_data, predictions, entity_inverse_map, relation_inverse_map, entity_names, relation_names):
 
     def english_from_fact(fact, enum_to_id, rnum_to_id, eid_to_name, rid_to_name):
-        exp_template = '<b>$e1 $r $e2</b>'
+        exp_template = '<b>(<font color="blue">$e1</font>, <font color="green">$r</font>, <font color="blue">$e2</font>)</b>'
         mapped_fact = utils.map_fact(fact, enum_to_id, rnum_to_id)
         mapped_fact_name = utils.map_fact(
             mapped_fact, eid_to_name, rid_to_name)
@@ -33,7 +30,7 @@ def english_exp_rules(mapped_data, predictions, entity_inverse_map, relation_inv
         pred = predictions[itr]
         if(pred[1] == -1):
             if(pred[0] == ""):
-                explanations.append(NO_EXPLANATION)
+                explanations.append(utils.NO_EXPLANATION)
             else:
                 to_explain = lambda_english_from_fact(fact)
                 explaining_fact = (
@@ -55,8 +52,9 @@ def english_exp_rules(mapped_data, predictions, entity_inverse_map, relation_inv
 def english_exp_template(mapped_data, predictions, template_objs, entity_inverse_map, relation_inverse_map, entity_names, relation_names):
     explanations = []
     for fact, pred in zip(mapped_data, predictions):
+        pred = 3
         if(pred == 0):
-            explanations.append(NO_EXPLANATION)
+            explanations.append(utils.NO_EXPLANATION)
         else:
             explanations.append(template_objs[pred-1].get_english_explanation(
                 fact, entity_inverse_map, relation_inverse_map, entity_names, relation_names))
@@ -65,12 +63,23 @@ def english_exp_template(mapped_data, predictions, template_objs, entity_inverse
 
 def write_english_exps(named_data, template_exps, rule_exps, output_file,num_per_hit):
     csv_data = []
+    book_keeping_file = open(output_file+'.book.txt','w')
     for fact, t_exp, r_exp in zip(named_data, template_exps, rule_exps):
-        if(t_exp == NO_EXPLANATION and r_exp == NO_EXPLANATION):
-            continue
-        row = [' '.join(fact), t_exp, r_exp]
+        # if(t_exp == utils.NO_EXPLANATION and r_exp == utils.NO_EXPLANATION):
+        #if(t_exp == utils.NO_EXPLANATION or r_exp == utils.NO_EXPLANATION):
+        #    continue
+        r = random.uniform(0,1)
+        fact_name_str = '<b>(<font color="blue">$e1</font>, <font color="green">$r</font>, <font color="blue">$e2</font>)</b>'
+        fact_named = string.Template(fact_name_str).substitute(e1=fact[0],r=fact[1],e2=fact[2])
+        book_keeping_file.write(fact_named+'\t')
+        r=0.1
+        if(r<=0.5):
+            book_keeping_file.write('our\n')
+            row = [fact_named, t_exp, r_exp]
+        else:
+            book_keeping_file.write('other\n')
+            row = [fact_named, r_exp, t_exp]
         csv_data.append(row)
-    
     reqd = int(len(csv_data)/num_per_hit)*num_per_hit
     csv_data = np.array(csv_data[:reqd])
     csv_data = csv_data.reshape((-1, 3*num_per_hit))
@@ -169,13 +178,13 @@ if __name__ == "__main__":
         template_exps = english_exp_template(mapped_data, template_predictions, template_objs,
                                              entity_inverse_map, relation_inverse_map, entity_names, relation_names)
     else:
-        template_exps = [NO_EXPLANATION for _ in range(len(mapped_data))]
+        template_exps = [utils.NO_EXPLANATION for _ in range(len(mapped_data))]
 
     if(args.rule_pred is not None):
         rule_exps = english_exp_rules(
             mapped_data, rule_predictions, entity_inverse_map, relation_inverse_map, entity_names, relation_names)
     else:
-        rule_exps = [NO_EXPLANATION for _ in range(len(mapped_data))]
+        rule_exps = [utils.NO_EXPLANATION for _ in range(len(mapped_data))]
 
     logging.info("Generated explanations")
 
