@@ -1,13 +1,14 @@
 from abc import ABC, abstractmethod
 
+
 class TemplateBaseClass(ABC):
     """ 
     This is an abstract class for all the templates. 
     """
- 
+
     def __init__(self):
         super().__init__()
-    
+
     @abstractmethod
     def process_data(self):
         pass
@@ -17,23 +18,25 @@ class TemplateBaseClass(ABC):
         pass
 
     @abstractmethod
-    def dump_data(self,filename):
+    def dump_data(self, filename):
         pass
-    
+
     @abstractmethod
-    def load_table(self,filename):
+    def load_table(self, filename):
         pass
-    
+
     @abstractmethod
-    def compute_score(self,triple):
+    def compute_score(self, triple):
         pass
+
     @abstractmethod
-    def get_input(self,fact):
+    def get_input(self, fact):
         pass
+
     @abstractmethod
     def get_explanation(self, fact):
         pass
+
     @abstractmethod
-    def get_english_explanation(self, fact, enum_to_id, rnum_to_id, eid_to_name, rid_to_name):
+    def get_english_explanation(self, fact, explainer):
         pass
-    

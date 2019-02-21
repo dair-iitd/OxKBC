@@ -1,13 +1,14 @@
+import logging
 import pickle
 import random
+import string
+import sys
 import time
 
 import numpy as np
-import logging
 
 import utils
 from templates.template import TemplateBaseClass
-import string
 
 
 class Template5(TemplateBaseClass):
@@ -27,8 +28,7 @@ class Template5(TemplateBaseClass):
 
         # self.exp_template = 'Since, $eprime is similar to entity $e1 and $rprime is similar to relation $r and I know that ($eprime, $rprime, $e2) , so I can say ($e1, $r, $e2)'
         # self.exp_template = '<b>\"$e1\"</b> is similar to <b>\"$eprime\"</b> and <b>\"$r\"</b> is similar to relation <b>\"$rprime\"</b> and <b>$eprime $rprime $e2</b> hence <b>$e1 $r $e2</b> and similar because\n $why_similar'
-        self.exp_template = '<b>(<font color="blue">$eprime</font>, <font color="green">$rprime</font>, <font color="blue">$e2</font>)</b> and <b><font color="blue">\"$e1\"</font></b> is $why_similar to <b><font color="blue">\"$eprime\"</font></b>'
-
+        self.exp_template = '$html_fact_e_r_prime and <b><font color="blue">\"$e1\"</font></b> is $why_similar to <b><font color="blue">\"$eprime\"</font></b>'
 
         if(load_table == None):
             logging.info("Load table is None, so beginning process_data")
@@ -67,12 +67,10 @@ class Template5(TemplateBaseClass):
                 self.unique_e1_r[(facts[0], facts[1])] = 0
             self.unique_e1_r[(facts[0], facts[1])] += 1
 
-
         for facts in self.kb_test.facts:
             if((facts[0], facts[1]) not in self.unique_e1_r):
                 self.unique_e1_r[(facts[0], facts[1])] = 0
             self.unique_e1_r[(facts[0], facts[1])] += 1
-
 
     def build_table(self):
         """
@@ -135,7 +133,7 @@ class Template5(TemplateBaseClass):
         self.dict_e2 = dump_dict['dict_e2']
         self.unique_e1_r = dump_dict['unique_e1_r']
         self.table = dump_dict['table']
-        self.stat_table = dump_dict['stat_table'] 
+        self.stat_table = dump_dict['stat_table']
 
     def compute_score(self, triple):
         '''
@@ -240,16 +238,20 @@ class Template5(TemplateBaseClass):
 
         return features
 
-    def get_english_explanation(self, fact, enum_to_id, rnum_to_id, eid_to_name, rid_to_name):
-        mapped_fact = utils.map_fact(fact, enum_to_id, rnum_to_id)
-        mapped_fact_name = utils.map_fact(mapped_fact, eid_to_name, rid_to_name)
-        eprime_num,rprime_num = self.get_explanation(fact)[1]
-        eprime_id = enum_to_id[eprime_num]
-        rprime_id = rnum_to_id[rprime_num]
+    def get_english_explanation(self, fact, explainer):
+        try:
+            eprime_num, rprime_num = self.get_explanation(fact)[1]
 
-        eprime = eid_to_name.get(eprime_id,eprime_id)
-        rprime = rid_to_name.get(rprime_id,rprime_id)
+            why_similar = explainer.get_entity_similar(fact[0], eprime_num)
+            html_fact_e_r_prime = explainer.html_fact(
+                [eprime_num, rprime_num, fact[2]])
 
-        why_similar = utils.get_why_similar(fact[0],eprime_num,enum_to_id, rnum_to_id, eid_to_name, rid_to_name,self.base_model)
-
-        return string.Template(self.exp_template).substitute(e1=mapped_fact_name[0],r=mapped_fact_name[1],e2=mapped_fact_name[2],eprime=eprime,rprime=rprime,why_similar=why_similar)
+            named_fact = explainer.name_fact(fact)
+            eprime_name = explainer.get_e_name(eprime_num)
+            return string.Template(self.exp_template).substitute(
+                html_fact_e_r_prime=html_fact_e_r_prime, e1=named_fact[0],
+                eprime=eprime_name, why_similar=why_similar)
+        except:
+            logging.error("Some error occured in template 5 while getting explanation\n{}".format(
+                sys.exc_info()[0]))
+            return explainer.NO_EXPLANATION

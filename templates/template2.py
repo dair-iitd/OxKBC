@@ -1,12 +1,14 @@
-import pickle
-from collections import Counter
 import logging
-import numpy as np
+import pickle
+import string
 import time
+from collections import Counter
+
+import numpy as np
 
 import utils
 from templates.template import TemplateBaseClass
-import string
+
 
 class Template2(TemplateBaseClass):
     """
@@ -107,7 +109,7 @@ class Template2(TemplateBaseClass):
 
     def get_input(self, fact):
         key = fact[0]
-        features = [0, 0, 0, 0, 0,0,0]
+        features = [0, 0, 0, 0, 0, 0, 0]
 
         if(key in self.table.keys()):
             max_score = self.stat_table[key]['max_score']
@@ -143,9 +145,8 @@ class Template2(TemplateBaseClass):
                 features = [my_score, best_score,
                             best_answer, z_score]
         return features
-    
-    def get_english_explanation(self, fact, enum_to_id, rnum_to_id, eid_to_name, rid_to_name):
-        why_frequent = utils.get_entity_frequent(fact, enum_to_id, rnum_to_id, eid_to_name, rid_to_name)
-        mapped_fact = utils.map_fact(fact, enum_to_id, rnum_to_id)
-        mapped_fact_name = utils.map_fact(mapped_fact, eid_to_name, rid_to_name)
-        return string.Template(self.exp_template).substitute(e1=mapped_fact_name[0], r=mapped_fact_name[1], e2=mapped_fact_name[2],why_frequent=why_frequent)
+
+    def get_english_explanation(self, fact, explainer):
+        why_frequent = explainer.get_entity_frequent(fact)
+        named_fact = explainer.name_fact(fact)
+        return string.Template(self.exp_template).substitute(e1=named_fact[0], r=named_fact[1], e2=named_fact[2], why_frequent=why_frequent)

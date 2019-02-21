@@ -10,98 +10,111 @@ import pandas as pd
 import random
 import template_builder
 import utils
+from explainer import Explainer
 
-def english_exp_rules(mapped_data, predictions, entity_inverse_map, relation_inverse_map, entity_names, relation_names):
-
-    def english_from_fact(fact, enum_to_id, rnum_to_id, eid_to_name, rid_to_name):
-        exp_template = '<b>(<font color="blue">$e1</font>, <font color="green">$r</font>, <font color="blue">$e2</font>)</b>'
-        mapped_fact = utils.map_fact(fact, enum_to_id, rnum_to_id)
-        mapped_fact_name = utils.map_fact(
-            mapped_fact, eid_to_name, rid_to_name)
-        return string.Template(exp_template).substitute(e1=mapped_fact_name[0], r=mapped_fact_name[1], e2=mapped_fact_name[2])
+def english_exp_rules(mapped_data, predictions,explainer):
 
     explanations = []
-
-    def lambda_english_from_fact(x):
-        return english_from_fact(x, entity_inverse_map, relation_inverse_map, entity_names, relation_names)
 
     for itr in range(len(mapped_data)):
         fact = mapped_data[itr]
         pred = predictions[itr]
         if(pred[1] == -1):
             if(pred[0] == ""):
-                explanations.append(utils.NO_EXPLANATION)
+                explanations.append(explainer.NO_EXPLANATION)
             else:
-                to_explain = lambda_english_from_fact(fact)
-                explaining_fact = (
-                    mapped_data[itr][0], pred[0], mapped_data[itr][2])
-                explaining_fact = lambda_english_from_fact(explaining_fact)
-                # explanations.append(to_explain+" because "+explaining_fact)
+                explaining_fact = explainer.html_fact([fact[0], pred[0], fact[2]])
                 explanations.append(explaining_fact)
         else:
             if len(pred[0])==2:
-                to_explain = lambda_english_from_fact(fact)
-                explaining_fact1 = (mapped_data[itr][0], pred[0][0], pred[1])
-                explaining_fact2 = (pred[1], pred[0][1], mapped_data[itr][2])
-                explaining_fact1 = lambda_english_from_fact(explaining_fact1)
-                explaining_fact2 = lambda_english_from_fact(explaining_fact2)
-                # explanations.append(to_explain+" because because AI knows " +explaining_fact+" and "+explaining_fact2)
+                explaining_fact1 = explainer.html_fact([fact[0], pred[0][0], pred[1]])
+                explaining_fact2 = explainer.html_fact([pred[1], pred[0][1], fact[2]])
                 explanations.append(explaining_fact1+" and "+explaining_fact2)
             else:
-                explaining_fact1 = (mapped_data[itr][0], pred[0][0], pred[1][0])
-                explaining_fact2 = (pred[1][0], pred[0][1], pred[1][1])
-                explaining_fact3 = (pred[1][1], pred[0][2], mapped_data[itr][2])
-                explaining_fact1 = lambda_english_from_fact(explaining_fact1)
-                explaining_fact2 = lambda_english_from_fact(explaining_fact2)
-                explaining_fact3 = lambda_english_from_fact(explaining_fact3)
+                explaining_fact1 = explainer.html_fact([fact[0], pred[0][0], pred[1][0]])
+                explaining_fact2 = explainer.html_fact([pred[1][0], pred[0][1], pred[1][1]])
+                explaining_fact3 = explainer.html_fact([pred[1][1], pred[0][2], fact[2]])
                 explanations.append(explaining_fact1+" and "+explaining_fact2+" and "+explaining_fact3)
-
     return explanations
 
 
-def english_exp_template(mapped_data, predictions, template_objs, entity_inverse_map, relation_inverse_map, entity_names, relation_names):
+def english_exp_template(mapped_data, predictions, template_objs, explainer):
     explanations = []
     for fact, pred in zip(mapped_data, predictions):
-        pred = 3
         if(pred == 0):
-            explanations.append(utils.NO_EXPLANATION)
+            explanations.append(explainer.NO_EXPLANATION)
         else:
-            explanations.append(template_objs[pred-1].get_english_explanation(
-                fact, entity_inverse_map, relation_inverse_map, entity_names, relation_names))
+            explanations.append(template_objs[pred-1].get_english_explanation(fact,explainer))
     return explanations
 
 
-def write_english_exps(named_data, template_exps, rule_exps, output_file,num_per_hit):
-    csv_data = []
-    book_keeping_file = open(output_file+'.book.txt','w')
-    for fact, t_exp, r_exp in zip(named_data, template_exps, rule_exps):
-        # if(t_exp == utils.NO_EXPLANATION and r_exp == utils.NO_EXPLANATION):
-        #if(t_exp == utils.NO_EXPLANATION or r_exp == utils.NO_EXPLANATION):
-        #    continue
-        r = random.uniform(0,1)
-        fact_name_str = '<b>(<font color="blue">$e1</font>, <font color="green">$r</font>, <font color="blue">$e2</font>)</b>'
-        fact_named = string.Template(fact_name_str).substitute(e1=fact[0],r=fact[1],e2=fact[2])
-        book_keeping_file.write(fact_named+'\t')
-        r=0.1
-        if(r<=0.5):
-            book_keeping_file.write('our\n')
-            row = [fact_named, t_exp, r_exp]
-        else:
-            book_keeping_file.write('other\n')
-            row = [fact_named, r_exp, t_exp]
-        csv_data.append(row)
-    reqd = int(len(csv_data)/num_per_hit)*num_per_hit
-    csv_data = np.array(csv_data[:reqd])
-    csv_data = csv_data.reshape((-1, 3*num_per_hit))
-    columns = []
-    for i in range(1, num_per_hit+1):
-        columns.extend(['fact_'+str(i), 'exp_A_'+str(i), 'exp_B_'+str(i)])
-    df = pd.DataFrame(csv_data, columns=columns)
-    df.to_csv(output_file+".csv", index=False, sep=',')
+def get_options(iter_id,our_is_A,one_is_no):
+    iter_id = iter_id%5
+    opt1_id = ('our_' if our_is_A else 'other_') + str(iter_id)
+    opt2_id = ('other_' if our_is_A else 'our_') + str(iter_id)
+    opt3_id = 'both_' + str(iter_id)
+    opt4_id = 'none_' + str(iter_id)
+    
+    opt1_str = '<crowd-radio-button name=\"' + opt1_id + '\"> A is better than B </crowd-radio-button>'
+    opt2_str = '<crowd-radio-button name=\"' + opt2_id + '\"> B is better than A </crowd-radio-button>'
+    opt3_str = '<crowd-radio-button name=\"' + opt3_id + '\"> Both A and B are equally good </crowd-radio-button>'
+    opt4_str = '<crowd-radio-button name=\"' + opt4_id + '\"> Both A and B are bad </crowd-radio-button>'
+    
+    if one_is_no:
+        opt3_str = ''
+        opt4_str = ''
+    
+    return [opt1_str,opt2_str,opt3_str,opt4_str]
+
+def write_english_exps(mapped_data, template_exps, rule_exps, output_file, num_per_hit, explainer):
+    html_data = []
+    both_no = 0
+    both_same = 0
+    for fact, t_exp, r_exp in zip(mapped_data, template_exps, rule_exps):
+        if(t_exp == explainer.NO_EXPLANATION and r_exp == explainer.NO_EXPLANATION):
+            both_no += 1
+            continue
+        if(t_exp == r_exp):
+            both_same += 1
+            continue    
+        htmled_fact = explainer.html_fact(fact)
+        row = [htmled_fact, t_exp, r_exp]
+        html_data.append(row)
+    
+    df_html = pd.DataFrame(html_data,columns=['fact','our','other'])
     pd.set_option('display.max_colwidth', -1)
     with open(output_file+".html",'w') as html_file:
-        html_file.write(utils.CSS_STYLE+'\n')
-        df.to_html(html_file, escape=False, justify='center')
+        html_file.write(explainer.CSS_STYLE+'\n')
+        df_html.to_html(html_file, escape=False, justify='center')
+
+    logging.info('Total Facts = {}'.format(len(mapped_data)))
+    logging.info('Both No explanations = {}'.format(both_no))
+    logging.info('Both Same explanations = {}'.format(both_same))
+
+    csv_data = []
+    iter_id = 0
+    for htmled_fact,t_exp,r_exp in html_data:
+        r = random.uniform(0,1)
+        row = [htmled_fact]
+        one_is_no = (t_exp == explainer.NO_EXPLANATION or r_exp == explainer.NO_EXPLANATION)
+        if(r<=0.5):
+            row.extend([t_exp,r_exp])
+            row.extend(get_options(iter_id,True,one_is_no))
+        else:
+            row.extend([r_exp,t_exp])
+            row.extend(get_options(iter_id,False,one_is_no))
+        csv_data.append(row)
+        iter_id += 1
+    columns = []
+    for i in range(num_per_hit):
+        columns.extend(['fact_'+str(i), 'exp_A_'+str(i), 'exp_B_'+str(i)])
+        for j in range(4):
+            columns.append('opt_'+str(i)+'_'+str(j))
+    reqd = int(len(html_data)/num_per_hit)*num_per_hit
+    csv_data = np.array(csv_data[:reqd])
+    csv_data = csv_data.reshape((-1, len(columns)))
+    df = pd.DataFrame(csv_data, columns=columns)
+    df.to_csv(output_file+".csv", index=False, sep=',')
 
 
 if __name__ == "__main__":
@@ -143,12 +156,7 @@ if __name__ == "__main__":
 
     data = utils.read_data(args.test_file)
 
-    if(len(data)%args.num != 0):
-        logging.error('Number of examples per hit is not a factor of length of data')
-        exit(-1)
-
-    mapped_data = np.array(utils.map_data(
-        data, distmult_dump['entity_to_id'], distmult_dump['relation_to_id'])).astype(np.int32)
+    mapped_data = np.array(utils.map_data(data, distmult_dump['entity_to_id'], distmult_dump['relation_to_id'])).astype(np.int32)
     logging.info("Loaded test file from %s" % (args.test_file))
 
     if(args.template_pred is None and args.rule_pred is None):
@@ -168,33 +176,24 @@ if __name__ == "__main__":
             logging.error("Unequal length of rule predictions and data")
             exit(-1)
 
-    entity_names = utils.read_entity_names(os.path.join(
-        data_root, "mid2wikipedia_cleaned.tsv"),add_wiki=True)
-    relation_names = utils.read_relation_names(
-        os.path.join(data_root, "relation_name.txt"))
 
     entity_inverse_map = utils.get_inverse_dict(distmult_dump['entity_to_id'])
-    relation_inverse_map = utils.get_inverse_dict(
-        distmult_dump['relation_to_id'])
-    utils.heuristic_purge_relations(relation_inverse_map,relation_names)
+    relation_inverse_map = utils.get_inverse_dict(distmult_dump['relation_to_id'])
 
-    template_objs = template_builder.template_obj_builder(
-        data_root, args.model_weights, args.template_load_dir, None, "distmult", [1, 2, 3, 4, 5], True)
 
-    utils.e1_e2_r, utils.e2_e1_r = utils.get_ent_ent_rel(template_objs[0].kb.facts) 
-    utils.r_e2_e1, utils.e1_e2_r = utils.get_most_freq_ind(template_objs[0].kb.facts) 
+    template_objs = template_builder.template_obj_builder(data_root, args.model_weights, args.template_load_dir, None, "distmult", [1, 2, 3, 4, 5], True)
+
+    explainer = Explainer(data_root,template_objs[0].kb,template_objs[0].base_model,entity_inverse_map,relation_inverse_map)
 
     if(args.template_pred is not None):
-        template_exps = english_exp_template(mapped_data, template_predictions, template_objs,
-                                             entity_inverse_map, relation_inverse_map, entity_names, relation_names)
+        template_exps = english_exp_template(mapped_data, template_predictions, template_objs,explainer)
     else:
-        template_exps = [utils.NO_EXPLANATION for _ in range(len(mapped_data))]
+        template_exps = [explainer.NO_EXPLANATION for _ in range(len(mapped_data))]
 
     if(args.rule_pred is not None):
-        rule_exps = english_exp_rules(
-            mapped_data, rule_predictions, entity_inverse_map, relation_inverse_map, entity_names, relation_names)
+        rule_exps = english_exp_rules(mapped_data, rule_predictions, explainer)
     else:
-        rule_exps = [utils.NO_EXPLANATION for _ in range(len(mapped_data))]
+        rule_exps = [explainer.NO_EXPLANATION for _ in range(len(mapped_data))]
 
     logging.info("Generated explanations")
 
@@ -202,8 +201,5 @@ if __name__ == "__main__":
         logging.error("Invalid length of explanations {} and {}".format(len(rule_exps),len(template_exps)))
         exit(-1)
 
-
-    named_data = utils.map_data(data, entity_names, relation_names)
-    write_english_exps(named_data, template_exps,
-                       rule_exps, args.output_filename,args.num)
+    write_english_exps(mapped_data, template_exps, rule_exps, args.output_filename, args.num, explainer)
     logging.info("Written explanations to %s" % (args.output_filename))

@@ -1,12 +1,12 @@
-import pickle
-
-import numpy as np
 import logging
+import pickle
+import string
+import sys
 import time
 
+import numpy as np
 
 import utils
-import string
 from templates.template import TemplateBaseClass
 
 
@@ -28,8 +28,8 @@ class Template3(TemplateBaseClass):
 
         # self.exp_template = '<b>$e1 $r $e2</b> because <b>$e1 $rprime $e2</b> and <b>\"$r\"</b> is similar to <b>\"$rprime\"</b>'
         # self.exp_template = '<b>$e1 $rprime $e2</b> and <b>\"$r\"</b> is similar to <b>\"$rprime\"</b>'
-        self.exp_template = '<b>(<font color="blue">$e1</font>, <font color="green">$rprime</font>, <font color="blue">$e2</font>)</b>'
-                    
+        self.exp_template = '$html_fact_rprime'
+
         if(load_table == None):
             logging.info("Load table is None, so beginning process_data")
             self.process_data()
@@ -214,13 +214,11 @@ class Template3(TemplateBaseClass):
 
         return features
 
-    def get_english_explanation(self, fact, enum_to_id, rnum_to_id, eid_to_name, rid_to_name):
+    def get_english_explanation(self, fact, explainer):
         try:
-            mapped_fact = utils.map_fact(fact, enum_to_id, rnum_to_id)
-            mapped_fact_name = utils.map_fact(mapped_fact, eid_to_name, rid_to_name)
-            rprime_id = rnum_to_id[self.get_explanation(fact)[1]]
-            rprime = rid_to_name.get(rprime_id,rprime_id)
-            return string.Template(self.exp_template).substitute(e1=mapped_fact_name[0],r=mapped_fact_name[1],e2=mapped_fact_name[2],rprime=rprime)
+            rprime_num = self.get_explanation(fact)[1]
+            return string.Template(self.exp_template).substitute(html_fact_rprime=explainer.html_fact([fact[0], rprime_num, fact[2]]))
         except:
-            return utils.NO_EXPLANATION
-
+            logging.error("Some error occured in template 3 while getting explanation\n{}".format(
+                sys.exc_info()[0]))
+            return explainer.NO_EXPLANATION
