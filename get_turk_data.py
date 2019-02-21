@@ -39,13 +39,23 @@ def english_exp_rules(mapped_data, predictions, entity_inverse_map, relation_inv
                 # explanations.append(to_explain+" because "+explaining_fact)
                 explanations.append(explaining_fact)
         else:
-            to_explain = lambda_english_from_fact(fact)
-            explaining_fact1 = (mapped_data[itr][0], pred[0][0], pred[1])
-            explaining_fact2 = (pred[1], pred[0][1], mapped_data[itr][2])
-            explaining_fact1 = lambda_english_from_fact(explaining_fact1)
-            explaining_fact2 = lambda_english_from_fact(explaining_fact2)
-            # explanations.append(to_explain+" because because AI knows " +explaining_fact+" and "+explaining_fact2)
-            explanations.append(explaining_fact1+" and "+explaining_fact2)
+            if len(pred[0])==2:
+                to_explain = lambda_english_from_fact(fact)
+                explaining_fact1 = (mapped_data[itr][0], pred[0][0], pred[1])
+                explaining_fact2 = (pred[1], pred[0][1], mapped_data[itr][2])
+                explaining_fact1 = lambda_english_from_fact(explaining_fact1)
+                explaining_fact2 = lambda_english_from_fact(explaining_fact2)
+                # explanations.append(to_explain+" because because AI knows " +explaining_fact+" and "+explaining_fact2)
+                explanations.append(explaining_fact1+" and "+explaining_fact2)
+            else:
+                explaining_fact1 = (mapped_data[itr][0], pred[0][0], pred[1][0])
+                explaining_fact2 = (pred[1][0], pred[0][1], pred[1][1])
+                explaining_fact3 = (pred[1][1], pred[0][2], mapped_data[itr][2])
+                explaining_fact1 = lambda_english_from_fact(explaining_fact1)
+                explaining_fact2 = lambda_english_from_fact(explaining_fact2)
+                explaining_fact3 = lambda_english_from_fact(explaining_fact3)
+                explanations.append(explaining_fact1+" and "+explaining_fact2+" and "+explaining_fact3)
+
     return explanations
 
 
