@@ -192,3 +192,34 @@ def get_ent_ent_rel(data_arr):
         e1_e2_r[e1][e2].append(r)
         e2_e1_r[e2][e1].append(r)
     return e1_e2_r,e2_e1_r
+
+def get_e1r_e2_dict(data_arr):
+    e1r_e2={}
+
+    for data in data_arr:
+        key=(data[0],data[1])
+        if key not in e1r_e2:
+            e1r_e2[key]=[]
+        e1r_e2[key].append(data[2])
+    
+    return e1r_e2
+
+
+def get_re2_e1_dict(data_arr):
+    re2_e1={}
+
+    for data in data_arr:
+        key=(data[1],data[2])
+        if key not in re2_e1:
+            re2_e1[key]=[]
+        re2_e1[key].append(data[0])
+    
+    return re2_e1
+
+
+def get_set_mapped_train_data(data_arr):
+    data_set=set()
+
+    for data in data_arr:
+        data_set.add((data[0],data[1],data[2]))
+    return data_set
