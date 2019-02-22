@@ -4,6 +4,8 @@ import os
 import pickle
 import string
 import time
+import queue
+import itertools
 
 import numpy as np
 import pandas as pd
@@ -67,20 +69,34 @@ def get_options(iter_id,our_is_A,one_is_no):
     return [opt1_str,opt2_str,opt3_str,opt4_str]
 
 def write_english_exps(mapped_data, template_exps, rule_exps, output_file, num_per_hit, explainer):
-    html_data = []
+    raw_data = queue.Queue(0)
     both_no = 0
     both_same = 0
+    qlty_ctrl = queue.Queue(0)
     for fact, t_exp, r_exp in zip(mapped_data, template_exps, rule_exps):
         if(t_exp == explainer.NO_EXPLANATION and r_exp == explainer.NO_EXPLANATION):
             both_no += 1
             continue
-        if(t_exp == r_exp):
-            both_same += 1
-            continue    
         htmled_fact = explainer.html_fact(fact)
         row = [htmled_fact, t_exp, r_exp]
-        html_data.append(row)
+        if(t_exp == r_exp):
+            both_same += 1
+            qlty_ctrl.put(row)
+            continue    
+        raw_data.put(row)
     
+    html_data = []
+    while(not raw_data.empty()):
+        if(len(html_data)%5==4 and not qlty_ctrl.empty()):
+            html_data.append(qlty_ctrl.get())
+        else:
+            html_data.append(raw_data.get())
+    
+    html_data_chunked = list(utils.chunks(html_data,5))
+    _ = [random.shuffle(el) for el in html_data_chunked]
+    html_data = list(itertools.chain(*html_data_chunked))
+    
+
     df_html = pd.DataFrame(html_data,columns=['fact','our','other'])
     pd.set_option('display.max_colwidth', -1)
     with open(output_file+".html",'w') as html_file:
