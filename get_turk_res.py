@@ -72,7 +72,7 @@ def get_winner(answers):
     elif (other_ct > our_ct):
         return ['other']
     else:
-        return []
+        return ['tie']
         # return ['our','other']
 
 def get_results(df,book):
@@ -152,7 +152,7 @@ if __name__ == "__main__":
 
     ctr_winner = collections.Counter(winner_list)
     analysis_str += ('Total number of facts = {}\n'.format(len(results)))
-    analysis_str += ('Total number of winning facts = {}\n'.format(len(winner_list)))
+    analysis_str += ('Total number of winning facts = {}\n'.format(len(winner_list)-winner_list.count('tie')))
     for el in ctr_winner:
         ctr_winner[el] /= len(winner_list)*0.01
     analysis_str += '{}\n\n'.format(ctr_winner)
