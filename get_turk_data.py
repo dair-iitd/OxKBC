@@ -68,7 +68,7 @@ def get_options(iter_id,our_is_A,one_is_no):
     
     return [opt1_str,opt2_str,opt3_str,opt4_str]
 
-def write_english_exps(mapped_data, template_exps, rule_exps, output_file, num_per_hit, explainer):
+def write_english_exps(mapped_data, template_exps, rule_exps, output_path, num_per_hit, explainer):
     raw_data = queue.Queue(0)
     both_no = 0
     both_same = 0
@@ -99,7 +99,8 @@ def write_english_exps(mapped_data, template_exps, rule_exps, output_file, num_p
 
     df_html = pd.DataFrame(html_data,columns=['fact','our','other'])
     pd.set_option('display.max_colwidth', -1)
-    with open(output_file+".html",'w') as html_file:
+    last_out_part = os.path.basename(os.path.normpath(output_path))
+    with open(os.path.join(output_path,last_out_part+"_book.html"),'w') as html_file:
         html_file.write(explainer.CSS_STYLE+'\n')
         df_html.to_html(html_file, escape=False, justify='center')
 
@@ -130,7 +131,7 @@ def write_english_exps(mapped_data, template_exps, rule_exps, output_file, num_p
     csv_data = np.array(csv_data[:reqd])
     csv_data = csv_data.reshape((-1, len(columns)))
     df = pd.DataFrame(csv_data, columns=columns)
-    df.to_csv(output_file+".csv", index=False, sep=',')
+    df.to_csv(os.path.join(output_path,last_out_part+"_hits.csv"), index=False, sep=',')
 
 
 if __name__ == "__main__":
@@ -142,7 +143,7 @@ if __name__ == "__main__":
                         help="Pickle file of model wieghts", required=True)
     parser.add_argument('-l', '--template_load_dir',
                         required=False, default=None)
-    parser.add_argument('-o', '--output_filename',
+    parser.add_argument('-o', '--output_path',
                         required=True, default=None)
     parser.add_argument('-tf', '--test_file',
                         required=True, default=None)
@@ -217,5 +218,6 @@ if __name__ == "__main__":
         logging.error("Invalid length of explanations {} and {}".format(len(rule_exps),len(template_exps)))
         exit(-1)
 
-    write_english_exps(mapped_data, template_exps, rule_exps, args.output_filename, args.num, explainer)
-    logging.info("Written explanations to %s" % (args.output_filename))
+    os.makedirs(args.output_path,exist_ok=True)
+    write_english_exps(mapped_data, template_exps, rule_exps, args.output_path, args.num, explainer)
+    logging.info("Written explanations to %s" % (args.output_path))

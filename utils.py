@@ -85,4 +85,9 @@ def map_data(data, mapped_entity = None, mapped_relation=None):
         mapped_data.append(map_fact(line,mapped_entity,mapped_relation))
     return mapped_data
 
+def chunks(l, n):
+    """Yield successive n-sized chunks from l."""
+    for i in range(0, len(l), n):
+        yield l[i:i + n]
+
 
