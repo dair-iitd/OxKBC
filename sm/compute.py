@@ -1,3 +1,4 @@
+import yaml
 import functools
 import logging
 import os
@@ -32,11 +33,15 @@ class Loss(object):
         self.header = functools.reduce(
             lambda x, y: x+y, [[y+str(x) for y in ['p', 'r', 'f', 's']] for x in self.labels])
         self.header.extend(['acc','mip', 'mir', 'mif'])
-
+        
+        if self.args.kldiv_lambda != 0:
+            self.target_distribution = torch.Tensor(yaml.load(open(self.args.label_distribution_file))[0]).float()
+            self.target_distribution = self.target_distribution/self.target_distribution.sum() 
+            self.target_distribution = Variable(self.target_distribution)
         if settings.cuda:
             self.criterion.cuda()
             self.weights = self.weights.cuda()
-
+            self.target_distribution = self.target_distribution.cuda()
     def __call__(self, var, model, mode):
         '''
         var is a list of variables returned by dataloader.
@@ -50,6 +55,7 @@ class Loss(object):
         max_score, ypred = torch.max(template_score, dim=1)
         
         loss = Variable(torch.Tensor([0]))
+        kldiv_loss = Variable(torch.Tensor([0]))
         if 'train' in mode:
             if mode == 'train_un':
                 #convert template score into probabilites
@@ -57,6 +63,12 @@ class Loss(object):
                 #template_score = template_score * self.weights
                 reward_tensor = (self.args.class_imbalance*y.float()*(template_score[:, 0]*self.weights[0]+torch.max(template_score[:, 1:], dim=1)[0])) + (1.0-y.float())*((template_score[:, 0]*self.args.pos_reward) + torch.sum(template_score[:, 1:], dim=1)*self.args.neg_reward)
                 loss = -1.0*reward_tensor.mean()
+                if self.args.kldiv_lambda !=  0:
+                    if y.float().sum().data[0] != 0:
+                        class_probs = torch.log((template_score*(y.float().unsqueeze(-1).expand_as(template_score))).sum(dim=0)/y.float().sum())
+                        kldiv_loss = F.kl_div(class_probs, self.target_distribution)
+                        loss += self.args.kldiv_lambda * kldiv_loss
+
             elif mode == 'train_sup':
                 #template_score = F.softmax(template_score, dim=1)
                 #template_score = template_score * self.weights
@@ -65,7 +77,7 @@ class Loss(object):
                 raise 
                  
 
-        return loss, ypred, y
+        return loss, kldiv_loss, ypred, y
 
     def calculate_accuracies(self, ycpu, ypred_cpu):
         if len(ycpu.shape) > 1 and ycpu.shape[1] > 1:
@@ -104,6 +116,7 @@ def compute(epoch, model, loader, optimizer, mode, eval_fn, args, labelled_train
     last_print = 0
     count = 0
     cum_loss = 0
+    cum_kl_loss = 0
     cum_count = 0
 
     if 'train' in mode:
@@ -133,12 +146,15 @@ def compute(epoch, model, loader, optimizer, mode, eval_fn, args, labelled_train
             if settings.cuda:
                 var[index] = var[index].cuda()
 
-        loss, ypred, ytrue = eval_fn(var, model, mode)
+        loss, kl_div_loss, ypred, ytrue = eval_fn(var, model, mode)
         predictions[idx] = ypred.data.cpu().numpy()
         ground_truth[idx] = ytrue.squeeze().data.cpu().numpy()
 
         cum_loss = cum_loss + loss.data[0]*ytrue.size(0)
+        cum_kl_loss = cum_kl_loss + kl_div_loss.data[0]*ytrue.size(0)
+        
         #cum_loss = cum_loss + loss.data.item()*ytrue.size(0)
+        #cum_kl_loss = cum_kl_loss + kl_div_loss.data.item()*ytrue.size(0)
         cum_count += count
 
         if 'train' in mode:
@@ -150,7 +166,7 @@ def compute(epoch, model, loader, optimizer, mode, eval_fn, args, labelled_train
             str_ct = str(Counter(ypred.data.cpu().numpy()))
             last_print = cum_count
             rec = [epoch, mode, cum_loss/cum_count, cum_count,
-                   len(loader.dataset), time.time() - start_time, 'Counts --> '+str_ct]
+                   len(loader.dataset), time.time() - start_time, 'Counts --> '+str_ct, cum_kl_loss/cum_count]
             logging.info(
                 ','.join([str(round(x, 6)) if isinstance(x, float) else str(x) for x in rec]))
 
@@ -161,7 +177,7 @@ def compute(epoch, model, loader, optimizer, mode, eval_fn, args, labelled_train
 
 
     rec = [epoch, mode, cum_loss/cum_count, cum_count,
-           len(loader.dataset), time.time() - start_time]
+           len(loader.dataset), time.time() - start_time, cum_kl_loss/cum_count]
 
     metric_header = []
     if args.pred_file is not None:
@@ -172,14 +188,14 @@ def compute(epoch, model, loader, optimizer, mode, eval_fn, args, labelled_train
         rec.extend(metric)
         metric_header = eval_fn.header
 
-    header = 'epoch,mode,loss,count,dataset_size,time'.split(',') + metric_header 
+    header = 'epoch,mode,loss,count,dataset_size,time,kl_loss'.split(',') + metric_header 
     if calc_acc:
-        logging.info('epoch,mode,loss,count,dataset_size,time,' +
+        logging.info('epoch,mode,loss,count,dataset_size,time,kl_loss' +
                  ','.join(metric_header))
         logging.info(
         ','.join([str(round(x, 6)) if isinstance(x, float) else str(x) for x in rec]))
 
-        print('epoch,mode,loss,count,dataset_size,time,' +
+        print('epoch,mode,loss,count,dataset_size,time,kl_loss' +
                      ','.join(metric_header), file = args.lpf,flush=True)
 
         print(','.join([str(round(x, 6)) if isinstance(x, float) else str(x) for x in rec]),

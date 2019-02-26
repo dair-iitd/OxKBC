@@ -74,6 +74,8 @@ def main(args):
         command += "--num_templates " + \
             str(args.num_templates)+" --mil --config "+args.config+" --cuda "
         command += "--supervision "+args.supervision+" "
+        if(args.kldiv_lambda != 0 and args.label_distribution_file != ''):
+            command += "--kldiv_lambda "+args.kldiv_lambda +" --label_distribution_file "+args.label_distribution_file + " "
         
         print(command)
         # continue
@@ -97,7 +99,9 @@ def main(args):
             args.batch_size)+" --each_input_size "+str(args.each_input_size)+" "
         command += "--num_templates " + \
             str(args.num_templates)+" --mil --config "+args.config+" --cuda "
-        command += "--supervision "+args.supervision+" "
+        command += "--supervision "+args.supervision + " "
+        if(args.kldiv_lambda != 0 and args.label_distribution_file != ''):
+            command += "--kldiv_lambda "+args.kldiv_lambda +" --label_distribution_file "+args.label_distribution_file + " "
         command += "--only_eval --log_eval "+val_log+" --checkpoint "+checkpoint_path
         command += " --pred_file valid_preds.txt"
         print(command)
@@ -114,6 +118,8 @@ def main(args):
         command += "--num_templates " + \
             str(args.num_templates)+" --mil --config "+args.config+" --cuda "
         command += "--supervision "+args.supervision+" "
+        if(args.kldiv_lambda != 0 and args.label_distribution_file != ''):
+            command += "--kldiv_lambda "+args.kldiv_lambda +" --label_distribution_file "+args.label_distribution_file + " "
         command += "--only_eval --log_eval "+test_log+" --checkpoint "+checkpoint_path
         command += " --pred_file test_preds.txt"
         print(command)
@@ -150,9 +156,12 @@ if __name__ == '__main__':
     parser.add_argument('--supervision', help='possible values - un, semi, sup',
                         type=str, default='un')
 
+    parser.add_argument('--kldiv_lambda', help='KL Divergence lambda', type=float, default=0.0)
+    parser.add_argument('--label_distribution_file', help='KL Divergence distribution file', type=str, default='')
+    
     parser.add_argument('--gen_data', help='Just Generate Data and exit',
                         action='store_true', default=False)
 
     args = parser.parse_args()
-
+    
     main(args)

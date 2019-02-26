@@ -4,7 +4,7 @@
 #PBS -N cross_val
 #PBS -P cse
 #PBS -j oe
-#PBS -l select=1:ngpus=1:K20GPU=false:ncpus=6
+#PBS -l select=1:ngpus=1:K20GPU=false:ncpus=4
 #PBS -l walltime=24:00:00
 ## SPECIFY JOB NOW
 

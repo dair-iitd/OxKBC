@@ -203,6 +203,11 @@ if __name__ == '__main__':
     parser.add_argument('--supervision', help='possible values - un, semi, sup',
                         type=str, default='un')
 
+    #kl div loss args
+    parser.add_argument('--kldiv_lambda', help='relative wt of kl div loss', default=0.0,type=float)
+    parser.add_argument('--label_distribution_file',help='yaml file containing target distribution', default= 'label_distrubution.yml' , type=str)
+
+
     args = parser.parse_args()
     config = {}
     if os.path.exists(os.path.expanduser(args.config)):

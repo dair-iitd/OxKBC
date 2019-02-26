@@ -15,27 +15,34 @@ then
 fi
 
 ## Parameters to search for
-NEG_REWARD=(0 -0.05 -0.125 -0.25 -0.5 -1 -1.5 -2 -4 -8)
-#RHO=(0 0.01 0.05 0.1 0.125 0.2 0.25 0.35 0.4 0.5 0.75)
-RHO=(0 0.01 0.05 0.1 0.125)
+# OLD Params
+#NEG_REWARD=(0 -0.05 -0.125 -0.25 -0.5 -1 -1.5 -2 -4 -8)
+# RHO=(0 0.01 0.05 0.1 0.125 0.2 0.25 0.35 0.4 0.5 0.75)
+
+# New params for kl divergence
+NEG_REWARD=(-0.5 -1 -2 -4)
+RHO=(0.01 0.05 0.1 0.125 0.25 0.5)
+#RHO=(0 0.01 0.05 0.1 0.125)
 
 ## Repeat the cross-validation NTIMES times
 NTIMES=5
 
 ## Global Variables
 folds=5
-dataset='yago'
+kldiv_lambda=40
+dataset='fb15k'
 hidden_unit_list="hidden_unit_list: [90,40]"
-supervision="un"
+supervision="semi"
 unlabelled_training_data_path='../logs/'${dataset}'/sm_with_id.data.pkl'
 labelled_training_data_path='../logs/'${dataset}'/exp_words/sm_valid_with_id.pkl'
+kldiv_dist_file='../logs/'${dataset}'/exp_words/label_distribution.yml'
 base_model_file='../dumps/'${dataset}'_distmult_dump_norm.pkl'
-base_logs="cross_val/"${dataset}"_90_40_"${supervision}
+base_logs="cross_val/"${dataset}"_90_40_"${supervision}"_kl_"${kldiv_lambda}
 mkdir -p $base_logs
 if [ "$rerun" = false ]
 then
 	echo "Genearating Data"
-	 #/home/cse/btech/cs1150210/anaconda3/bin/python3 cross_validation.py --folds ${folds} --dir ${base_logs} --labelled_training_data_path $labelled_training_data_path --supervision ${supervision} --gen_data
+	 /home/cse/btech/cs1150210/anaconda3/bin/python3 cross_validation.py --folds ${folds} --dir ${base_logs} --labelled_training_data_path $labelled_training_data_path --supervision ${supervision} --gen_data
 fi
 for run in $(seq 1 $NTIMES); do
 	logs=${base_logs}"/run_"${run}
@@ -64,7 +71,7 @@ for run in $(seq 1 $NTIMES); do
 			echo "neg_reward: $i" >>$yml
 			echo "rho: $j" >>$yml
 			echo "${hidden_unit_list}" >>$yml
-			echo "/home/cse/btech/cs1150210/anaconda3/bin/python3 cross_validation.py --folds ${folds} --dir ${dir} --labelled_training_data_path $base_logs --unlabelled_training_data_path ${unlabelled_training_data_path} --num_epochs 20 --config $yml --batch_size 2048 --num_templates 5 --each_input_size 7 --supervision ${supervision} &" >>$sh
+			echo "/home/cse/btech/cs1150210/anaconda3/bin/python3 cross_validation.py --folds ${folds} --dir ${dir} --labelled_training_data_path $base_logs --unlabelled_training_data_path ${unlabelled_training_data_path} --num_epochs 20 --config $yml --batch_size 2048 --num_templates 5 --each_input_size 7 --supervision ${supervision} --kldiv_lambda $kldiv_lambda --label_distribution_file $kldiv_dist_file &" >>$sh
 			echo "pids[${counter}]=""$""!" >>$sh
 			counter=$((counter + 1))
 		done
