@@ -42,6 +42,12 @@ class Explainer:
 
     def read_relation_names(self, path):
         relation_names = {}
+        ## Need to do this for yago TODO: Change it for a relation_names.txt file in yago
+        if not os.path.isfile(path):
+            for _, r in self.rnum_to_id.items():
+                relation_names[r] = r
+            return relation_names
+        
         with open(path, "r", errors='ignore', encoding='ascii') as f:
             lines = f.readlines()
             for line in lines:
@@ -75,7 +81,7 @@ class Explainer:
                 content = [el.strip() for el in content_raw]
                 if content[0] in entity_names:
                     logging.warn('Duplicate Entity found %s in line %s' %
-                                 (content[0], ' '.join(line)))
+                                 (content[0], line))
                 name = content[1]
                 wiki_id = content[2]
                 entity_names[content[0]] = {"name": name, "wiki_id": wiki_id}
@@ -151,7 +157,8 @@ class Explainer:
             n = len(l) - 2
             string_more = '{} and <div class=\"tooltip2\">{} more...<span class=\"tooltiptext2\">'.format(
                 ' , '.join(l[:2]), n)
-            for el in l[2:]:
+            max_len = min(100,len(l))
+            for el in l[2:max_len]:
                 string_more += el + "<br>"
             string_more += "</span></div>"
         return string_more
@@ -202,7 +209,7 @@ class Explainer:
         return string_frequent
 
     def get_entity_frequent(self, fact):
-        e1_name = self.get_e_name(fact[1])
+        e1_name = self.get_e_name(fact[0])
         e2_name = self.get_e_name(fact[2])
 
         other_part = self.freq_for_entity(fact[0], fact[2])

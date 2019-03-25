@@ -25,6 +25,7 @@ def valid_row(row):
     if(total_sum != 5):
         return 'You did not mark any option in some questions'
     if(not (row[get_key_answer('both',quality_ctrl_id)] or row[get_key_answer('none',quality_ctrl_id)]) ):
+        print("Quality control id == >",quality_ctrl_id)
         return 'You did not chose the option both explanations are good/bad, even when both A and B were same'
     return ''
     
@@ -35,6 +36,7 @@ def get_invalid_hits(df,outfilename):
     for index,row in df.iterrows():
         message = valid_row(row) 
         if(message!=''):
+            print('Invalid HIT at {} with message ==> {} '.format(index, message))
             df_new['Reject'][index] = message
             invalid_hits.append(row['AssignmentId'])
     if(len(invalid_hits)!=0):

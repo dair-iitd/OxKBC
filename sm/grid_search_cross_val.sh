@@ -29,7 +29,7 @@ NTIMES=5
 
 ## Global Variables
 folds=5
-kldiv_lambda=40
+kldiv_lambda=30
 dataset='fb15k'
 hidden_unit_list="hidden_unit_list: [90,40]"
 supervision="semi"
@@ -81,7 +81,7 @@ for run in $(seq 1 $NTIMES); do
 		if [ $counter -ne 0 ]
 		then
 			echo "Submitting Job"
-			qsub -P cse $sh
+			qsub $sh
 		fi
 		rm $sh
 	done

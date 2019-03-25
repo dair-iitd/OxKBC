@@ -41,7 +41,8 @@ class Loss(object):
         if settings.cuda:
             self.criterion.cuda()
             self.weights = self.weights.cuda()
-            self.target_distribution = self.target_distribution.cuda()
+            if self.args.kldiv_lambda != 0:
+                self.target_distribution = self.target_distribution.cuda()
     def __call__(self, var, model, mode):
         '''
         var is a list of variables returned by dataloader.

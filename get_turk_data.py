@@ -73,7 +73,9 @@ def write_english_exps(mapped_data, template_exps, rule_exps, output_path, num_p
     both_no = 0
     both_same = 0
     qlty_ctrl = queue.Queue(0)
-    for fact, t_exp, r_exp in zip(mapped_data, template_exps, rule_exps):
+    total_exp_data = list(zip(mapped_data,template_exps,rule_exps))
+    random.shuffle(total_exp_data)
+    for fact, t_exp, r_exp in total_exp_data:
         if(t_exp == explainer.NO_EXPLANATION and r_exp == explainer.NO_EXPLANATION):
             both_no += 1
             continue
@@ -127,12 +129,13 @@ def write_english_exps(mapped_data, template_exps, rule_exps, output_path, num_p
         columns.extend(['fact_'+str(i), 'exp_A_'+str(i), 'exp_B_'+str(i)])
         for j in range(4):
             columns.append('opt_'+str(i)+'_'+str(j))
+    print('Generated columns {}'.format(columns))
+    print('Generated csv_data {}'.format(len(csv_data)))
     reqd = int(len(html_data)/num_per_hit)*num_per_hit
     csv_data = np.array(csv_data[:reqd])
     csv_data = csv_data.reshape((-1, len(columns)))
     df = pd.DataFrame(csv_data, columns=columns)
     df.to_csv(os.path.join(output_path,last_out_part+"_hits.csv"), index=False, sep=',')
-
 
 if __name__ == "__main__":
 

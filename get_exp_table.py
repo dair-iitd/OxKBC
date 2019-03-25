@@ -38,7 +38,7 @@ def read_entity_names(path):
         for line in lines:
             content = line.split()
             if content[0] in entity_names:
-                logging.warn('Duplicate Entity found %s in line %s' % (content[0],' '.join(line)))
+                logging.warn('Duplicate Entity found %s in line %s' % (content[0],line))
             entity_names[content[0]] = ' '.join(content[1:-2])
     return entity_names
 
@@ -206,7 +206,7 @@ if __name__ == "__main__":
     else:
         mapped_data = np.loadtxt(args.test_file).astype(np.int32)
 
-    np.random.shuffle(mapped_data)
+    #np.random.shuffle(mapped_data)
     logging.info("Loaded test file from %s and randomly shuffled it" %
                  (args.test_file))
     entity_names = read_entity_names(os.path.join(

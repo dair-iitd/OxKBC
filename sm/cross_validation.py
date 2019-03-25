@@ -75,7 +75,7 @@ def main(args):
             str(args.num_templates)+" --mil --config "+args.config+" --cuda "
         command += "--supervision "+args.supervision+" "
         if(args.kldiv_lambda != 0 and args.label_distribution_file != ''):
-            command += "--kldiv_lambda "+args.kldiv_lambda +" --label_distribution_file "+args.label_distribution_file + " "
+            command += "--kldiv_lambda "+str(args.kldiv_lambda) +" --label_distribution_file "+args.label_distribution_file + " "
         
         print(command)
         # continue
@@ -101,7 +101,7 @@ def main(args):
             str(args.num_templates)+" --mil --config "+args.config+" --cuda "
         command += "--supervision "+args.supervision + " "
         if(args.kldiv_lambda != 0 and args.label_distribution_file != ''):
-            command += "--kldiv_lambda "+args.kldiv_lambda +" --label_distribution_file "+args.label_distribution_file + " "
+            command += "--kldiv_lambda "+str(args.kldiv_lambda) +" --label_distribution_file "+args.label_distribution_file + " "
         command += "--only_eval --log_eval "+val_log+" --checkpoint "+checkpoint_path
         command += " --pred_file valid_preds.txt"
         print(command)
@@ -119,7 +119,7 @@ def main(args):
             str(args.num_templates)+" --mil --config "+args.config+" --cuda "
         command += "--supervision "+args.supervision+" "
         if(args.kldiv_lambda != 0 and args.label_distribution_file != ''):
-            command += "--kldiv_lambda "+args.kldiv_lambda +" --label_distribution_file "+args.label_distribution_file + " "
+            command += "--kldiv_lambda "+str(args.kldiv_lambda) +" --label_distribution_file "+args.label_distribution_file + " "
         command += "--only_eval --log_eval "+test_log+" --checkpoint "+checkpoint_path
         command += " --pred_file test_preds.txt"
         print(command)
