@@ -1,3 +1,5 @@
+## Use this file to run cross validation.
+## Use with @grid_search_cross_val.sh
 import argparse
 import os
 import pickle
@@ -76,11 +78,11 @@ def main(args):
         command += "--supervision "+args.supervision+" "
         if(args.kldiv_lambda != 0 and args.label_distribution_file != ''):
             command += "--kldiv_lambda "+str(args.kldiv_lambda) +" --label_distribution_file "+args.label_distribution_file + " "
-        
+
         print(command)
         # continue
         os.system(command)
-        
+
         files = os.listdir(directory)
         filename = None
         for x in files:
@@ -158,10 +160,10 @@ if __name__ == '__main__':
 
     parser.add_argument('--kldiv_lambda', help='KL Divergence lambda', type=float, default=0.0)
     parser.add_argument('--label_distribution_file', help='KL Divergence distribution file', type=str, default='')
-    
+
     parser.add_argument('--gen_data', help='Just Generate Data and exit',
                         action='store_true', default=False)
 
     args = parser.parse_args()
-    
+
     main(args)

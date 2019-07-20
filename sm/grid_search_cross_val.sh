@@ -38,6 +38,7 @@ labelled_training_data_path='../logs/'${dataset}'/exp_words/sm_valid_with_id.pkl
 kldiv_dist_file='../logs/'${dataset}'/exp_words/label_distribution.yml'
 base_model_file='../dumps/'${dataset}'_distmult_dump_norm.pkl'
 base_logs="cross_val/"${dataset}"_90_40_"${supervision}"_kl_"${kldiv_lambda}
+mkdir -p cross_val
 mkdir -p $base_logs
 if [ "$rerun" = false ]
 then

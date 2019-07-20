@@ -1,0 +1,196 @@
+<!-- Project id = 1419750 -->
+<!-- You must include this JavaScript file -->
+<script src="https://assets.crowd.aws/crowd-html-elements.js"></script>
+
+<!-- For the full list of available Crowd HTML Elements and their input/output documentation,
+      please refer to https://docs.aws.amazon.com/sagemaker/latest/dg/sms-ui-template-reference.html -->
+
+<style>
+    .withmargin{
+        margin: 40px;
+    }
+  .tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+  }
+
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 1000px;
+    background-color: rgb(197, 192, 192);
+    color: rgb(10, 1, 1);
+    text-align: left;
+    border-radius: 6px;
+    padding: 5px;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+  }
+
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+  }
+
+  .tooltip2 {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted rgb(223, 209, 15);
+  }
+
+  .tooltip2 .tooltiptext2 {
+    visibility: hidden;
+    width: 1000px;
+    background-color: rgba(159, 223, 175, 0.877);
+    color: rgb(10, 1, 1);
+    text-align: left;
+    border-radius: 6px;
+    padding: 5px;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 2;
+  }
+
+  .tooltip2:hover .tooltiptext2 {
+    visibility: visible;
+  }
+</style>
+
+<!-- You must include crowd-form so that your task submits answers to MTurk -->
+<crowd-form answer-format="flatten-objects">
+
+  <crowd-instructions link-text="View instructions" link-type="button">
+    <short-summary>
+      <p>Is the given fact true?</p>
+    </short-summary>
+
+    <detailed-instructions>
+        <p>
+        We have a corpus of some facts available in form of triplets, e.g. (New York, is contained in, USA). Here ‘New York’ and ‘USA’  are entities related by the relation ‘is contained in’. However, this corpus is not complete and often it is possible to predict new facts from the existing corpus.
+        <br><br>In this task, you will be presented with one such prediction followed by a plausible explanation(if present) for the prediction. This explanation may not always imply the prediction, but it may increase our confidence about the prediction.
+
+        <br>Your job is to tell whether the given prediction is true, false or cannot be determined.
+
+        <br> <b>The explanation is there to assist you, though you are free to perform a Google search</b>
+        </p>
+
+      <p>
+          Please note the following -
+          <ol>
+
+            <li><b>Hyperlinks on the entities</b> would take you to the corresponding wiki page if it exists, otherwise, you will land on Wikipedia home page.</li>
+            <li>Whenever an explanation says that an entity <b>is "similar"</b> to another entity, then hover over it to see why the AI system believes so.  It lists the facts which makes it think why they are similar. These facts are present in the original corpus.</li>
+            <li>Whenever an explanation says <b>"frequently seen with"</b>, then hover over it to see other facts from the corpus in which they appear together. Again, as mentioned before, the facts are from the corpus. For brevity, we state few facts about why the AI system thinks they are similar and you get the expanded list if you hover over <u>"and x more..."</u></li>
+            <li>Sometimes the similarity (frequently) reason might be an <b>empty list</b>, in which case the AI system is unable to say why it thinks they are similar (frequent). Of course, the system may also be wrong.</li>
+
+          <!--<li>Explanations A and B may in turn use some other facts already known to the system.</li>-->
+          <!--<li>Hyperlinks refer to the corresponding wikipedia page.</li>-->
+          <!--<li>There is an optional Comments box for your feedback. </li>-->
+
+          </ol>
+
+      </p>
+    </detailed-instructions>
+
+    <!--<positive-example>-->
+    <!--  <p>-->
+    <!--    <b>F: </b> <a target="_blank" href="https://en.wikipedia.org/wiki/Taken_2">Taken 2</a> has release region <a target="_blank" href="https://en.wikipedia.org/wiki/United_Kingdom">United Kingdom</a>-->
+    <!--    <br>-->
+    <!--    <b>A: </b> <b>"<a target="_blank" href="https://en.wikipedia.org/wiki/Taken_2">Taken 2</a>"</b> is similar to <b>"<a target="_blank" href="https://en.wikipedia.org/wiki/Taken_(film)">Taken</a>"</b> and <b><a target="_blank" href="https://en.wikipedia.org/wiki/Taken_(film)">Taken</a> has release region <a target="_blank" href="https://en.wikipedia.org/wiki/United_Kingdom">United Kingdom</a></b> so <b><a target="_blank" href="https://en.wikipedia.org/wiki/Taken_2">Taken 2</a> has release region <a target="_blank" href="https://en.wikipedia.org/wiki/United_Kingdom">United Kingdom</a></b>-->
+    <!--    <br>-->
+    <!--    <b>B: </b> because <b><a target="_blank" href="https://en.wikipedia.org/wiki/Taken_2">Taken 2</a> has language <a target="_blank" href="https://en.wikipedia.org/wiki/English_language">English Language</a></b> and <b><a target="_blank" href="https://en.wikipedia.org/wiki/English_language">English Language</a> is mainly spoken in <a target="_blank" href="https://en.wikipedia.org/wiki/United_Kingdom">United Kingdom</a></b> -->
+
+    <!--  </p>-->
+    <!--  <p>Here clearly A is better than B</p>-->
+    <!--</positive-example>-->
+
+    <!--<negative-example>-->
+    <!--  <p>Provide an example of a bad answer here</p>-->
+    <!--  <p>Explain why it's a bad answer</p>-->
+    <!--</negative-example>-->
+  </crowd-instructions>
+
+  <div>
+      <br><b>NOTE: This is a timed assignment, the time you take to complete the task is being recorded.</b><br><br>
+      <br><b>What can you say about the given facts? (Read Instructions for better understanding)</b>
+      <br><b>Chose one of the following options for the given fact and its explanation (if present).</b>
+  </div>
+
+    <div id="ex0" class="withmargin">
+        <div>
+            <br><b>Prediction: </b> ${fact_0}
+            <br><b>Explanation: </b>${exp_0}
+        </div>
+        <div>
+            <crowd-radio-group name="ans_0">
+                <crowd-radio-button name="true_0"> True </crowd-radio-button><br>
+                <crowd-radio-button name="false_0"> False </crowd-radio-button><br>
+                <crowd-radio-button name="na_0"> Cannot be determined </crowd-radio-button><br>
+            </crowd-radio-group>
+        </div>
+    </div>
+
+
+    <div id="ex1" class="withmargin">
+        <div>
+            <br><b>Prediction: </b> ${fact_1}
+            <br><b>Explanation: </b>${exp_1}
+        </div>
+        <div>
+            <crowd-radio-group name="ans_1">
+                <crowd-radio-button name="true_1"> True </crowd-radio-button><br>
+                <crowd-radio-button name="false_1"> False </crowd-radio-button><br>
+                <crowd-radio-button name="na_1"> Cannot be determined </crowd-radio-button><br>
+            </crowd-radio-group>
+        </div>
+    </div>
+
+    <div id="ex2" class="withmargin">
+        <div>
+            <br><b>Prediction: </b> ${fact_2}
+            <br><b>Explanation: </b>${exp_2}
+        </div>
+        <div>
+            <crowd-radio-group name="ans_2">
+                <crowd-radio-button name="true_2"> True </crowd-radio-button><br>
+                <crowd-radio-button name="false_2"> False </crowd-radio-button><br>
+                <crowd-radio-button name="na_2"> Cannot be determined </crowd-radio-button><br>
+            </crowd-radio-group>
+        </div>
+    </div>
+
+    <div id="ex3" class="withmargin">
+        <div>
+            <br><b>Prediction: </b> ${fact_3}
+            <br><b>Explanation: </b>${exp_3}
+        </div>
+        <div>
+            <crowd-radio-group name="ans_3">
+                <crowd-radio-button name="true_3"> True </crowd-radio-button><br>
+                <crowd-radio-button name="false_3"> False </crowd-radio-button><br>
+                <crowd-radio-button name="na_3"> Cannot be determined </crowd-radio-button><br>
+            </crowd-radio-group>
+        </div>
+    </div>
+
+    <div id="ex4" class="withmargin">
+        <div>
+            <br><b>Prediction: </b> ${fact_4}
+            <br><b>Explanation: </b>${exp_4}
+        </div>
+        <div>
+            <crowd-radio-group name="ans_4">
+                <crowd-radio-button name="true_4"> True </crowd-radio-button><br>
+                <crowd-radio-button name="false_4"> False </crowd-radio-button><br>
+                <crowd-radio-button name="na_4"> Cannot be determined </crowd-radio-button><br>
+            </crowd-radio-group>
+        </div>
+    </div>
+
+
+    <crowd-input name="comment" label="Optional Comment"></crowd-input>
+    <br><br>
+
+</crowd-form>

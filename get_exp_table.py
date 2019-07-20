@@ -1,3 +1,6 @@
+## This code is used to generate an table, that we use to annotate the facts
+## It writes for each template a set of parameters and writes it in a merged.csv file for easy copying.
+
 import argparse
 import logging
 import os
@@ -206,7 +209,7 @@ if __name__ == "__main__":
     else:
         mapped_data = np.loadtxt(args.test_file).astype(np.int32)
 
-    #np.random.shuffle(mapped_data)
+    np.random.shuffle(mapped_data)
     logging.info("Loaded test file from %s and randomly shuffled it" %
                  (args.test_file))
     entity_names = read_entity_names(os.path.join(

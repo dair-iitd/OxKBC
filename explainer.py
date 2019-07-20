@@ -8,7 +8,11 @@ import string
 
 
 class Explainer:
-    
+    """
+        This is our explainer class, that handles all the human facing generation of data and explanations
+        This is also responsible for parsing wikipedia links and generating an explanation for a fact based on a template in English
+    """
+
     def __init__(self, dataset_root, kb, model, enum_to_id, rnum_to_id):
 
         self.WIKI_PREFIX_URL = 'https://en.wikipedia.org/wiki/'
@@ -47,7 +51,7 @@ class Explainer:
             for _, r in self.rnum_to_id.items():
                 relation_names[r] = r
             return relation_names
-        
+
         with open(path, "r", errors='ignore', encoding='ascii') as f:
             lines = f.readlines()
             for line in lines:

@@ -1,3 +1,5 @@
+# This script is used to map the entity and relation names to their ids (as present in the fb15k dataset)
+
 import argparse
 import logging
 import os
@@ -7,35 +9,39 @@ import time
 import numpy as np
 import pandas as pd
 
+
 def read_data(path):
     data = []
-    with open(path, "r",errors='ignore',encoding='ascii') as infile:
+    with open(path, "r", errors='ignore', encoding='ascii') as infile:
         lines = infile.readlines()
         data = [line.strip().split() for line in lines]
     return data
 
-def map_data(data, mapped_entity = None, mapped_relation=None):
+
+def map_data(data, mapped_entity=None, mapped_relation=None):
     mapped_data = []
     for line in data:
         try:
             e1_mapped = mapped_entity[line[0]] if mapped_entity is not None else line[0]
             r_mapped = mapped_relation[line[1]] if mapped_relation is not None else line[1]
             e2_mapped = mapped_entity[line[2]] if mapped_entity is not None else line[2]
-            mapped_data.append([e1_mapped,r_mapped,e2_mapped])
+            mapped_data.append([e1_mapped, r_mapped, e2_mapped])
         except KeyError as e:
             logging.warn('Got Key Error for line %s' % (' '.join(line)))
     return mapped_data
 
 def read_entity_names(path):
     entity_names = {}
-    with open(path, "r",errors='ignore',encoding='ascii') as f:
+    with open(path, "r", errors='ignore', encoding='ascii') as f:
         lines = f.readlines()
         for line in lines:
             content = line.split()
             if content[0] in entity_names:
-                logging.warn('Duplicate Entity found %s in line %s' % (content[0],' '.join(line)))
+                logging.warn('Duplicate Entity found %s in line %s' %
+                             (content[0], ' '.join(line)))
             entity_names[content[0]] = ' '.join(content[1:-2])
     return entity_names
+
 
 def read_pkl(filename):
     with open(filename, "rb") as f:
@@ -86,19 +92,21 @@ if __name__ == "__main__":
     entity_inverse_map = get_inverse_dict(distmult_dump['entity_to_id'])
     relation_inverse_map = get_inverse_dict(distmult_dump['relation_to_id'])
 
-    inverse_mapped_data = map_data(mapped_data,entity_inverse_map,relation_inverse_map)
-    inverse_mapped_data_name = map_data(inverse_mapped_data,entity_names,None)
+    inverse_mapped_data = map_data(
+        mapped_data, entity_inverse_map, relation_inverse_map)
+    inverse_mapped_data_name = map_data(
+        inverse_mapped_data, entity_names, None)
 
     logging.info('id_data length = {}'.format(len(inverse_mapped_data)))
     logging.info('name_data length = {}'.format(len(inverse_mapped_data_name)))
 
-    fid = open(args.out_file+'_id.txt','w')
-    fname = open(args.out_file+'_name.txt','w')
+    fid = open(args.out_file+'_id.txt', 'w')
+    fname = open(args.out_file+'_name.txt', 'w')
 
     for i in range(len(inverse_mapped_data)):
         el_id = inverse_mapped_data[i]
         el_name = inverse_mapped_data_name[i]
-        if(all(len(x)>=3 for x in el_id) and all(len(x)>=3 for x in el_name)):
+        if(all(len(x) >= 3 for x in el_id) and all(len(x) >= 3 for x in el_name)):
             fid.write('\t'.join(el_id)+'\n')
             fname.write('\t'.join(el_name)+'\n')
 
