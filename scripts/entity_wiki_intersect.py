@@ -3,9 +3,6 @@
 
 # ### This script was used to create a wikipedia linkfile for the entities in the FB15k and not the complete Freebase
 
-# In[ ]:
-
-
 import utils
 import argparse
 import logging
@@ -16,25 +13,13 @@ import time
 import numpy as np
 import pandas as pd
 
-
-# In[9]:
-
-
 data_repo_root = "../data/fb15k/"
 model_weights = "dumps/fb15k237_distmult_dump_norm.pkl"
 wiki_file = os.path.join(data_repo_root, "mid2wikipedia.tsv")
 orig_file = os.path.join(data_repo_root, "entity_mid_name_type_typeid.txt")
 intersection_file = os.path.join(data_repo_root, "mid2wikipedia_cleaned.tsv")
 
-
-# In[5]:
-
-
 distmult_dump = utils.read_pkl(model_weights)
-
-
-# In[12]:
-
 
 def read_data(path):
     mapping_name = {}
@@ -47,14 +32,7 @@ def read_data(path):
     return mapping_name, mapping_url
 
 
-# In[13]:
-
-
 mapping_name, mapping_url = read_data(wiki_file)
-
-
-# In[15]:
-
 
 reader = open(orig_file, "r")
 writer = open(intersection_file, "w")
