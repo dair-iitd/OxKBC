@@ -35,13 +35,16 @@ def read_entity_names(path):
     with open(path, "r", errors='ignore', encoding='ascii') as f:
         lines = f.readlines()
         for line in lines:
-            content = line.split()
+            content_raw = line.split('\t')
+            content = [el.strip() for el in content_raw]
             if content[0] in entity_names:
                 logging.warn('Duplicate Entity found %s in line %s' %
-                             (content[0], ' '.join(line)))
-            entity_names[content[0]] = ' '.join(content[1:-2])
+                                (content[0], line))
+            name = content[1]
+            wiki_id = content[2]
+            # entity_names[content[0]] = {"name": name, "wiki_id": wiki_id}
+            entity_names[content[0]] = name
     return entity_names
-
 
 def read_pkl(filename):
     with open(filename, "rb") as f:
@@ -87,7 +90,7 @@ if __name__ == "__main__":
     logging.info("Loaded test file from %s and randomly shuffled it" %
                  (args.convert_file))
     entity_names = read_entity_names(os.path.join(
-        data_root, "entity_mid_name_type_typeid.txt"))
+        data_root, "mid2wikipedia_cleaned.tsv"))
 
     entity_inverse_map = get_inverse_dict(distmult_dump['entity_to_id'])
     relation_inverse_map = get_inverse_dict(distmult_dump['relation_to_id'])

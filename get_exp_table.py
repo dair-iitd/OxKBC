@@ -36,14 +36,31 @@ def map_data(data, mapped_entity, mapped_relation):
 
 def read_entity_names(path):
     entity_names = {}
-    with open(path, "r",errors='ignore',encoding='ascii') as f:
+    with open(path, "r", errors='ignore', encoding='ascii') as f:
         lines = f.readlines()
         for line in lines:
-            content = line.split()
+            content_raw = line.split('\t')
+            content = [el.strip() for el in content_raw]
             if content[0] in entity_names:
-                logging.warn('Duplicate Entity found %s in line %s' % (content[0],line))
-            entity_names[content[0]] = ' '.join(content[1:-2])
+                logging.warn('Duplicate Entity found %s in line %s' %
+                                (content[0], line))
+            name = content[1]
+            wiki_id = content[2]
+            # entity_names[content[0]] = {"name": name, "wiki_id": wiki_id}
+            entity_names[content[0]] = name
     return entity_names
+
+
+# def read_entity_names(path):
+#     entity_names = {}
+#     with open(path, "r",errors='ignore',encoding='ascii') as f:
+#         lines = f.readlines()
+#         for line in lines:
+#             content = line.split()
+#             if content[0] in entity_names:
+#                 logging.warn('Duplicate Entity found %s in line %s' % (content[0],line))
+#             entity_names[content[0]] = ' '.join(content[1:-2])
+#     return entity_names
 
 
 def read_pkl(filename):
@@ -173,7 +190,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '-d', '--dataset', help="Name of the dataset as in data folder", required=True)
     parser.add_argument('-w', '--model_weights',
-                        help="Pickle file of model wieghts", required=True)
+                        help="Pickle file of model weights", required=True)
     parser.add_argument('-l', '--template_load_dir',
                         required=False, default=None)
     parser.add_argument('-o', '--output_data_dir',
@@ -212,8 +229,7 @@ if __name__ == "__main__":
     np.random.shuffle(mapped_data)
     logging.info("Loaded test file from %s and randomly shuffled it" %
                  (args.test_file))
-    entity_names = read_entity_names(os.path.join(
-        data_root, "entity_mid_name_type_typeid.txt"))
+    entity_names = read_entity_names(os.path.join(data_root, "mid2wikipedia_cleaned.tsv"))
 
     entity_inverse_map = get_inverse_dict(distmult_dump['entity_to_id'])
     relation_inverse_map = get_inverse_dict(distmult_dump['relation_to_id'])
