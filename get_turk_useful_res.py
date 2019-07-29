@@ -22,25 +22,31 @@ def get_key_answer(key,id):
 def get_key_input(key,id):
     return string.Template('Input.${key}_${id}').substitute(key=key,id=id)
 
-def valid_row(row):
+def valid_row(row,book):
     total_sum = 0
-    false_sum = 0
     for i in range(5):
-        false_sum += row[get_key_answer('false',i)]
         for opt in ANSWER_OPTIONS:
             total_sum += row[get_key_answer(opt,i)]
     if(total_sum != 5):
         return 'You did not mark any option in some questions'
-    if(false_sum != 0):
-        return 'You did not chose that the fact is true, though the fact was true.'
+
+    for i in range(5):
+        fact = row[get_key_input('fact',i)]
+        fact_text = bs.BeautifulSoup(fact,'lxml').text
+        if(str(book[book.fact == fact_text]['true?'].iloc[0]) == 'na'):
+            continue
+        elif(str(int(book[book.fact == fact_text]['true?'].iloc[0])) == '1' and row[get_key_answer('false',i)] == 1 ):
+           return 'You did not chose that the fact is true, though the fact was true.'
+        elif(str(int(book[book.fact == fact_text]['true?'].iloc[0])) == '0' and row[get_key_answer('true',i)] == 1 ):
+           return 'You did not chose that the fact is false, though the fact was false.'
     return ''
 
-def get_invalid_hits(df,outfilename):
+def get_invalid_hits(df,outfilename,book):
     df_new = df.copy()
     df = df.fillna(False)
     invalid_hits = []
     for index,row in df.iterrows():
-        message = valid_row(row)
+        message = valid_row(row,book)
         if(message!=''):
             print('Invalid HIT at {} with message ==> {} '.format(index, message))
             df_new['Reject'][index] = message
@@ -64,6 +70,20 @@ def get_winner(answers):
     else:
         return ['na']
 
+def get_book(book_filename):
+    # TODO: Change this to have a clean pipeline
+    with open(book_filename,'r') as f:
+        soup = bs.BeautifulSoup(f, 'lxml')
+        table = soup.find('table')
+        table_body = table.find('tbody')
+        rows = table_body.find_all('tr')
+        data = []
+        for row in rows:
+            cols = row.find_all('td')
+            cols = [ele.text for ele in cols]
+            data.append([ele for ele in cols if ele])
+    return pd.DataFrame(data,columns=['fact','exp','true?'])
+
 def get_results(df):
     df = df.fillna(False)
     results = {}
@@ -75,8 +95,8 @@ def get_results(df):
             if(fact not in results):
                 results[fact] = {'exp': exp, 'answers' : [],'time_taken': [] , 'row_idx':[], 'fact_no':[]}
 
-            if(row[get_key_answer('true',i)]):
-                results[fact]['time_taken'].append(float(row['WorkTimeInSeconds'])/5.0)
+#            if(row[get_key_answer('true',i)]):
+            results[fact]['time_taken'].append(float(row['WorkTimeInSeconds'])/5.0)
 
             for opt in ANSWER_OPTIONS:
                 if(row[get_key_answer(opt,i)]):
@@ -108,12 +128,16 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-rf', '--result_file', help="Name of the result csv downloaded from mturk", required=True)
     parser.add_argument('-op', '--output_path', help="Output path for rejected people and results", required=True)
+    parser.add_argument('-bf', '--book_file', help="Original HTML (Book) written by get_turk_useful_data", required=True)
     args = parser.parse_args()
+
+    book = get_book(args.book_file)
 
     df = pd.read_csv(args.result_file)
     df = df[df['AssignmentStatus'] != 'Rejected']
+
     res_file_last_part = os.path.basename(os.path.normpath(args.result_file)).split('.')[0]
-    invalid_hits = get_invalid_hits(df,os.path.join(args.output_path,res_file_last_part+'_rejected.csv'))
+    invalid_hits = get_invalid_hits(df,os.path.join(args.output_path,res_file_last_part+'_rejected.csv'),book)
     if(len(invalid_hits)!=0):
         print('There are {} invalid assignments which have id \n{}'.format(len(invalid_hits),invalid_hits))
         exit(-1)
