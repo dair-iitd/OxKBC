@@ -53,20 +53,18 @@ def english_exp_template(mapped_data, predictions, template_objs, explainer):
             explanations.append(template_objs[pred-1].get_english_explanation(fact,explainer))
     return explanations
 
-def write_english_exps(mapped_data, exps, output_path, num_per_hit, explainer):
-    raw_data = queue.Queue(0)
-
+def write_english_exps(mapped_data, exps, output_path, num_per_hit, explainer,y_labels):
     html_data = []
-    total_exp_data = list(zip(mapped_data,exps))
+    total_exp_data = list(zip(mapped_data,exps,y_labels))
     random.shuffle(total_exp_data)
-    for fact, exp in total_exp_data:
+    for fact, exp, y in total_exp_data:
         if(exp == explainer.NO_EXPLANATION):
             continue
         htmled_fact = explainer.html_fact(fact)
-        row = [htmled_fact, exp]
+        row = [htmled_fact, exp, y]
         html_data.append(row)
 
-    df_html = pd.DataFrame(html_data,columns=['fact','explanation'])
+    df_html = pd.DataFrame(html_data,columns=['fact','explanation','true?'])
     pd.set_option('display.max_colwidth', -1)
     last_out_part = os.path.basename(os.path.normpath(output_path))
     with open(os.path.join(output_path,last_out_part+"_book.html"),'w') as html_file:
@@ -76,7 +74,7 @@ def write_english_exps(mapped_data, exps, output_path, num_per_hit, explainer):
     logging.info('Total Facts = {}'.format(len(mapped_data)))
     logging.info('Final facts written = {}'.format(len(html_data)))
 
-    csv_data_exps = html_data
+    csv_data_exps = [[x[0],x[1]] for x in html_data]
     csv_data_no_exps = [[x[0],explainer.NO_EXPLANATION] for x in html_data]
 
     columns = []
@@ -124,6 +122,8 @@ if __name__ == "__main__":
                         type=utils._log_level_string_to_int,
                         nargs='?',
                         help='Set the logging output level. {0}'.format(utils._LOG_LEVEL_STRINGS))
+    parser.add_argument('-y', '--y_label', help="Optional y_label specifying if the fact is true or false", required=False,default=None)
+
 
     args = parser.parse_args()
 
@@ -176,5 +176,13 @@ if __name__ == "__main__":
     logging.info("Generated explanations")
 
     os.makedirs(args.output_path,exist_ok=True)
-    write_english_exps(mapped_data, exps, args.output_path, args.num, explainer)
+
+    y_labels = ['na' for _ in range(len(mapped_data))]
+    if(args.y_label is not None):
+        y_labels = np.loadtxt(args.y_label)
+        if(len(y_labels) != len(mapped_data)):
+            logging.error('Length of y_labels not same as len of mapped data')
+            exit(-1)
+
+    write_english_exps(mapped_data, exps, args.output_path, args.num, explainer,y_labels)
     logging.info("Written explanations to %s" % (args.output_path))
