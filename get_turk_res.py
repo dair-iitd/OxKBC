@@ -11,6 +11,7 @@ import collections
 import string
 import os
 import bs4 as bs
+import itertools
 
 ANSWER_OPTIONS = ['our','other','both','none']
 
@@ -22,6 +23,7 @@ def get_key_input(key,id):
 
 def valid_row(row):
     total_sum = 0
+    quality_ctrl_id = None
     for i in range(5):
         if(row[get_key_input('exp_A',i)] == row[get_key_input('exp_B',i)]):
             quality_ctrl_id = i
@@ -29,21 +31,22 @@ def valid_row(row):
             total_sum += row[get_key_answer(opt,i)]
     if(total_sum != 5):
         return 'You did not mark any option in some questions'
-    if(not (row[get_key_answer('both',quality_ctrl_id)] or row[get_key_answer('none',quality_ctrl_id)]) ):
-        print("Quality control id == >",quality_ctrl_id)
-        return 'You did not chose the option both explanations are good/bad, even when both A and B were same'
+    if(quality_ctrl_id is not None):
+        if(not (row[get_key_answer('both',quality_ctrl_id)] or row[get_key_answer('none',quality_ctrl_id)]) ):
+            print("Quality control id == >",quality_ctrl_id)
+            return 'You did not chose the option both explanations are good/bad, even when both A and B were same'
     return ''
 
 def get_invalid_hits(df,outfilename):
     df_new = df.copy()
     df = df.fillna(False)
-    invalid_hits = []
+    invalid_hits = collections.defaultdict(list)
     for index,row in df.iterrows():
         message = valid_row(row)
         if(message!=''):
             print('Invalid HIT at {} with message ==> {} '.format(index, message))
             df_new['Reject'][index] = message
-            invalid_hits.append(row['AssignmentId'])
+            invalid_hits[row['WorkerId']].append(row['AssignmentId'])
     if(len(invalid_hits)!=0):
         df_new.to_csv(outfilename,index=False,sep=',')
     return invalid_hits
@@ -138,7 +141,7 @@ if __name__ == "__main__":
     res_file_last_part = os.path.basename(os.path.normpath(args.result_file)).split('.')[0]
     invalid_hits = get_invalid_hits(df,os.path.join(args.output_path,res_file_last_part+'_rejected.csv'))
     if(len(invalid_hits)!=0):
-        print('There are {} invalid assignments which have id \n{}'.format(len(invalid_hits),invalid_hits))
+        print('There are {} invalid assignments which have id \n{}'.format(len(list(itertools.chain(*list(invalid_hits.values())))),pprint.pformat(invalid_hits)))
         exit(-1)
 
     book = get_book(args.book_file)
