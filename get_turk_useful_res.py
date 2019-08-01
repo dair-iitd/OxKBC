@@ -175,16 +175,19 @@ if __name__ == "__main__":
     answers_list = []
     winner_list = []
     avg_time_list = []
+    reason_list = []
     accuracy = 0
     for k in results:
         answers_list.extend(results[k]['answers'])
         winner_list.extend(results[k]['winner'])
         avg_time_list.extend(results[k]['time_taken'])
-        if book:
+        if book is not None:
             if(float(results[k]['our_true?']) == 1 and results[k]['winner'][0] == 'true'):
                 accuracy +=1
             elif(float(results[k]['our_true?']) == 0 and results[k]['winner'][0] == 'false'):
                 accuracy +=1
+        if args.reason:
+            reason_list.extend(list(itertools.chain(*[x.split('_') for x in results[k]['reasons']])))
     accuracy = accuracy*100.0/len(results.keys())
 
     ctr_answers = collections.Counter(answers_list)
@@ -202,8 +205,11 @@ if __name__ == "__main__":
     analysis_str += '{}\n\n'.format(ctr_winner)
     analysis_str += '\nAverage time taken in seconds: {}\n\n'.format(np.mean(avg_time_list))
 
-    if book:
+    if book is not None:
         analysis_str += 'Turkers Accuracy: {}%\n\n'.format(accuracy)
+
+    if args.reason:
+        analysis_str += '\n\n Workers reason: {}\n'.format(collections.Counter(reason_list))
 
     print(analysis_str)
     write_results(results,os.path.join(args.output_path,res_file_last_part+'_analysis.html'),analysis_str)

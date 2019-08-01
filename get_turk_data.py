@@ -108,6 +108,7 @@ def write_english_exps(mapped_data, template_exps, rule_exps, output_path, num_p
     while(not raw_data.empty()):
         if(len(html_data) % 5 == 4 and not qlty_ctrl.empty()):
             html_data.append(qlty_ctrl.get())
+            qlty_ctrl.put(html_data[-1]) ## Need this so that every HIT has a quality control fact.
         else:
             html_data.append(raw_data.get())
 

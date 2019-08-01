@@ -34,7 +34,7 @@ def valid_row(row):
     if(quality_ctrl_id is not None):
         if(not (row[get_key_answer('both',quality_ctrl_id)] or row[get_key_answer('none',quality_ctrl_id)]) ):
             print("Quality control id == >",quality_ctrl_id)
-            return 'You did not chose the option both explanations are good/bad, even when both A and B were same'
+            return 'You did not chose the option both explanations are good/bad, even when both A and B were same in question number {}'.format(quality_ctrl_id+1)
     return ''
 
 def get_invalid_hits(df,outfilename):
@@ -142,7 +142,7 @@ if __name__ == "__main__":
     invalid_hits = get_invalid_hits(df,os.path.join(args.output_path,res_file_last_part+'_rejected.csv'))
     if(len(invalid_hits)!=0):
         print('There are {} invalid assignments which have id \n{}'.format(len(list(itertools.chain(*list(invalid_hits.values())))),pprint.pformat(invalid_hits)))
-        exit(-1)
+        #exit(-1)
 
     book = get_book(args.book_file)
     results = get_results(df,book)
