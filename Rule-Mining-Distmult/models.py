@@ -61,9 +61,11 @@ class TypedDM():
         return self.relation_similarity[r1,r2]
     
     def dot_relation(self,rel1,rel2):
-        rel1_embedding=np.concatenate((self.dump['rel_real'][rel1],self.dump['head_rel_type'][rel1],self.dump['tail_rel_type'][rel1]))
-        rel2_embedding=np.concatenate((self.dump['rel_real'][rel2],self.dump['head_rel_type'][rel2],self.dump['tail_rel_type'][rel2]))
-        return rel1_embedding*rel2_embedding
+        #rel1_embedding=np.concatenate((self.dump['rel_real'][rel1],self.dump['head_rel_type'][rel1],self.dump['tail_rel_type'][rel1]))
+        #rel2_embedding=np.concatenate((self.dump['rel_real'][rel2],self.dump['head_rel_type'][rel2],self.dump['tail_rel_type'][rel2]))
+        #return rel1_embedding*rel2_embedding
+        rel_real_dot=self.dump['rel_real'][rel1]*self.dump['rel_real'][rel2]
+        return np.concatenate((rel_real_dot,self.dump['head_rel_type'][rel1],self.dump['tail_rel_type'][rel2]))
 
     # def get_relation_similarity(self,rel1,rel2,):
 
