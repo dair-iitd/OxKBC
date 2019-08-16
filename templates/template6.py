@@ -1,8 +1,4 @@
 #ToDO:
-# 1. How to most efficiently compute (r1.r2)~r? (might have to make changes in models.py)
-# 2. What exact data to save?
-# 3. What exact features to return?
-# 4. Complete the last 2 functions of explainations.
 
 import numpy as np
 from templates.template import TemplateBaseClass
@@ -12,26 +8,26 @@ class Template6(TemplateBaseClass):
         """
     	def __init__(self, kblist, base_model, use_hard_triple_scoring=True, load_table=None, dump_file=None):
                 super().__init__()
-                self.kb = kblist[0]
-                self.kb_val = kblist[1]
-                self.kb_test = kblist[2]
-                self.base_model = base_model
-                self.use_hard_triple_scoring = use_hard_triple_scoring
+            self.kb = kblist[0]
+            self.kb_val = kblist[1]
+            self.kb_test = kblist[2]
+            self.base_model = base_model
+            self.use_hard_triple_scoring = use_hard_triple_scoring
 
-                self.exp_template = @HELP
+            self.exp_template = '$html_fact_rprime'
 
-                if(load_table == None):
-                        logging.info("Load table is None, so beginning process_data")
-                        self.process_data()
-                        logging.info("Process_data done")
-                        logging.info("BEGIN Build table")
-                        self.build_table()
-                        logging.info("END Build table")
-                        logging.info("BEGIN dump data")
-                        self.dump_data(dump_file)
-                        logging.info("END dump table")
-                else:
-                        self.load_table(load_table)
+            if(load_table == None):
+                    logging.info("Load table is None, so beginning process_data")
+                    self.process_data()
+                    logging.info("Process_data done")
+                    logging.info("BEGIN Build table")
+                    self.build_table()
+                    logging.info("END Build table")
+                    logging.info("BEGIN dump data")
+                    self.dump_data(dump_file)
+                    logging.info("END dump table")
+            else:
+                    self.load_table(load_table)
 
         def process_data(self):
 	        """
@@ -39,30 +35,32 @@ class Template6(TemplateBaseClass):
 	        unique_e1_r: stores unique e1_r for building table [TRAINING + TEST + VAL]
 	        dict_e: stores all possible e2 for a given e1 [TRAINING]
 	        dict_e1_r: stores all possible e2 for given e1 and r [TRAINING]
+	        cache_r_r1_r2: a cache for similarity(r,hadamard(r1,r2))
 	        """
 	        self.dict_e1_e2 = {}
 	        self.unique_e1_r = {}
 	        self.dict_e = {}
 	        self.dict_e1_r = {}
+	        self.cache_r_r1_r2 = {}
 
 	        for facts in self.kb.facts:
 	            key = (facts[0], facts[2])
-	        # dict_e1_e2
+	        	# dict_e1_e2
 	            if(key not in self.dict_e1_e2):
 	                self.dict_e1_e2[key] = []
 	            self.dict_e1_e2[key].append(facts[1])
 
-	        # dict_e1_r
+	        	# dict_e1_r
 	            if((facts[0], facts[1]) not in self.dict_e1_r):
 	                self.dict_e1_r[(facts[0], facts[1])] = []
 	            self.dict_e1_r[(facts[0], facts[1])].append(facts[2])
 
-	        # dict_e
+	        	# dict_e
 	            if facts[0] not in self.dict_e:
 	                self.dict_e[facts[0]] = []
 	            self.dict_e[facts[0]].append(facts[2])
 
-	        # unique_e1_r being created
+	        	# unique_e1_r being created
 	            if((facts[0], facts[1]) not in self.unique_e1_r):
 	                self.unique_e1_r[(facts[0], facts[1])] = len(self.unique_e1_r)
 
@@ -141,43 +139,46 @@ class Template6(TemplateBaseClass):
 
 	        assert (len(triple) == 3), "Triple must contain three elements"
 
-	        score = 0
+	        best_score = 0
 	        best_r1 = -1
 	        best_u1 = -1
 	        best_r2 = -1
 
 	        e2 = triple[2]
+	        r  = triple[1]
 	        e1 = triple[0]
 
 	        if(self.use_hard_triple_scoring == False):
 	            raise NotImplementedError
 	        else:
-	            # key = (e1, e2)
-	            # if(key not in self.dict_e1_e2):
-	            #     score = 0
-	            # else:
-	            #     rel_list = list(
-	            #         filter(lambda x: x != triple[1], self.dict_e1_e2[key]))
-	            #     if(len(rel_list) != 0):
-	            #         sim_scores = self.base_model.get_relation_similarity_list(
-	            #             triple[1], rel_list)
-	            #         logging.debug(sim_scores)
-	            #         idx = np.argmax(sim_scores)
-	            #         score = sim_scores[idx]
-	            #         best = rel_list[idx]
                 entities = self.dict_e[e1]
                 for u1 in range(entities):
                 	relations1 = self.dict_e1_e2[(e1,u1)]
                 	relations2 = self.dict_e1_e2[(u1,e2)]
                 	for r1 in relations1:
                 		for r2 in relations2:
-	                        # relations1 = self.dict_e1_e2[(e1,u1)]
-	                        # relations2 = self.dict_e1_e2[(u1,e2)]
-	                        # PROCESS TO UPDATE SCORE, BEST_R1, BEST_U1, BEST_R2
-	                        # relations_product = COMPUTE PRODUCT
+                			if((r,r1,r2) in self.cache_r_r1_r2):
+                				score = cache_r_r1_r2[(r,r1,r2)]
+                			else:
+	                			hadamard_r1_r2 = [0,0,0]
+	                			hadamard_r1_r2[0] = self.base_model.rel_similarity_re[r1]*self.base_model.rel_similarity_re[r2]
+	                			hadamard_r1_r2[1] = self.base_model.head_rel_similarity_type[r1]*self.base_model.head_rel_similarity_type[r2]
+	                			hadamard_r1_r2[2] = self.base_model.tail_rel_similarity_type[r1]*self.base_model.tail_rel_similarity_type[r2]
+
+	                			similarity_with_r = [0,0,0]
+	                			similarity_with_r[0] = hadamard_r1_r2[0].dot(self.base_model.rel_similarity_re[r])
+	                			similarity_with_r[1] = hadamard_r1_r2[1].dot(self.base_model.head_rel_similarity_re[r])
+	                			similarity_with_r[2] = hadamard_r1_r2[2].dot(self.base_model.tail_rel_similarity_re[r])
+
+	                			score = similarity_with_r[0] * similarity_with_r[1] * similarity_with_r[2]
+                				cache_r_r1_r2[(r,r1,r2)] = score
+                			if(score > best_score):
+                				best_score = score
+                				best_r1 = r1
+                				best_r2 = r2
+                				best_u1 = u1
 	        return (score, best_r1, best_u1, best_r2)
 
-	    #DECIDE WHAT EXACT FEATURES TO RETURN
 	    def get_input(self, fact):
 	        key = (fact[0], fact[1])
 	        features = [0, 0, 0, 0, 0, 0, 0]
@@ -185,16 +186,16 @@ class Template6(TemplateBaseClass):
 	        if(key in self.table.keys()):
 	            val_list = [x[0] for x in self.table[key].values()]
 	            if (len(val_list) != 0):
-	                # max_score = self.stat_table[key]['max_score']
-	                # my_score = self.table[key].get(fact[2], (0, -1))[0]
-	                # simi = self.base_model.get_entity_similarity(
-	                #     fact[2], self.stat_table[key]['simi_index'])
-	                # rank = utils.get_rank(val_list, my_score)
-	                # conditional_rank = rank*1.0/len(val_list)
-	                # mean = self.stat_table[key]['mean']
-	                # std = self.stat_table[key]['std']
-	                # features = [my_score, max_score, simi,
-	                #             rank, conditional_rank, mean, std]
+	                max_score = self.stat_table[key]['max_score']
+	                my_score = self.table[key].get(fact[2], (0, -1, -1, -1))[0]
+	                simi = self.base_model.get_entity_similarity(
+	                    fact[2], self.stat_table[key]['simi_index'])
+	                rank = utils.get_rank(val_list, my_score)
+	                conditional_rank = rank*1.0/len(val_list)
+	                mean = self.stat_table[key]['mean']
+	                std = self.stat_table[key]['std']
+	                features = [my_score, max_score, simi,
+	                            rank, conditional_rank, mean, std]
 
 	        return features
 
