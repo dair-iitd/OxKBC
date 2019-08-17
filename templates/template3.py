@@ -15,7 +15,7 @@ class Template3(TemplateBaseClass):
     Template: r~r' ^ e1 r' e2
     """
 
-    def __init__(self, kblist, base_model, use_hard_triple_scoring=True, load_table=None, dump_file=None):
+    def __init__(self, kblist, base_model, use_hard_triple_scoring=True, load_table=None, dump_file=None, parts = 1, offset = 0):
         super().__init__()
         self.kb = kblist[0]
         self.kb_val = kblist[1]

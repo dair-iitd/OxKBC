@@ -15,7 +15,7 @@ class Template2(TemplateBaseClass):
     Template: Most frequent for this head entity
     """
 
-    def __init__(self, kblist, base_model, use_hard_triple_scoring=True, load_table=None, dump_file=None):
+    def __init__(self, kblist, base_model, use_hard_triple_scoring=True, load_table=None, dump_file=None, parts = 1,  offset = 0):
         super().__init__()
         self.kb = kblist[0]
         self.base_model = base_model
