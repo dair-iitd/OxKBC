@@ -14,7 +14,6 @@ from tqdm import tqdm
 import multiprocessing
 from IPython.core.debugger import Pdb
 import os
-
 #os.system("taskset -p 0xfffff %d" % os.getpid())
 
 
@@ -31,7 +30,8 @@ class Template6(TemplateBaseClass):
         self.base_model = base_model
         self.use_hard_triple_scoring = use_hard_triple_scoring
         # Pdb().set_trace()
-        self.exp_template = '$html_fact_rprime'
+        #self.exp_template = '$html_fact_rprime'
+        self.exp_template = '$html_fact_e1_r1_u1 and $html_fact_u1_r2_e2'
         self.parts = parts
         self.offset = offset
         self.dump_file = dump_file
@@ -326,4 +326,12 @@ class Template6(TemplateBaseClass):
         return features
 
     def get_english_explanation(self, fact, explainer):
-        pass
+        try:
+            #Pdb().set_trace()
+            path = self.get_explanation(fact)[1]
+            #self.exp_template = '$html_fact_e1_r1_u1 and $html_fact_u1_r2_e2'
+            return string.Template(self.exp_template).substitute(html_fact_e1_r1_u1=explainer.html_fact([fact[0], path[0], path[1]]), html_fact_u1_r2_e2=explainer.html_fact([path[1], path[2], fact[2]]))
+        except:
+            logging.error("Some error occured in template 6 while getting explanation\n{}".format(
+                sys.exc_info()[0]))
+            return explainer.NO_EXPLANATION
