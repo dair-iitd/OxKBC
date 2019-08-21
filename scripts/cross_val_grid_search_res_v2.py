@@ -44,7 +44,9 @@ def check_data(base_dir, folds):
                 return False
     return True
 
-
+def make_path(arch, kl, neg_r, rho):
+	# exp_c-configs.fb15k_config_7_4.yml_k-0_n--0.5_r-0.01 
+	return "exp_c-{}_k-{}_n-{}_r-{}".format(arch, kl, neg_r, rho)
 def get_params(directory):
     exps = os.listdir(directory)
     neg_rewards = set()
@@ -55,8 +57,14 @@ def get_params(directory):
 
     for exp in exps:
         if os.path.isdir(os.path.join(directory, exp)):
-        	exp_split = exp.split('_')
-            neg_r, rho, kl, arch = exp_split[1], exp_split[2], exp_split[3], exp_split[4]
+        	delim1 = exp.find("_c-")
+        	delim2 = exp.find("_k-")
+        	delim3 = exp.find("_n-")
+        	delim4 = exp.find("_r-")
+        	neg_r = exp[delim3+3:delim4]
+        	rho   = exp[delim4+3:]
+        	kl    = exp[delim2+3:delim3]
+        	arch  = exp[delim1+3:delim2]
             neg_rewards.add(neg_r)
             rhos.add(rho)
             kls.add(kl)
@@ -111,7 +119,7 @@ def begin_checks(base_dir, folds, runs):
             	for kl in kls:
             		for arch in archs:
 		                directory = os.path.join(
-		                    base_dir, "run_"+str(run), "exp_"+col+"_"+row+"_"+kl+"_"+arch)
+		                    base_dir, "run_"+str(run), make_path(arch, kl, col, row))
 		                if not check_exp(directory, data, folds):
 		                    invalid_exps.append(directory)
 
@@ -161,7 +169,7 @@ def calc_run_results(directory, rows, cols, KLs, Archs, data, folds):
         for row in rows:
         	for kl in KLs:
         		for arch in Archs:
-		            exp_directory = os.path.join(directory, "exp_"+col+"_"+row+"_"+kl+"_"+arch)
+		            exp_directory = os.path.join(directory, make_path(arch, kl, col, row))
 		            val, test = calc_exp(exp_directory, data, folds)
 		            results_one_run['neg_re'].append(col)
 		            results_one_run['rho'].append(row)
