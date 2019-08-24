@@ -23,8 +23,8 @@ def main(args):
 
     # Store name of experiment
     exp_name = args.exp_name
-    exp_name = '{}_r{}_p{}_n{}_i{}'.format(
-        exp_name, args.rho, args.pos_reward, args.neg_reward, args.class_imbalance)
+    exp_name = '{}_r{}_p{}_n{}_i{}_k{}'.format(
+        exp_name, args.rho, args.pos_reward, args.neg_reward, args.class_imbalance, args.kldiv_lambda)
 
     # Create an directory for output path
     args.output_path = os.path.join(args.output_path, args.exp_name)
@@ -152,6 +152,8 @@ if __name__ == '__main__':
     parser.add_argument(
         '--val_labels_path', help="Validation data Labels path for multi-label evaluation", type=str, default=None)
 
+    parser.add_argument(
+        '--train_labels_path', help="Training data Labels path for multi-label training", type=str, default=None)
 
     parser.add_argument('--exp_name', help='Experiment name',
                         type=str, default='default_exp')
@@ -206,6 +208,11 @@ if __name__ == '__main__':
     #kl div loss args
     parser.add_argument('--kldiv_lambda', help='relative wt of kl div loss', default=0.0,type=float)
     parser.add_argument('--label_distribution_file',help='yaml file containing target distribution', default= 'label_distrubution.yml' , type=str)
+
+    #other loss hyperparameters:
+    parser.add_argument('--neg_reward', help='negative reward', default=-1, type=float)
+    parser.add_argument('--rho', help='rho ', default=0.125, type=float)
+
 
 
     args = parser.parse_args()

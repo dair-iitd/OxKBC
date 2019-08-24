@@ -66,7 +66,7 @@ def main(args):
                 train_data_path, val_data_path, test_data_path))
             exit(0)
 
-        command = "/home/cse/btech/cs1150210/anaconda3/bin/python3 main.py --training_data_path " + \
+        command = args.python_path + " main.py --training_data_path " + \
             args.unlabelled_training_data_path+" --val_data_path " + \
             val_data_path+" --exp_name "+exp_name+" "
         command += "--labelled_training_data_path " + \
@@ -92,7 +92,7 @@ def main(args):
             continue
 
         checkpoint_path = os.path.join(directory, filename)
-        command = "/home/cse/btech/cs1150210/anaconda3/bin/python3 main.py --training_data_path " + \
+        command = args.python_path +  " main.py --training_data_path " + \
             args.unlabelled_training_data_path+" --val_data_path " + \
             val_data_path+" --exp_name "+exp_name+" "
         command += "--labelled_training_data_path " + \
@@ -110,7 +110,7 @@ def main(args):
 
         os.system(command)
 
-        command = "/home/cse/btech/cs1150210/anaconda3/bin/python3 main.py --training_data_path " + \
+        command = args.python_path + " main.py --training_data_path " + \
             args.unlabelled_training_data_path+" --val_data_path " + \
             test_data_path+" --exp_name "+exp_name+" "
         command += "--labelled_training_data_path " + \
@@ -141,6 +141,12 @@ if __name__ == '__main__':
     parser.add_argument('--labelled_training_data_path',
                         help="Labelled Training data path (pkl file) or base_folder path where data previously generated", type=str)
 
+    
+    #parser.add_argument('--python_path', help='path to python bin', type=str,default='/home/cse/btech/cs1150210/anaconda3/bin/python3')
+    #parser.add_argument('--python_path', help='path to python bin', type=str,default='/home/yatin/anaconda3/bin/python3')
+    parser.add_argument('--python_path', help='path to python bin', type=str,default='/home/cse/phd/csz178057/anaconda3/bin/python3')
+
+
     # Training parameters
     parser.add_argument('--num_epochs', help='epochs', type=int, default=100)
     parser.add_argument('--batch_size', help='batch size',
@@ -160,6 +166,10 @@ if __name__ == '__main__':
 
     parser.add_argument('--kldiv_lambda', help='KL Divergence lambda', type=float, default=0.0)
     parser.add_argument('--label_distribution_file', help='KL Divergence distribution file', type=str, default='')
+    parser.add_argument('--neg_reward', help='negative reward', default=-1, type=float)
+    parser.add_argument('--rho', help='rho ', default=0.0125, type=float)
+
+
 
     parser.add_argument('--gen_data', help='Just Generate Data and exit',
                         action='store_true', default=False)

@@ -14,6 +14,8 @@ import torch.nn as nn
 from torch.autograd import Variable
 
 import torch.nn.functional as F 
+from IPython.core.debugger import Pdb
+
 
 def get_evaluation_function(args):
     return Loss(args)
@@ -65,7 +67,8 @@ class Loss(object):
                 reward_tensor = (self.args.class_imbalance*y.float()*(template_score[:, 0]*self.weights[0]+torch.max(template_score[:, 1:], dim=1)[0])) + (1.0-y.float())*((template_score[:, 0]*self.args.pos_reward) + torch.sum(template_score[:, 1:], dim=1)*self.args.neg_reward)
                 loss = -1.0*reward_tensor.mean()
                 if self.args.kldiv_lambda !=  0:
-                    if y.float().sum().data[0] != 0:
+                    #if y.float().sum().data[0] != 0:
+                    if y.float().sum().item() != 0:
                         class_probs = torch.log((template_score*(y.float().unsqueeze(-1).expand_as(template_score))).sum(dim=0)/y.float().sum())
                         kldiv_loss = F.kl_div(class_probs, self.target_distribution)
                         loss += self.args.kldiv_lambda * kldiv_loss
@@ -73,7 +76,10 @@ class Loss(object):
             elif mode == 'train_sup':
                 #template_score = F.softmax(template_score, dim=1)
                 #template_score = template_score * self.weights
-                loss = F.cross_entropy(template_score,y)
+                if len(y.shape) > 1 and y.shape[1] > 1:
+                    loss = F.binary_cross_entropy_with_logits(template_score, y.float())
+                else:
+                    loss = F.cross_entropy(template_score,y)
             else:
                 raise 
                  
@@ -82,10 +88,32 @@ class Loss(object):
 
     def calculate_accuracies(self, ycpu, ypred_cpu):
         if len(ycpu.shape) > 1 and ycpu.shape[1] > 1:
+            #Pdb().set_trace()
             logging.info("Multi task evaluation")
             ypred_cpu = np.ravel(ypred_cpu)
             correct_count = ycpu[np.arange(ycpu.shape[0]),ypred_cpu.astype(int)].sum()
-            return [correct_count*1.0/len(ypred_cpu)]
+            #return [correct_count*1.0/len(ypred_cpu)]
+            total_acc = correct_count*1.0/len(ypred_cpu)
+
+            acc = ycpu[np.arange(ycpu.shape[0]),ypred_cpu.astype(int)]
+            ind_color = ycpu[:,1:].sum(axis=1) > 0
+            correct_color = acc[ind_color].sum()
+            recall = 1.0*correct_color/ind_color.sum()
+            pred_color = (ypred_cpu > 0).sum()
+            precision = 1.0*correct_color/pred_color
+            if recall + precision == 0:
+                f = 0
+            else:
+                f = (2*recall*precision)/(recall + precision)
+
+            return [precision, recall, total_acc, f]
+
+            
+            #ygt = ycpu[:, 1:].sum(axis=1)
+            #ygt = (ygt > 0).astype(int)
+            #ypred = ycpu[np.arange(ycpu.shape[0]),ypred_cpu.astype(int)].astype(int)
+            #p,r,f,s = metrics.precision_recall_fscore_support(ygt, ypred,labels=[1])
+            #return [correct_count*1.0/len(ypred_cpu),p[0],r[0],s[0],correct_count*1.0/len(ypred_cpu), f[0]]
 
         p, r, f, s = metrics.precision_recall_fscore_support(
             ycpu, ypred_cpu, labels=self.labels)
@@ -104,9 +132,9 @@ class Loss(object):
         logging.info(' Predicted counts val: {}'.format(str_ct))
         logging.info(' True counts val: {}'.format(str_ct_y))
         
-        cf = metrics.confusion_matrix(ycpu,ypred_cpu,labels=[0,1,2,3,4,5])
+        cf = metrics.confusion_matrix(ycpu,ypred_cpu,labels=range(args.num_templates+1))
         logging.info('Confusion Matrix:\n {}'.format(cf))
-        logging.info('Classification Report\n'+metrics.classification_report(ycpu,ypred_cpu,labels=[0,1,2,3,4,5]))
+        logging.info('Classification Report\n'+metrics.classification_report(ycpu,ypred_cpu,labels=range(args.num_templates+1)))
 
         return metric
 
@@ -151,11 +179,11 @@ def compute(epoch, model, loader, optimizer, mode, eval_fn, args, labelled_train
         predictions[idx] = ypred.data.cpu().numpy()
         ground_truth[idx] = ytrue.squeeze().data.cpu().numpy()
 
-        cum_loss = cum_loss + loss.data[0]*ytrue.size(0)
-        cum_kl_loss = cum_kl_loss + kl_div_loss.data[0]*ytrue.size(0)
+        #cum_loss = cum_loss + loss.data[0]*ytrue.size(0)
+        #cum_kl_loss = cum_kl_loss + kl_div_loss.data[0]*ytrue.size(0)
         
-        #cum_loss = cum_loss + loss.data.item()*ytrue.size(0)
-        #cum_kl_loss = cum_kl_loss + kl_div_loss.data.item()*ytrue.size(0)
+        cum_loss = cum_loss + loss.data.item()*ytrue.size(0)
+        cum_kl_loss = cum_kl_loss + kl_div_loss.data.item()*ytrue.size(0)
         cum_count += count
 
         if 'train' in mode:

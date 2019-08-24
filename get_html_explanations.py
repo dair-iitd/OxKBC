@@ -85,38 +85,35 @@ def get_options(iter_id, our_is_A, one_is_no):
     return [opt1_str, opt2_str, opt3_str, opt4_str]
 
 
-def write_english_exps(mapped_data, template_exps, rule_exps, output_path, num_per_hit, explainer):
+def write_english_exps(mapped_data, template_exps, output_path, num_per_hit, explainer):
     raw_data = queue.Queue(0)
-    both_no = 0
-    both_same = 0
-    qlty_ctrl = queue.Queue(0)
-    total_exp_data = list(zip(mapped_data, template_exps, rule_exps))
-    random.shuffle(total_exp_data)
-    for fact, t_exp, r_exp in total_exp_data:
-        if(t_exp == explainer.NO_EXPLANATION and r_exp == explainer.NO_EXPLANATION):
-            both_no += 1
-            continue
+    #qlty_ctrl = queue.Queue(0)
+    total_exp_data = list(zip(mapped_data, zip(*template_exps)))
+    #random.shuffle(total_exp_data)
+    for fact, t_exp in total_exp_data:
+        #if(t_exp == explainer.NO_EXPLANATION and r_exp == explainer.NO_EXPLANATION):
+        #    continue
         htmled_fact = explainer.html_fact(fact)
-        row = [htmled_fact, t_exp, r_exp]
-        if(t_exp == r_exp):
-            both_same += 1
-            qlty_ctrl.put(row)
-            continue
+        row = [htmled_fact, t_exp[0], t_exp[1], t_exp[2], t_exp[3], t_exp[4], t_exp[5]]
+        #if(t_exp == r_exp):
+        #    both_same += 1
+        #    qlty_ctrl.put(row)
+        #    continue
         raw_data.put(row)
 
     html_data = []
     while(not raw_data.empty()):
-        if(len(html_data) % 5 == 4 and not qlty_ctrl.empty()):
-            html_data.append(qlty_ctrl.get())
-            qlty_ctrl.put(html_data[-1]) ## Need this so that every HIT has a quality control fact.
-        else:
-            html_data.append(raw_data.get())
+        #if(len(html_data) % 5 == 4 and not qlty_ctrl.empty()):
+        #html_data.append(qlty_ctrl.get())
+        #    qlty_ctrl.put(html_data[-1]) ## Need this so that every HIT has a quality control fact.
+        #else:
+        html_data.append(raw_data.get())
 
-    html_data_chunked = list(utils.chunks(html_data, 5))
-    _ = [random.shuffle(el) for el in html_data_chunked]
-    html_data = list(itertools.chain(*html_data_chunked))
+    #html_data_chunked = list(utils.chunks(html_data, 5))
+    #_ = [random.shuffle(el) for el in html_data_chunked]
+    #html_data = list(itertools.chain(*html_data_chunked))
 
-    df_html = pd.DataFrame(html_data, columns=['fact', 'our', 'other'])
+    df_html = pd.DataFrame(html_data, columns=['fact', 'template1', 'template2', 'template3', 'template4', 'template5', 'template6'])
     pd.set_option('display.max_colwidth', -1)
     last_out_part = os.path.basename(os.path.normpath(output_path))
     with open(os.path.join(output_path, last_out_part+"_book.html"), 'w') as html_file:
@@ -124,37 +121,37 @@ def write_english_exps(mapped_data, template_exps, rule_exps, output_path, num_p
         df_html.to_html(html_file, escape=False, justify='center')
 
     logging.info('Total Facts = {}'.format(len(mapped_data)))
-    logging.info('Both No explanations = {}'.format(both_no))
-    logging.info('Both Same explanations = {}'.format(both_same))
+    #logging.info('Both No explanations = {}'.format(both_no))
+    #logging.info('Both Same explanations = {}'.format(both_same))
 
-    csv_data = []
-    iter_id = 0
-    for htmled_fact, t_exp, r_exp in html_data:
-        r = random.uniform(0, 1)
-        row = [htmled_fact]
-        one_is_no = (t_exp == explainer.NO_EXPLANATION or r_exp ==
-                     explainer.NO_EXPLANATION)
-        if(r <= 0.5):
-            row.extend([t_exp, r_exp])
-            row.extend(get_options(iter_id, True, one_is_no))
-        else:
-            row.extend([r_exp, t_exp])
-            row.extend(get_options(iter_id, False, one_is_no))
-        csv_data.append(row)
-        iter_id += 1
-    columns = []
-    for i in range(num_per_hit):
-        columns.extend(['fact_'+str(i), 'exp_A_'+str(i), 'exp_B_'+str(i)])
-        for j in range(4):
-            columns.append('opt_'+str(i)+'_'+str(j))
-    print('Generated columns {}'.format(columns))
-    print('Generated csv_data {}'.format(len(csv_data)))
-    reqd = int(len(html_data)/num_per_hit)*num_per_hit
-    csv_data = np.array(csv_data[:reqd])
-    csv_data = csv_data.reshape((-1, len(columns)))
-    df = pd.DataFrame(csv_data, columns=columns)
-    df.to_csv(os.path.join(output_path, last_out_part +
-                           "_hits.csv"), index=False, sep=',')
+    #csv_data = []
+    #iter_id = 0
+    #for htmled_fact, t_exp, r_exp in html_data:
+    #    r = random.uniform(0, 1)
+    #    row = [htmled_fact]
+    #    one_is_no = (t_exp == explainer.NO_EXPLANATION or r_exp ==
+    #                 explainer.NO_EXPLANATION)
+    #    if(r <= 0.5):
+    #        row.extend([t_exp, r_exp])
+    #        row.extend(get_options(iter_id, True, one_is_no))
+    #    else:
+    #        row.extend([r_exp, t_exp])
+    #        row.extend(get_options(iter_id, False, one_is_no))
+    #    csv_data.append(row)
+    #    iter_id += 1
+    #columns = []
+    #for i in range(num_per_hit):
+    #    columns.extend(['fact_'+str(i), 'exp_A_'+str(i), 'exp_B_'+str(i)])
+    #    for j in range(4):
+    #        columns.append('opt_'+str(i)+'_'+str(j))
+    #print('Generated columns {}'.format(columns))
+    #print('Generated csv_data {}'.format(len(csv_data)))
+    #reqd = int(len(html_data)/num_per_hit)*num_per_hit
+    #csv_data = np.array(csv_data[:reqd])
+    #csv_data = csv_data.reshape((-1, len(columns)))
+    #df = pd.DataFrame(csv_data, columns=columns)
+    #df.to_csv(os.path.join(output_path, last_out_part +
+    #                       "_hits.csv"), index=False, sep=',')
 
 
 if __name__ == "__main__":
@@ -170,10 +167,10 @@ if __name__ == "__main__":
                         required=True, default=None)
     parser.add_argument('-tf', '--test_file',
                         required=True, default=None)
-    parser.add_argument('-tp', '--template_pred',
-                        help='List of template predictions of data', default=None)
-    parser.add_argument('-rp', '--rule_pred',
-                        help='List of rules predicted for data', default=None)
+    #parser.add_argument('-tp', '--template_pred',
+    #                    help='List of template predictions of data', default=None)
+    #parser.add_argument('-rp', '--rule_pred',
+    #                    help='List of rules predicted for data', default=None)
     parser.add_argument('--data_repo_root',
                         required=False, default='data')
     parser.add_argument(
@@ -201,22 +198,29 @@ if __name__ == "__main__":
         data, distmult_dump['entity_to_id'], distmult_dump['relation_to_id'])).astype(np.int32)
     logging.info("Loaded test file from %s" % (args.test_file))
 
-    if(args.template_pred is None and args.rule_pred is None):
-        logging.error("Both template_pred and rule_pred cannot be None")
+    #if(args.template_pred is None and args.rule_pred is None):
+    #    logging.error("Both template_pred and rule_pred cannot be None")
 
-    if(args.template_pred is not None):
-        template_predictions = np.loadtxt(args.template_pred).astype(np.int32)
-        logging.info("Loaded test file predictions  %s" % (args.template_pred))
-        if(len(template_predictions) != len(mapped_data)):
-            logging.error("Unequal length of template predictions and data")
-            exit(-1)
+    #if(args.template_pred is not None):
+    #    template_predictions = np.loadtxt(args.template_pred).astype(np.int32)
+    #    logging.info("Loaded test file predictions  %s" % (args.template_pred))
+    #    if(len(template_predictions) != len(mapped_data)):
+    #        logging.error("Unequal length of template predictions and data")
+    #        exit(-1)
+    template_predictions = [np.array([i]*len(mapped_data)) for i in range(1,7)]
+    #tmpl1_predictions = np.array([1]*len(mapped_data))
+    #tmpl2_predictions = np,array([2]*len(mapped_data))
+    #tmpl3_predictions = np.array([3]*len(mapped_data))
+    #tmpl4_predictions = np.array([4]*len(mapped_data))
+    #tmpl5_predictions = np.array([5]*len(mapped_data))
+    #tmpl6_predictions = np.array([6]*len(mapped_data))
 
-    if(args.rule_pred is not None):
-        rule_predictions = utils.read_pkl(args.rule_pred)
-        logging.info("Loaded rule predictions  from %s" % (args.rule_pred))
-        if(len(rule_predictions) != len(mapped_data)):
-            logging.error("Unequal length of rule predictions and data")
-            exit(-1)
+    #if(args.rule_pred is not None):
+    #    rule_predictions = utils.read_pkl(args.rule_pred)
+    #    logging.info("Loaded rule predictions  from %s" % (args.rule_pred))
+    #    if(len(rule_predictions) != len(mapped_data)):
+    #        logging.error("Unequal length of rule predictions and data")
+    #        exit(-1)
 
     entity_inverse_map = utils.get_inverse_dict(distmult_dump['entity_to_id'])
     relation_inverse_map = utils.get_inverse_dict(
@@ -228,26 +232,25 @@ if __name__ == "__main__":
     explainer = Explainer(
         data_root, template_objs[0].kb, template_objs[0].base_model, entity_inverse_map, relation_inverse_map)
 
-    if(args.template_pred is not None):
-        template_exps = english_exp_template(
-            mapped_data, template_predictions, template_objs, explainer)
-    else:
-        template_exps = [
-            explainer.NO_EXPLANATION for _ in range(len(mapped_data))]
+    #if(args.template_pred is not None):
+    template_exps = [english_exp_template(
+            mapped_data, var, template_objs, explainer) for var in template_predictions]
+    #else:
+    #    template_exps = [
+    #        explainer.NO_EXPLANATION for _ in range(len(mapped_data))]
 
-    if(args.rule_pred is not None):
-        rule_exps = english_exp_rules(mapped_data, rule_predictions, explainer)
-    else:
-        rule_exps = [explainer.NO_EXPLANATION for _ in range(len(mapped_data))]
+    #if(args.rule_pred is not None):
+    #    rule_exps = english_exp_rules(mapped_data, rule_predictions, explainer)
+    #else:
+    #    rule_exps = [explainer.NO_EXPLANATION for _ in range(len(mapped_data))]
 
     logging.info("Generated explanations")
 
-    if(len(rule_exps) != len(template_exps)):
-        logging.error("Invalid length of explanations {} and {}".format(
-            len(rule_exps), len(template_exps)))
-        exit(-1)
+    #if(len(rule_exps) != len(template_exps)):
+    #    logging.error("Invalid length of explanations {} and {}".format(
+    #        len(rule_exps), len(template_exps)))
+    #    exit(-1)
 
     os.makedirs(args.output_path, exist_ok=True)
-    write_english_exps(mapped_data, template_exps, rule_exps,
-                       args.output_path, args.num, explainer)
+    write_english_exps(mapped_data, template_exps, args.output_path, args.num, explainer)
     logging.info("Written explanations to %s" % (args.output_path))

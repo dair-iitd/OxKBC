@@ -41,6 +41,7 @@ def get_data_loaders(args):
                     base_model_file=args.base_model_file,
                     each_input_size=args.each_input_size, 
                     use_ids=args.use_ids, mode='train', 
+                    labels_file_path = args.train_labels_path,
                     stats_file_path=stats_file)
         train_anot_loader = DataLoader(train_anot_ds, batch_size = args.batch_size, shuffle=True)
 
@@ -76,7 +77,7 @@ class SelectionModuleDataset(torch.utils.data.Dataset):
         self.start_idx = 3
 
         self.raw_data = data.copy()
-
+        #my_score, max_score, simi, rank, conditional_rank, mean, std
         if stats_file_path is None or (not os.path.exists(stats_file_path)):
             means = np.mean(data[:, self.start_idx:-1], axis=0).reshape(1, -1)
             stds = np.std(data[:, self.start_idx:-1], axis=0).reshape(1, -1)
@@ -144,9 +145,6 @@ class SelectionModuleDataset(torch.utils.data.Dataset):
             n = max(n,num_labels)
             self.Y = sp.csr_matrix((val_idx, (row_idx, col_idx)), shape=(m, n))
             assert(m == len(self.data))
-
-        
-
 
 
     def __len__(self):
