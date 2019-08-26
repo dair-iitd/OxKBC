@@ -135,6 +135,11 @@ def main(args):
         if(args.kldiv_lambda != 0 and args.label_distribution_file != ''):
             command += "--kldiv_lambda "+str(args.kldiv_lambda) +" --label_distribution_file "+args.label_distribution_file + " "
 
+        command += ' --neg_reward ' + str(args.neg_reward) + ' --rho ' + str(args.rho) 
+        if args.exclude_t_ids is not None:
+            command += ' --exclude_t_ids ' + ' '.join(map(str,args.exclude_t_ids)) + " "
+
+
         print(command)
         # continue
         os.system(command)
@@ -161,6 +166,9 @@ def main(args):
         if(args.kldiv_lambda != 0 and args.label_distribution_file != ''):
             command += "--kldiv_lambda "+str(args.kldiv_lambda) +" --label_distribution_file "+args.label_distribution_file + " "
         command += "--only_eval --log_eval "+val_log+" --checkpoint "+checkpoint_path
+        command += ' --neg_reward ' + str(args.neg_reward) + ' --rho ' + str(args.rho) 
+        if args.exclude_t_ids is not None:
+            command += ' --exclude_t_ids ' + ' '.join(map(str,args.exclude_t_ids)) + " "
         command += " --pred_file valid_preds.txt"
         print(command)
 
@@ -179,6 +187,9 @@ def main(args):
         if(args.kldiv_lambda != 0 and args.label_distribution_file != ''):
             command += "--kldiv_lambda "+str(args.kldiv_lambda) +" --label_distribution_file "+args.label_distribution_file + " "
         command += "--only_eval --log_eval "+test_log+" --checkpoint "+checkpoint_path
+        command += ' --neg_reward ' + str(args.neg_reward) + ' --rho ' + str(args.rho) 
+        if args.exclude_t_ids is not None:
+            command += ' --exclude_t_ids ' + ' '.join(map(str,args.exclude_t_ids)) + " "
         command += " --pred_file test_preds.txt"
         print(command)
 
@@ -235,7 +246,8 @@ if __name__ == '__main__':
         '--train_labels_path', help="Input Training data Labels path for multi-label training", type=str, default=None)
 
     parser.add_argument('--seed',help='seed to be used before shuffling', type=int, default = 42)
-
+    #parser.add_argument('--exclude_t_ids', type= str, default = None, help='List of templates to be excluded while making predictions')
+    parser.add_argument('--exclude_t_ids', nargs='+', type=int, required=False,default=None, help='List of templates to be excluded while making predictions')
     args = parser.parse_args()
 
     main(args)

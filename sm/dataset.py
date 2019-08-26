@@ -152,6 +152,9 @@ class SelectionModuleDataset(torch.utils.data.Dataset):
             for i,l_list in enumerate(lines):
                 l_list = [args.o2n[old_tid] for old_tid in l_list]
                 l_list = set(l_list) # remove duplicates
+                if ((len(l_list) > 1) and (0 in l_list)):
+                    l_list.remove(0)
+                #
                 for y in l_list:
                     row_idx.append(i)
                     col_idx.append(y)
