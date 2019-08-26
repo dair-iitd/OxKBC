@@ -6,11 +6,29 @@ import shutil
 
 import settings
 import torch
-
+from IPython.core.debugger import Pdb
 LOG_FILE = 'log.txt'
 
 _LOG_LEVEL_STRINGS = ['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG']
 EPSILON = 0.0000001
+
+
+
+def get_template_id_maps(num_templates, exclude_t_ids):
+    old_to_new = [0]*(num_templates+1)
+    new_to_old = [0]*(num_templates+1 - len(exclude_t_ids))
+    cnt  = 0
+    for i in range(num_templates+1):
+        if i in exclude_t_ids:
+            old_to_new[i] = 0
+        else:
+            new_to_old[cnt] = i
+            old_to_new[i] = cnt
+            cnt += 1
+    
+    #Pdb().set_trace()
+    return old_to_new, new_to_old
+
 
 
 def _log_level_string_to_int(log_level_string):

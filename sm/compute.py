@@ -21,30 +21,40 @@ def get_evaluation_function(args):
     return Loss(args)
 
 
+
+
+
 class Loss(object):
     def __init__(self, args):
         self.args = args
-        self.criterion = nn.NLLLoss(weight=torch.Tensor([1.0, 20.0]))
 
-        l = [args.mil_reward for i in range(args.num_templates)]
+        l = [args.mil_reward for i in range(args.num_templates - len(args.exclude_t_ids))]
         l.insert(0, args.rho)
         #self.weights = Variable(torch.Tensor(
         #    l).unsqueeze(0), requires_grad=False)
         self.weights =  Variable(torch.Tensor(l), requires_grad=False)
-        self.labels = [x+1 for x in range(args.num_templates)]
+        self.labels = [x+1 for x in range(args.num_templates - len(args.exclude_t_ids))]
         self.header = functools.reduce(
-            lambda x, y: x+y, [[y+str(x) for y in ['p', 'r', 'f', 's']] for x in self.labels])
+            lambda x, y: x+y, [[y+str(args.n2o[x]) for y in ['p', 'r', 'f', 's']] for x in self.labels])
         self.header.extend(['acc','mip', 'mir', 'mif'])
         
         if self.args.kldiv_lambda != 0:
-            self.target_distribution = torch.Tensor(yaml.load(open(self.args.label_distribution_file))[0]).float()
+            #Pdb().set_trace()
+            odist = yaml.load(open(self.args.label_distribution_file))[0]
+            fdist = []
+            for i,d in enumerate(odist):
+                if i not in args.exclude_t_ids:
+                    fdist.append(d)
+
+            self.target_distribution = torch.Tensor(fdist).float()
+
             self.target_distribution = self.target_distribution/self.target_distribution.sum() 
             self.target_distribution = Variable(self.target_distribution)
         if settings.cuda:
-            self.criterion.cuda()
             self.weights = self.weights.cuda()
             if self.args.kldiv_lambda != 0:
                 self.target_distribution = self.target_distribution.cuda()
+    
     def __call__(self, var, model, mode):
         '''
         var is a list of variables returned by dataloader.
@@ -132,10 +142,10 @@ class Loss(object):
         logging.info(' Predicted counts val: {}'.format(str_ct))
         logging.info(' True counts val: {}'.format(str_ct_y))
         
-        cf = metrics.confusion_matrix(ycpu,ypred_cpu,labels=range(args.num_templates+1))
+        cf = metrics.confusion_matrix(ycpu,ypred_cpu,labels=range(self.args.num_templates+1- len(self.args.exclude_t_ids)))
         logging.info('Confusion Matrix:\n {}'.format(cf))
-        logging.info('Classification Report\n'+metrics.classification_report(ycpu,ypred_cpu,labels=range(args.num_templates+1)))
-
+        logging.info('Classification Report\n'+metrics.classification_report(ycpu,ypred_cpu,labels=range(self.args.num_templates+1-len(self.args.exclude_t_ids))))
+        #
         return metric
 
 
@@ -209,8 +219,9 @@ def compute(epoch, model, loader, optimizer, mode, eval_fn, args, labelled_train
            len(loader.dataset), time.time() - start_time, cum_kl_loss/cum_count]
 
     metric_header = []
+    #Pdb().set_trace()
     if args.pred_file is not None:
-        np.savetxt(os.path.join(args.output_path,args.pred_file), predictions)
+        np.savetxt(os.path.join(args.output_path,args.pred_file), np.array(args.n2o)[predictions.astype(int)])
         logging.info("Written Predictions to {}".format(os.path.join(args.output_path,args.pred_file)))
     if mode != 'train_un' and calc_acc:
         metric = eval_fn.calculate_accuracies(ground_truth, predictions)

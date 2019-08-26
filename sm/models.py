@@ -5,11 +5,11 @@ import numpy as np
 import settings
 import torch
 import torch.nn as nn
-
+from IPython.core.debugger import Pdb
 
 def select_model(args):
     if args.mil:
-        return SelectionModuleMIL(args.each_input_size, args.num_templates, args.hidden_unit_list, args.embed_size, args.use_ids)
+        return SelectionModuleMIL(args.each_input_size, args.num_templates, args.hidden_unit_list, args.embed_size, args.use_ids, args)
     else:
         return SelectionModule(args.each_input_size*args.num_templates, args.num_templates+1, args.hidden_unit_list, args.embed_size, args.use_ids)
 
@@ -37,8 +37,9 @@ class SelectionModule(nn.Module):
 
 
 class SelectionModuleMIL(nn.Module):
-    def __init__(self, input_size, num_templates, hidden_unit_list, embed_size, use_ids):
+    def __init__(self, input_size, num_templates, hidden_unit_list, embed_size, use_ids, args):
         super(SelectionModuleMIL, self).__init__()
+        self.args = args 
         module_list = []
         self.use_ids = use_ids
         prev = embed_size + input_size if self.use_ids else input_size
@@ -68,13 +69,15 @@ class SelectionModuleMIL(nn.Module):
             embeds = x[:, :self.embed_size]
         x_vec = x[:, self.embed_size:] if self.use_ids else x
         ts = []
+        #Pdb().set_trace()
         for i in range(self.num_templates):
-            if self.use_ids:
-                ts.append(self.mlp(torch.cat(
-                    (embeds, x_vec[:, i*self.input_size: (i+1)*self.input_size]), dim=1)))
-            else:
-                ts.append(
-                    self.mlp(x_vec[:, i*self.input_size: (i+1)*self.input_size]))
+            if i not in self.args.exclude_t_ids:
+                if self.use_ids:
+                    ts.append(self.mlp(torch.cat(
+                        (embeds, x_vec[:, i*self.input_size: (i+1)*self.input_size]), dim=1)))
+                else:
+                    ts.append(
+                        self.mlp(x_vec[:, i*self.input_size: (i+1)*self.input_size]))
 
         if self.use_ids:
             others_score = self.mlp(torch.cat(

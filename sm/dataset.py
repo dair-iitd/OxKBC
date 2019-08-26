@@ -6,10 +6,11 @@ import numpy as np
 
 import torch
 from torch.utils.data import DataLoader, Dataset
-
+from IPython.core.debugger import Pdb
 import scipy.sparse as sp
 
 def get_data_loaders(args):
+    #need to change ys to account for args.exclude_t_ids
     stats_file = os.path.join(args.output_path,'stats')
     #stats_file = args.training_data_path + '_stats' 
     train_loader = None 
@@ -18,7 +19,7 @@ def get_data_loaders(args):
                     base_model_file=args.base_model_file,
                     each_input_size=args.each_input_size, 
                     use_ids=args.use_ids, mode='train', 
-                    stats_file_path=stats_file)
+                    stats_file_path=stats_file, args = args, labels = 0)
                     
     train_loader = DataLoader(train_ds,batch_size=args.batch_size, shuffle=True)
 
@@ -30,7 +31,7 @@ def get_data_loaders(args):
                     use_ids=args.use_ids, mode='eval', 
                     labels_file_path=args.val_labels_path,
                     num_labels = args.num_templates + 1,
-                    stats_file_path=stats_file)
+                    stats_file_path=stats_file, args = args, labels = 1)
 
         val_loader = DataLoader(val_ds, batch_size=args.batch_size, shuffle=False)
     
@@ -42,7 +43,7 @@ def get_data_loaders(args):
                     each_input_size=args.each_input_size, 
                     use_ids=args.use_ids, mode='train', 
                     labels_file_path = args.train_labels_path,
-                    stats_file_path=stats_file)
+                    stats_file_path=stats_file, args = args, labels = 1)
         train_anot_loader = DataLoader(train_anot_ds, batch_size = args.batch_size, shuffle=True)
 
 
@@ -58,7 +59,9 @@ def get_data_loaders(args):
     
 
 class SelectionModuleDataset(torch.utils.data.Dataset):
-    def __init__(self, input_file_path, base_model_file, each_input_size=7, use_ids=False, mode='train', stats_file_path=None, labels_file_path=None, num_labels = 0):
+    def __init__(self, input_file_path, base_model_file, each_input_size=7, use_ids=False, mode='train', stats_file_path=None, labels_file_path=None, num_labels = 0, args = None, labels = 0):
+        self.args = args
+        self.is_labelled = labels
         if '.txt' in input_file_path:
             logging.info("Input file {} is a txt file".format(input_file_path))
             data = np.loadtxt(input_file_path, delimiter=',', dtype=float)
@@ -127,22 +130,35 @@ class SelectionModuleDataset(torch.utils.data.Dataset):
         logging.info('Normalized and successfully loaded data. Size of dataset = {}'.format(
             self.data.shape))
 
+        #Pdb().set_trace()
+        if self.is_labelled and self.args.exclude_t_ids is not None and len(self.args.exclude_t_ids) > 0:
+            logging.info("Dataset: Excluding following template ids from target and mapping them to 0: {}".format(','.join(map(str,self.args.exclude_t_ids))))
+            
+            o2n = np.array(args.o2n)
+            self.data[:,-1] = o2n[self.data[:,-1].astype(int)]
+            #for i, tid in enumerate(self.args.exclude_t_ids):
+            #    self.data[:, -1][self.data[:,-1] == tid] = 0
+
+
+
         self.Y = None 
         if labels_file_path is not None:
+            exclude_t_ids_set = set(self.args.exclude_t_ids)
             logging.info("Multi-label evaluation on. Labels in : {}".format(labels_file_path))
             fh = open(labels_file_path,'r')
             lines = fh.readlines()
             lines = [list(map(int,line.strip().strip(',').split(','))) for line in lines]
             row_idx, col_idx, val_idx = [], [], []
             for i,l_list in enumerate(lines):
-                l_list = list(set(l_list)) # remove duplicates
+                l_list = [args.o2n[old_tid] for old_tid in l_list]
+                l_list = set(l_list) # remove duplicates
                 for y in l_list:
                     row_idx.append(i)
                     col_idx.append(y)
                     val_idx.append(1)
             m = max(row_idx) + 1 
             n = max(col_idx) + 1 
-            n = max(n,num_labels)
+            n = max(n,num_labels - len(self.args.exclude_t_ids))
             self.Y = sp.csr_matrix((val_idx, (row_idx, col_idx)), shape=(m, n))
             assert(m == len(self.data))
 

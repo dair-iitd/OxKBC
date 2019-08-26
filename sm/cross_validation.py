@@ -12,31 +12,87 @@ def create_dir(dir_path):
 def generate_data(args):
     create_dir(args.dir)
     labelled_data = pickle.load(open(args.labelled_training_data_path, 'rb'))
-    np.random.shuffle(labelled_data)
+    labels = open(args.train_labels_path).readlines()
+    assert len(labelled_data) == len(labels)
+    data_with_labels = list(zip(labelled_data, labels))
+    np.random.seed(args.seed)
+    np.random.shuffle(data_with_labels)
+    #np.random.shuffle(labelled_data)
     length = labelled_data.shape[0]
     test_sample_size = int(1.0/args.folds*length)
     for i in range(args.folds):
         test_range_beg = i*test_sample_size
         test_range_end = (i+1)*test_sample_size
-        test_sample = labelled_data[test_range_beg:test_range_end]
+        #test_sample = labelled_data[test_range_beg:test_range_end]
+        test_sample = np.array([data_with_labels[j][0] for j in range(test_range_beg,test_range_end)])
+        test_sample_y = [data_with_labels[j][1] for j in range(test_range_beg, test_range_end)]
+
         test_data_path = os.path.join(args.dir, "test_"+str(i)+".pkl")
         pickle.dump(test_sample, open(test_data_path, "wb"))
+        test_label_path = os.path.join(args.dir, "test_label_"+str(i)+".csv")
+        with open(test_label_path,'w') as tlfh:
+            tlfh.write(''.join(test_sample_y))
 
         train_val_sample = np.concatenate(
             (labelled_data[0:test_range_beg], labelled_data[test_range_end:]), axis=0)
-        np.random.shuffle(train_val_sample)
+        
+        
+        train_val_data= data_with_labels[:test_range_beg] + data_with_labels[test_range_end:]
+
+        np.random.seed(args.seed+args.seed)
+        np.random.shuffle(train_val_data)
+
+        #train_val_sample = np.concatenate(
+        #    (
+        #        np.array([data_with_labels[j][0] for j in range(0,test_range_beg)]), 
+        #        np.array([data_with_labels[j][0] for j in range(test_range_end,len(data_with_labels))])
+        #    ), axis=0)
+        
+        #np.random.shuffle(train_val_sample)
 
         if(args.supervision == 'un'):
             train_sample_size = 0
         else:
             train_sample_size = int(0.6*length)
+    
+        train_sample, train_sample_labels = list(zip(*train_val_data[0:train_sample_size]))
+        train_sample = np.array(list(train_sample))
+        
+        val_sample, val_sample_labels = list(zip(*train_val_data[train_sample_size:]))
+        val_sample = np.array(list(val_sample))
 
-        train_sample = train_val_sample[0:train_sample_size]
-        val_sample = train_val_sample[train_sample_size:]
+
+        #train_sample = train_val_sample[0:train_sample_size]
+        #val_sample = train_val_sample[train_sample_size:]
         train_data_path = os.path.join(args.dir, "train_"+str(i)+".pkl")
         val_data_path = os.path.join(args.dir, "val_"+str(i)+".pkl")
         pickle.dump(train_sample, open(train_data_path, "wb"))
         pickle.dump(val_sample, open(val_data_path, "wb"))
+
+        train_data_label_path = os.path.join(args.dir, "train_label_"+str(i)+".csv")
+        val_data_label_path = os.path.join(args.dir, "val_label_"+str(i)+".csv")
+        
+        with open(train_data_label_path, 'w') as tlfh:
+            tlfh.write(''.join(list(train_sample_labels)))
+
+        with open(val_data_label_path, 'w') as tlfh:
+            tlfh.write(''.join(list(val_sample_labels)))
+
+
+"""
+def check(x,y):
+    a = [int(x[-1]) for x in pickle.load(open(x,'rb'))]
+    b = [int(x.strip().split(',')[0]) for x in open(y,'r').readlines()]
+    assert len(a) == len(b)
+    for i in range(len(a)):
+        assert a[i] == b[i]
+
+for ttype in ['train_','val_','test_']:
+    for i in range(5):
+        print(ttype,i)
+        check(ttype+str(i)+'.pkl', ttype+'label_'+str(i)+'.csv')
+
+"""
 
 
 def main(args):
@@ -144,7 +200,8 @@ if __name__ == '__main__':
     
     #parser.add_argument('--python_path', help='path to python bin', type=str,default='/home/cse/btech/cs1150210/anaconda3/bin/python3')
     #parser.add_argument('--python_path', help='path to python bin', type=str,default='/home/yatin/anaconda3/bin/python3')
-    parser.add_argument('--python_path', help='path to python bin', type=str,default='/home/cse/phd/csz178057/anaconda3/bin/python3')
+    #parser.add_argument('--python_path', help='path to python bin', type=str,default='/home/cse/phd/csz178057/anaconda3/bin/python3')
+    parser.add_argument('--python_path', help='path to python bin', type=str,default='$HOME/anaconda3/bin/python3')
 
 
     # Training parameters
@@ -168,11 +225,16 @@ if __name__ == '__main__':
     parser.add_argument('--label_distribution_file', help='KL Divergence distribution file', type=str, default='')
     parser.add_argument('--neg_reward', help='negative reward', default=-1, type=float)
     parser.add_argument('--rho', help='rho ', default=0.0125, type=float)
-
+    parser.add_argument('--multilabel', help='should do multilabel training ? ', default=0, type=int)
 
 
     parser.add_argument('--gen_data', help='Just Generate Data and exit',
                         action='store_true', default=False)
+    
+    parser.add_argument(
+        '--train_labels_path', help="Input Training data Labels path for multi-label training", type=str, default=None)
+
+    parser.add_argument('--seed',help='seed to be used before shuffling', type=int, default = 42)
 
     args = parser.parse_args()
 

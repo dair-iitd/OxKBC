@@ -50,6 +50,8 @@ def main(args):
         exp_name, args.output_path))
     logging.info('Loaded arguments as \n{}'.format(str(pprint.pformat(args))))
 
+
+
     # Begin of main code
 
     train_loader, val_loader, labelled_train_loader = dataset.get_data_loaders(
@@ -171,12 +173,13 @@ if __name__ == '__main__':
     parser.add_argument('--each_input_size',
                         help='Input size of each template', type=int, default=7)
     parser.add_argument(
-        '--num_templates', help='number of templates excluding other', type=int, default=5)
+        '--num_templates', help='number of templates excluding other', type=int, default=6)
     parser.add_argument('--use_ids', help='Use embeddings of entity and relations while training',
                         action='store_true', default=False)
     parser.add_argument('--mil', help='Use MIL model',
                         action='store_true', default=False)
-
+    parser.add_argument('--exclude_t_ids', nargs='+', type=int, required=False,default=[], help='List of templates to be excluded while making predictions')
+ 
     # Optimizer parameters
     parser.add_argument(
         '--optim', help='type of optimizer to use: sgd or adam', type=str, default='sgd')
@@ -223,6 +226,14 @@ if __name__ == '__main__':
     config.update({'embed_size': utils.get_embed_size(
         args.base_model_file, args.use_ids)})
     args = utils.Map(config)
-    settings.set_settings(args)
+    o2n , n2o = utils.get_template_id_maps(args.num_templates, args.exclude_t_ids)
+    args.o2n = o2n
+    args.n2o = n2o
 
+    for key in ['train_labels_path','val_labels_path']:
+        if args[key]  == 'None':
+            args[key] = None
+
+    
+    settings.set_settings(args)
     main(args)
