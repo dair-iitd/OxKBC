@@ -86,8 +86,8 @@ def get_params():
     rho = [0.125]
     config = ['configs/fb15k_config_90_40.yml'] 
     kldiv_lambda = [0, 1]
-    #exclude_t_ids = ['2 5',None]
-    exclude_t_ids = [None]
+    exclude_t_ids = ['2 5',None]
+    #exclude_t_ids = [None]
     names = ['neg_reward','rho','kldiv_lambda','config','exclude_t_ids']
     all_params = [neg_reward,rho, kldiv_lambda, config,exclude_t_ids]
     short_names = ['n','r','k','c','ex']
@@ -108,8 +108,8 @@ def get_params():
         name_setting = {n: get_string(s) for n, s in zip(names, setting)}
         log_str = '_'.join(['%s-%s' % (name2short[n], name_setting[n]) for n in sorted_names])
         all_settings[log_str] = name_setting 
-
-    return all_settings, name2list,['config','exclude_t_ids','rho'],['kldiv_lambda','neg_reward']
+    #return all_settings, name2list, high level params, rows_cols
+    return all_settings, name2list,['config','kldiv_lambda','rho'],['exclude_t_ids','neg_reward']
 
 
 
