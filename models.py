@@ -60,11 +60,25 @@ class TypedDM():
         return utils.sigmoid(score)*utils.sigmoid(head_type_compatibility)*utils.sigmoid(tail_type_compatibility)
 
     def get_hadamard_product(self,r1,r2):
-        relation_product =  self.dump['rel_real'][r1] * self.dump['rel_real'][r2]
-        type_compatibility_head_product = self.dump['head_rel_type'][r1] * self.dump['head_rel_type'][r2]
-        type_compatibility_tail_product = self.dump['tail_rel_type'][r1] * self.dump['tail_rel_type'][r2]
+        v1 = self.dump['rel_real'][r1]
+        v2 = self.dump['rel_real'][r2] 
+        relation_product =  (v1 * v2)
+        if(np.linalg.norm(relation_product)!=0):
+            relation_product /= np.linalg.norm(relation_product)
+
+        v1 = self.dump['head_rel_type'][r1]
+        v2 = self.dump['head_rel_type'][r2]
+        type_compatibility_head_product = (v1 * v2)
+        if(np.linalg.norm(type_compatibility_head_product)!=0):
+            type_compatibility_head_product /= np.linalg.norm(type_compatibility_head_product)
+        
+        v1 = self.dump['tail_rel_type'][r1] 
+        v2 = self.dump['tail_rel_type'][r2] 
+        type_compatibility_tail_product = (v1 * v2)
+        if(np.linalg.norm(type_compatibility_tail_product)!=0):
+            type_compatibility_tail_product /= np.linalg.norm(type_compatibility_tail_product)
+
         return [relation_product, type_compatibility_head_product, type_compatibility_tail_product]
-        # return relation_similarity*type_compatibility_head*type_compatibility_tail
     
     def get_relation_similarity_from_embedding(self,r1_emb, r2_emb):
         sim = 1.0

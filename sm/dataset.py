@@ -9,6 +9,8 @@ from torch.utils.data import DataLoader, Dataset
 from IPython.core.debugger import Pdb
 import scipy.sparse as sp
 
+DEFAULT_VALUE = -1
+
 def get_data_loaders(args):
     #need to change ys to account for args.exclude_t_ids
     stats_file = os.path.join(args.output_path,'stats')
@@ -56,7 +58,35 @@ def get_data_loaders(args):
     else:
         raise
 
-    
+
+def change_default_scores(data, start_idx, each_input_size):
+    #my_score, max_score, simi, rank, conditional_rank, mean, std
+    #only change : my_score
+    #when: when my_score == 0
+    def SIDX(template_id):
+        return (start_idx + template_id*each_input_size)
+
+    num_templates = (data.shape[1] - start_idx -1 )//each_input_size
+    all_means = []
+    all_stds  = []
+    for i in range(num_templates):
+        indx = data[:,SIDX(i)] == 0
+        data[indx,SIDX(i)] = DEFAULT_VALUE
+        data[indx,SIDX(i)+2] = DEFAULT_VALUE
+
+        this_means = data[np.logical_not(indx), SIDX(i): SIDX(i+1)].mean(axis=0).reshape(1,-1)
+        this_stds = data[np.logical_not(indx), SIDX(i): SIDX(i+1)].std(axis=0).reshape(1,-1)
+        this_means[0,1] = this_means[0,0]
+        this_stds[0, 1] = this_stds[0, 0]
+        for j in [3,4]: 
+            this_means[0,j] = 0
+            this_stds[0,j] = 1
+        #
+        all_means.append(this_means)
+        all_stds.append(this_stds)
+    #
+    return data, {'mean': np.concatenate(all_means, axis=1), 'std': np.concatenate(all_stds, axis=1)}
+
 
 class SelectionModuleDataset(torch.utils.data.Dataset):
     def __init__(self, input_file_path, base_model_file, each_input_size=7, use_ids=False, mode='train', stats_file_path=None, labels_file_path=None, num_labels = 0, args = None, labels = 0):
@@ -80,37 +110,18 @@ class SelectionModuleDataset(torch.utils.data.Dataset):
         self.start_idx = 3
 
         self.raw_data = data.copy()
+        data,self.stats = change_default_scores(data, self.start_idx, each_input_size)
         #my_score, max_score, simi, rank, conditional_rank, mean, std
         if stats_file_path is None or (not os.path.exists(stats_file_path)):
-            means = np.mean(data[:, self.start_idx:-1], axis=0).reshape(1, -1)
-            stds = np.std(data[:, self.start_idx:-1], axis=0).reshape(1, -1)
-            for i in range(means.shape[1]//each_input_size):
-                idx = i*each_input_size
-                #temp = np.concatenate(
-                #    (data[:, idx], data[:, idx+1])).reshape(-1)
-                temp = data[:,self.start_idx + idx].reshape(-1)
-                new_mean = np.mean(temp)
-                new_std = np.std(temp)
-                # Normalizing my_score and max_score using same distribution
-                means[0, idx] = new_mean
-                means[0, idx+1] = new_mean
-                stds[0, idx] = new_std
-                stds[0, idx+1] = new_std
-                # Not normalizing rank and conditional rank
-                means[0, idx+3] = 0
-                means[0, idx+4] = 0
-                stds[0, idx+3] = 1
-                stds[0, idx+4] = 1
-            #pickle.dump({'mean': means, 'std': stds},
-            #            open(input_file_path+'_stats', 'wb'))
-            pickle.dump({'mean': means, 'std': stds},
+            pickle.dump(self.stats,
                         open(stats_file_path, 'wb'))
             logging.info("Calculated stats of the given input file, dumped stats to {}".format(
                 input_file_path+'_stats'))
         else:
-            stats = pickle.load(open(stats_file_path, 'rb'))
-            means = stats['mean']
-            stds = stats['std']
+            self.stats = pickle.load(open(stats_file_path, 'rb'))
+        #
+        means = self.stats['mean']
+        stds = self.stats['std']
 
         if(base_model_file is not None and os.path.exists(base_model_file)):
             with open(base_model_file, 'rb') as f:

@@ -8,52 +8,90 @@ python3 preprocessing.py -d fb15k -m distmult -f data/fb15k/labelled_train/label
 python create_train_val_split.py --labelled_total_data_path ../logs/fb15k/sm_valid_with_id.data.pkl --total_labels_path ../data/fb15k/labelled_train/labelled_train_y6.txt --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --train_labels_path ../logs/fb15k/sm_sup_train_multilabels.txt --val_data_path ../logs/fb15k/sm_sup_valid_with_id.pkl --val_labels_path ../logs/fb15k/sm_sup_valid_multilabels.txt --train_split 0.8 --seed 242 --num_templates 6
 
 #create splits for cross val
-python3 cross_validation.py --gen_data --folds 5 --dir cross_val_ml/fb15k/semi --labelled_training_data_path ../logs/fb15k/sm_valid_with_id.data.pkl --supervision semi --train_labels_path ../data/fb15k/labelled_train/labelled_train_y6.txt --seed 142 
+#python3 cross_validation.py --gen_data --folds 5 --dir cross_val_ml/fb15k/semi --labelled_training_data_path ../logs/fb15k/sm_valid_with_id.data.pkl --supervision semi --train_labels_path ../data/fb15k/labelled_train/labelled_train_y6.txt --seed 142 
 
 
-#preprocessing of test data NOT YET RUN EVEN ONCE
+#preprocessing of test data
 python3 preprocessing.py -d fb15k -m distmult -f data/fb15k/test/test_hits_1_ordered_x.txt -s logs/fb15k/test_hits1_single_label_sm.data.pkl -w dumps/fb15k_distmult_dump_norm.pkl -l logs/fb15k -v 1 --t_ids 1 2 3 4 5 6 --data_repo_root ../data --negative_count 0 --y_labels data/fb15k/test/test_hits_1_ordered_y.txt
 
 
 python3 preprocessing.py -d fb15k -m distmult -f data/fb15k/test/test_hits_10_ordered_x.txt -s logs/fb15k/test_hits10_single_label_sm.data.pkl -w dumps/fb15k_distmult_dump_norm.pkl -l logs/fb15k -v 1 --t_ids 1 2 3 4 5 6 --data_repo_root ../data --negative_count 0 --y_labels data/fb15k/test/test_hits_10_ordered_y.txt
 
 
-###### Semi Supervised KL = 0  Multilabel Train  ##########
+
+
+
+###### Semi Supervised KL = 0  Multilabel Train exclude 2.5 ##########
 
 # train
 for i in {1..5}; do
-    python3 main.py --training_data_path ../logs/fb15k/sm_with_id.data.pkl --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --val_data_path ../logs/fb15k/sm_sup_valid_with_id.pkl --exp_name train_ml --num_epochs 20 --config configs/fb15k_config_90_40.yml --kldiv_lambda 0 --neg_reward -2 --rho 0.125 --lr 0.001 --cuda --batch_size 2048 --mil --num_templates 6 --each_input_size 7 --supervision semi --output_path temp/best_fb15k/run_$i/ --exclude_t_ids 2 5 --val_labels_path ../logs/fb15k/sm_sup_valid_multilabels.txt --train_labels_path ../logs/fb15k/sm_sup_train_multilabels.txt &
+    python3 main.py --training_data_path ../logs/fb15k/sm_with_id.data.pkl --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --val_data_path ../logs/fb15k/sm_sup_valid_with_id.pkl --exp_name train_ml --num_epochs 20 --config configs/fb15k_config_90_40.yml --kldiv_lambda 0 --neg_reward -2 --rho 0.125 --lr 0.001 --cuda --batch_size 2048 --mil --num_templates 6 --each_input_size 7 --supervision semi --output_path temp/best_fb15k_semi_ml_ex25/run_$i/ --exclude_t_ids 2 5 --val_labels_path ../logs/fb15k/sm_sup_valid_multilabels.txt --train_labels_path ../logs/fb15k/sm_sup_train_multilabels.txt &
 done
 
 # single label test
 for i in {1..5}; do
-    python3 main.py --training_data_path ../logs/fb15k/sm_with_id.data.pkl --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --val_data_path ../logs/fb15k/test_hits1_single_label_sm.data.pkl.pkl --exp_name test --num_epochs 20 --config configs/fb15k_config_90_40.yml --kldiv_lambda 0 --neg_reward -2 --rho 0.125 --lr 0.001 --cuda --batch_size 2048 --mil --num_templates 6 --each_input_size 7 --supervision semi --output_path temp/best_fb15k/run_$i/ --checkpoint temp/best_fb15k/run_$i/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_best_checkpoint.pth0 --exclude_t_ids 2 5 --only_eval --pred_file preds.txt --log_eval temp/best_fb15k/train_ml_eval_sl.csv  ;
+    python3 main.py --training_data_path ../logs/fb15k/sm_with_id.data.pkl --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --val_data_path ../logs/fb15k/test_hits1_single_label_sm.data.pkl.pkl --exp_name test --num_epochs 20 --config configs/fb15k_config_90_40.yml --kldiv_lambda 0 --neg_reward -2 --rho 0.125 --lr 0.001 --cuda --batch_size 2048 --mil --num_templates 6 --each_input_size 7 --supervision semi --output_path temp/best_fb15k_semi_ml_ex25/run_$i/ --checkpoint temp/best_fb15k_semi_ml_ex25/run_$i/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_best_checkpoint.pth0 --exclude_t_ids 2 5 --only_eval --pred_file preds.txt --log_eval temp/best_fb15k_semi_ml_ex25/train_ml_eval_sl.csv  ;
 done
 
 # mutli label test_hits1_single_label_sm
 for i in {1..5}; do
-    python3 main.py --training_data_path ../logs/fb15k/sm_with_id.data.pkl --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --val_data_path ../logs/fb15k/test_hits1_single_label_sm.data.pkl.pkl --exp_name test --num_epochs 20 --config configs/fb15k_config_90_40.yml --kldiv_lambda 0 --neg_reward -2 --rho 0.125 --lr 0.001 --cuda --batch_size 2048 --mil --num_templates 6 --each_input_size 7 --supervision semi --output_path temp/best_fb15k/run_$i/ --checkpoint temp/best_fb15k/run_$i/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_best_checkpoint.pth0 --exclude_t_ids 2 5 --only_eval --pred_file preds.txt --log_eval temp/best_fb15k/train_ml_eval_ml.csv --val_labels_path ../data/fb15k/test/test_hits_1_ordered_y.txt ;
+    python3 main.py --training_data_path ../logs/fb15k/sm_with_id.data.pkl --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --val_data_path ../logs/fb15k/test_hits1_single_label_sm.data.pkl.pkl --exp_name test --num_epochs 20 --config configs/fb15k_config_90_40.yml --kldiv_lambda 0 --neg_reward -2 --rho 0.125 --lr 0.001 --cuda --batch_size 2048 --mil --num_templates 6 --each_input_size 7 --supervision semi --output_path temp/best_fb15k_semi_ml_ex25/run_$i/ --checkpoint temp/best_fb15k_semi_ml_ex25/run_$i/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_best_checkpoint.pth0 --exclude_t_ids 2 5 --only_eval --pred_file preds.txt --log_eval temp/best_fb15k_semi_ml_ex25/train_ml_eval_ml.csv --val_labels_path ../data/fb15k/test/test_hits_1_ordered_y.txt ;
 done
 
 
 
-###### Semi Supervised KL = 0 ##########
-
+###### Semi Supervised KL = 0  Single Label Train EXCLUDE 2.5##########
 # train
 for i in {1..5}; do
-    python3 main.py --training_data_path ../logs/fb15k/sm_with_id.data.pkl --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --val_data_path ../logs/fb15k/sm_sup_valid_with_id.pkl --exp_name train --num_epochs 20 --config cross_val/fb15k_90_40_semi/run_1/exp_-2_0.125.yml --lr 0.001 --cuda --batch_size 2048 --mil --num_templates 5 --each_input_size 7 --supervision semi --output_path temp/best_fb15k/run_$i/ & done 
+    python3 main.py --training_data_path ../logs/fb15k/sm_with_id.data.pkl --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --val_data_path ../logs/fb15k/sm_sup_valid_with_id.pkl --exp_name train_sl --num_epochs 20 --config configs/fb15k_config_90_40.yml --kldiv_lambda 0 --neg_reward -2 --rho 0.125 --lr 0.001 --cuda --batch_size 2048 --mil --num_templates 6 --each_input_size 7 --supervision semi --output_path temp/best_fb15k_semi_sl_ex25/run_$i/ --exclude_t_ids 2 5 &
+done
 
 # single label test
 for i in {1..5}; do
-    python3 main.py --training_data_path ../logs/fb15k/sm_with_id.data.pkl --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --val_data_path ../logs/fb15k/test_exp/test_hits1_single_label_sm.data.pkl --exp_name test --num_epochs 20 --config cross_val/fb15k_90_40_semi/run_1/exp_-2_0.125.yml --lr 0.001 --cuda --batch_size 2048 --mil --num_templates 5 --each_input_size 7 --supervision semi --output_path temp/best_fb15k/run_$i/ --checkpoint temp/best_fb15k/run_$i/train/train_r0.125_p1_n-2_i4_best_checkpoint.pth0 --only_eval --pred_file preds.txt;
-    
+    python3 main.py --training_data_path ../logs/fb15k/sm_with_id.data.pkl --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --val_data_path ../logs/fb15k/test_hits1_single_label_sm.data.pkl.pkl --exp_name test --num_epochs 20 --config configs/fb15k_config_90_40.yml --kldiv_lambda 0 --neg_reward -2 --rho 0.125 --lr 0.001 --cuda --batch_size 2048 --mil --num_templates 6 --each_input_size 7 --supervision semi --output_path temp/best_fb15k_semi_sl_ex25/run_$i/ --checkpoint temp/best_fb15k_semi_sl_ex25/run_$i/train_sl/train_sl_r0.125_p1_n-2.0_i4_k0.0_best_checkpoint.pth0 --exclude_t_ids 2 5 --only_eval --pred_file preds.txt --log_eval temp/best_fb15k_semi_sl_ex25/train_sl_eval_sl.csv  ;
 done
 
-# mutli label test
+# mutli label test_hits1_single_label_sm
 for i in {1..5}; do
-    python3 main.py --training_data_path ../logs/fb15k/sm_with_id.data.pkl --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --val_data_path ../logs/fb15k/test_exp/test_hits1_single_label_sm.data.pkl --val_labels_path  ../logs/fb15k/test_exp/test_y_true_hits1.txt --exp_name test_ml --num_epochs 20 --config cross_val/fb15k_90_40_semi/run_1/exp_-2_0.125.yml --lr 0.001 --cuda --batch_size 2048 --mil --num_templates 5 --each_input_size 7 --supervision semi --output_path temp/best_fb15k/run_$i/ --checkpoint temp/best_fb15k/run_$i/train/train_r0.125_p1_n-2_i4_best_checkpoint.pth0 --only_eval --pred_file preds.txt;
-    
+    python3 main.py --training_data_path ../logs/fb15k/sm_with_id.data.pkl --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --val_data_path ../logs/fb15k/test_hits1_single_label_sm.data.pkl.pkl --exp_name test --num_epochs 20 --config configs/fb15k_config_90_40.yml --kldiv_lambda 0 --neg_reward -2 --rho 0.125 --lr 0.001 --cuda --batch_size 2048 --mil --num_templates 6 --each_input_size 7 --supervision semi --output_path temp/best_fb15k_semi_sl_ex25/run_$i/ --checkpoint temp/best_fb15k_semi_sl_ex25/run_$i/train_sl/train_sl_r0.125_p1_n-2.0_i4_k0.0_best_checkpoint.pth0 --exclude_t_ids 2 5 --only_eval --pred_file preds.txt --log_eval temp/best_fb15k_semi_sl_ex25/train_sl_eval_ml.csv --val_labels_path ../data/fb15k/test/test_hits_1_ordered_y.txt ;
 done
+
+###### Semi Supervised KL = 0  Multilabel Train DO NOT exclude 2.5 ##########
+
+# train
+for i in {1..5}; do
+    python3 main.py --training_data_path ../logs/fb15k/sm_with_id.data.pkl --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --val_data_path ../logs/fb15k/sm_sup_valid_with_id.pkl --exp_name train_ml --num_epochs 20 --config configs/fb15k_config_90_40.yml --kldiv_lambda 0 --neg_reward -2 --rho 0.125 --lr 0.001 --cuda --batch_size 2048 --mil --num_templates 6 --each_input_size 7 --supervision semi --output_path temp/best_fb15k_semi_ml/run_$i/ --val_labels_path ../logs/fb15k/sm_sup_valid_multilabels.txt --train_labels_path ../logs/fb15k/sm_sup_train_multilabels.txt &
+done
+
+# single label test
+for i in {1..5}; do
+    python3 main.py --training_data_path ../logs/fb15k/sm_with_id.data.pkl --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --val_data_path ../logs/fb15k/test_hits1_single_label_sm.data.pkl.pkl --exp_name test --num_epochs 20 --config configs/fb15k_config_90_40.yml --kldiv_lambda 0 --neg_reward -2 --rho 0.125 --lr 0.001 --cuda --batch_size 2048 --mil --num_templates 6 --each_input_size 7 --supervision semi --output_path temp/best_fb15k_semi_ml/run_$i/ --checkpoint temp/best_fb15k_semi_ml/run_$i/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_best_checkpoint.pth0 --only_eval --pred_file preds.txt --log_eval temp/best_fb15k_semi_ml/train_ml_eval_sl.csv  ;
+done
+
+# mutli label test_hits1_single_label_sm
+for i in {1..5}; do
+    python3 main.py --training_data_path ../logs/fb15k/sm_with_id.data.pkl --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --val_data_path ../logs/fb15k/test_hits1_single_label_sm.data.pkl.pkl --exp_name test --num_epochs 20 --config configs/fb15k_config_90_40.yml --kldiv_lambda 0 --neg_reward -2 --rho 0.125 --lr 0.001 --cuda --batch_size 2048 --mil --num_templates 6 --each_input_size 7 --supervision semi --output_path temp/best_fb15k_semi_ml/run_$i/ --checkpoint temp/best_fb15k_semi_ml/run_$i/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_best_checkpoint.pth0 --only_eval --pred_file preds.txt --log_eval temp/best_fb15k_semi_ml/train_ml_eval_ml.csv --val_labels_path ../data/fb15k/test/test_hits_1_ordered_y.txt ;
+done
+
+
+###### Semi Supervised KL = 0  Single Label Train DO NOT EXCLUDE 2.5##########
+# train
+for i in {1..5}; do
+    python3 main.py --training_data_path ../logs/fb15k/sm_with_id.data.pkl --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --val_data_path ../logs/fb15k/sm_sup_valid_with_id.pkl --exp_name train_sl --num_epochs 20 --config configs/fb15k_config_90_40.yml --kldiv_lambda 0 --neg_reward -2 --rho 0.125 --lr 0.001 --cuda --batch_size 2048 --mil --num_templates 6 --each_input_size 7 --supervision semi --output_path temp/best_fb15k_semi_sl/run_$i/ &
+done
+
+# single label test
+for i in {1..5}; do
+    python3 main.py --training_data_path ../logs/fb15k/sm_with_id.data.pkl --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --val_data_path ../logs/fb15k/test_hits1_single_label_sm.data.pkl.pkl --exp_name test --num_epochs 20 --config configs/fb15k_config_90_40.yml --kldiv_lambda 0 --neg_reward -2 --rho 0.125 --lr 0.001 --cuda --batch_size 2048 --mil --num_templates 6 --each_input_size 7 --supervision semi --output_path temp/best_fb15k_semi_sl/run_$i/ --checkpoint temp/best_fb15k_semi_sl/run_$i/train_sl/train_sl_r0.125_p1_n-2.0_i4_k0.0_best_checkpoint.pth0  --only_eval --pred_file preds.txt --log_eval temp/best_fb15k_semi_sl/train_sl_eval_sl.csv  ;
+done
+
+# mutli label test_hits1_single_label_sm
+for i in {1..5}; do
+    python3 main.py --training_data_path ../logs/fb15k/sm_with_id.data.pkl --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --val_data_path ../logs/fb15k/test_hits1_single_label_sm.data.pkl.pkl --exp_name test --num_epochs 20 --config configs/fb15k_config_90_40.yml --kldiv_lambda 0 --neg_reward -2 --rho 0.125 --lr 0.001 --cuda --batch_size 2048 --mil --num_templates 6 --each_input_size 7 --supervision semi --output_path temp/best_fb15k_semi_sl/run_$i/ --checkpoint temp/best_fb15k_semi_sl/run_$i/train_sl/train_sl_r0.125_p1_n-2.0_i4_k0.0_best_checkpoint.pth0 --only_eval --pred_file preds.txt --log_eval temp/best_fb15k_semi_sl/train_sl_eval_ml.csv --val_labels_path ../data/fb15k/test/test_hits_1_ordered_y.txt ;
+done
+
+
+
 
 
 ############ Unsupervised ###########

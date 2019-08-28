@@ -80,9 +80,9 @@ common_setting_string = '--folds {} --labelled_training_data_path {} --unlabelle
 #config = ['configs/fb15k_config_90_40.yml', 'configs/fb15k_config_7_4.yml'] 
 #kldiv_lambda = [0, 1]
 
-neg_reward = [-1, -2]
-rho = [0.125]
-config = ['configs/fb15k_config_90_40.yml'] 
+neg_reward = [-1, -2, -3]
+rho = [0.05, 0.1, 0.125, 0.5]
+config = ['configs/fb15k_config_90_40.yml', 'configs/fb15k_config_7_4.yml'] 
 kldiv_lambda = [0, 1]
 exclude_t_ids = ['2 5',None]
 
@@ -95,7 +95,7 @@ short_names = ['n','r','k','c','ex']
 name2short = dict(zip(names,short_names))
 
 timing_key = 'config'
-timing = [5]*len(config)
+timing = [10]*len(config)
 #assert(len(globals()[timing_key]) == len(timing))
 assert len(all_params[names.index(timing_key)]) == len(timing),'len of timing should be same as len of timing_key param'
 

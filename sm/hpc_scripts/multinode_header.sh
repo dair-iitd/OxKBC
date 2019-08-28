@@ -6,7 +6,7 @@
 #PBS -m bea
 ### Specify email address to use for notification.
 #PBS -M $USER@iitd.ac.in
-#PBS -l select=3:ngpus=2:ncpus=20${selectos}
+#PBS -l select=3:ngpus=2:ncpus=12${selectos}
 ## SPECIFY JOB NOW
 
 CURTIME=$(date +%Y%m%d%H%M%S)
