@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader, Dataset
 from IPython.core.debugger import Pdb
 import scipy.sparse as sp
 
-DEFAULT_VALUE = -1
+#DEFAULT_VALUE = 0
 
 def get_data_loaders(args):
     #need to change ys to account for args.exclude_t_ids
@@ -21,7 +21,7 @@ def get_data_loaders(args):
                     base_model_file=args.base_model_file,
                     each_input_size=args.each_input_size, 
                     use_ids=args.use_ids, mode='train', 
-                    stats_file_path=stats_file, args = args, labels = 0)
+                    stats_file_path=stats_file, args = args, labels = 0,is_multi_label = None)
                     
     train_loader = DataLoader(train_ds,batch_size=args.batch_size, shuffle=True)
 
@@ -33,7 +33,7 @@ def get_data_loaders(args):
                     use_ids=args.use_ids, mode='eval', 
                     labels_file_path=args.val_labels_path,
                     num_labels = args.num_templates + 1,
-                    stats_file_path=stats_file, args = args, labels = 1)
+                    stats_file_path=stats_file, args = args, labels = 1, is_multi_label = args.eval_ml)
 
         val_loader = DataLoader(val_ds, batch_size=args.batch_size, shuffle=False)
     
@@ -45,7 +45,7 @@ def get_data_loaders(args):
                     each_input_size=args.each_input_size, 
                     use_ids=args.use_ids, mode='train', 
                     labels_file_path = args.train_labels_path,
-                    stats_file_path=stats_file, args = args, labels = 1)
+                    stats_file_path=stats_file, args = args, labels = 1, is_multi_label = args.train_ml)
         train_anot_loader = DataLoader(train_anot_ds, batch_size = args.batch_size, shuffle=True)
 
 
@@ -59,7 +59,7 @@ def get_data_loaders(args):
         raise
 
 
-def change_default_scores(data, start_idx, each_input_size):
+def change_default_scores(data, start_idx, each_input_size, args):
     #my_score, max_score, simi, rank, conditional_rank, mean, std
     #only change : my_score
     #when: when my_score == 0
@@ -71,17 +71,33 @@ def change_default_scores(data, start_idx, each_input_size):
     all_stds  = []
     for i in range(num_templates):
         indx = data[:,SIDX(i)] == 0
-        data[indx,SIDX(i)] = DEFAULT_VALUE
-        data[indx,SIDX(i)+2] = DEFAULT_VALUE
-
-        this_means = data[np.logical_not(indx), SIDX(i): SIDX(i+1)].mean(axis=0).reshape(1,-1)
-        this_stds = data[np.logical_not(indx), SIDX(i): SIDX(i+1)].std(axis=0).reshape(1,-1)
+        data[indx,SIDX(i)] = args.default_value
+        if args.exclude_default == 1:
+            this_means = data[np.logical_not(indx), SIDX(i): SIDX(i+1)].mean(axis=0).reshape(1,-1)
+            this_stds = data[np.logical_not(indx), SIDX(i): SIDX(i+1)].std(axis=0).reshape(1,-1)
+            this_max = data[np.logical_not(indx), SIDX(i): SIDX(i+1)].max(axis=0).reshape(1,-1)
+        else:
+            this_means = data[:, SIDX(i): SIDX(i+1)].mean(axis=0).reshape(1,-1)
+            this_stds = data[:, SIDX(i): SIDX(i+1)].std(axis=0).reshape(1,-1)
+            this_max = data[:, SIDX(i): SIDX(i+1)].max(axis=0).reshape(1,-1)
+        #
         this_means[0,1] = this_means[0,0]
         this_stds[0, 1] = this_stds[0, 0]
-        for j in [3,4]: 
+        for j in [2,4]: 
+        #for j in [3,4]: 
             this_means[0,j] = 0
             this_stds[0,j] = 1
         #
+        this_means[0,3] = 0
+        this_stds[0,3] = this_max[0,3]
+        
+        
+        this_means[0,5] = this_means[0,0]
+        this_stds[0,5] = this_stds[0,0]
+        
+        this_means[0,6] = 0
+        this_stds[0,6] = this_stds[0,0]
+        
         all_means.append(this_means)
         all_stds.append(this_stds)
     #
@@ -89,7 +105,8 @@ def change_default_scores(data, start_idx, each_input_size):
 
 
 class SelectionModuleDataset(torch.utils.data.Dataset):
-    def __init__(self, input_file_path, base_model_file, each_input_size=7, use_ids=False, mode='train', stats_file_path=None, labels_file_path=None, num_labels = 0, args = None, labels = 0):
+    def __init__(self, input_file_path, base_model_file, each_input_size=7, use_ids=False, mode='train', stats_file_path=None, labels_file_path=None, num_labels = 0, args = None, labels = 0,is_multi_label = 1):
+        is_multi_label = ((labels_file_path is not None) and (is_multi_label == 1))
         self.args = args
         self.is_labelled = labels
         if '.txt' in input_file_path:
@@ -110,7 +127,7 @@ class SelectionModuleDataset(torch.utils.data.Dataset):
         self.start_idx = 3
 
         self.raw_data = data.copy()
-        data,self.stats = change_default_scores(data, self.start_idx, each_input_size)
+        data,self.stats = change_default_scores(data, self.start_idx, each_input_size, args)
         #my_score, max_score, simi, rank, conditional_rank, mean, std
         if stats_file_path is None or (not os.path.exists(stats_file_path)):
             pickle.dump(self.stats,
@@ -151,17 +168,26 @@ class SelectionModuleDataset(torch.utils.data.Dataset):
             #    self.data[:, -1][self.data[:,-1] == tid] = 0
 
 
-
         self.Y = None 
+        y_single = []
         if labels_file_path is not None:
+
+            logging.info("Reading Labels from an External file: {}".format(labels_file_path))
             exclude_t_ids_set = set(self.args.exclude_t_ids)
-            logging.info("Multi-label evaluation on. Labels in : {}".format(labels_file_path))
             fh = open(labels_file_path,'r')
             lines = fh.readlines()
             lines = [list(map(int,line.strip().strip(',').split(','))) for line in lines]
             row_idx, col_idx, val_idx = [], [], []
             for i,l_list in enumerate(lines):
                 l_list = [args.o2n[old_tid] for old_tid in l_list]
+                this_y = l_list[0]
+                if this_y == 0:
+                    for temp_y in l_list:
+                        if temp_y != 0:
+                            this_y = temp_y
+                            break
+                #
+                y_single.append(this_y)
                 l_list = set(l_list) # remove duplicates
                 if ((len(l_list) > 1) and (0 in l_list)):
                     l_list.remove(0)
@@ -173,9 +199,14 @@ class SelectionModuleDataset(torch.utils.data.Dataset):
             m = max(row_idx) + 1 
             n = max(col_idx) + 1 
             n = max(n,num_labels - len(self.args.exclude_t_ids))
-            self.Y = sp.csr_matrix((val_idx, (row_idx, col_idx)), shape=(m, n))
+            if is_multi_label:  
+                logging.info("Multi-label evaluation on. Labels in : {}".format(labels_file_path))
+                self.Y = sp.csr_matrix((val_idx, (row_idx, col_idx)), shape=(m, n))
+            else:
+                logging.info("Single -label evaluation. Labels in : {}".format(labels_file_path))
+                self.data[:,-1] = np.array(y_single)
             assert(m == len(self.data))
-
+            #
 
     def __len__(self):
         return len(self.data)

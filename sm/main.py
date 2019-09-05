@@ -178,8 +178,10 @@ if __name__ == '__main__':
                         action='store_true', default=False)
     parser.add_argument('--mil', help='Use MIL model',
                         action='store_true', default=False)
-    parser.add_argument('--exclude_t_ids', nargs='+', type=int, required=False,default=[], help='List of templates to be excluded while making predictions')
- 
+    parser.add_argument('--exclude_t_ids', nargs='*', type=int, required=False,default=[], help='List of templates to be excluded while making predictions')
+    
+    parser.add_argument('--hidden_unit_list', nargs='*', type=int, required=False,default=[], help='number of hidden neurons in each layer')
+
     # Optimizer parameters
     parser.add_argument(
         '--optim', help='type of optimizer to use: sgd or adam', type=str, default='sgd')
@@ -216,6 +218,12 @@ if __name__ == '__main__':
     parser.add_argument('--neg_reward', help='negative reward', default=-1, type=float)
     parser.add_argument('--rho', help='rho ', default=0.125, type=float)
 
+    #multi label train/eval is done when: eval_labels_file is not None and eval_ml = 1. Hence default behaviour is: single label as default value of eval_labels_file is None
+    parser.add_argument('--train_ml',help='should use multi label loss?', default = 1, type=int)
+    parser.add_argument('--eval_ml',help='should eval multi label ?', default = 1, type=int)
+    
+    parser.add_argument('--default_value',help='default value of template score when it is undefined?', default = 0, type=float)
+    parser.add_argument('--exclude_default',help='should default value be excluded while computing stats?', default = 0, type=int)
 
 
     args = parser.parse_args()

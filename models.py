@@ -84,8 +84,10 @@ class TypedDM():
         sim = 1.0
         for i,j in zip(r1_emb, r2_emb):
             sim = sim*np.dot(i,j)
-        #
-        return sim
+        #if(sim>=0):
+        #    return pow(sim,1/3)
+        #return -pow(-sim,1/3)
+        return (sim)
 
     def get_relation_embedding(self,r):
         return [self.dump['rel_real'][r], self.dump['head_rel_type'][r], self.dump['tail_rel_type'][r]]

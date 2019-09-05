@@ -70,14 +70,14 @@ class SelectionModuleMIL(nn.Module):
         x_vec = x[:, self.embed_size:] if self.use_ids else x
         ts = []
         #Pdb().set_trace()
-        for i in range(self.num_templates):
+        for i in range(1,self.num_templates+1):
             if i not in self.args.exclude_t_ids:
                 if self.use_ids:
                     ts.append(self.mlp(torch.cat(
-                        (embeds, x_vec[:, i*self.input_size: (i+1)*self.input_size]), dim=1)))
+                        (embeds, x_vec[:, (i-1)*self.input_size: (i)*self.input_size]), dim=1)))
                 else:
                     ts.append(
-                        self.mlp(x_vec[:, i*self.input_size: (i+1)*self.input_size]))
+                        self.mlp(x_vec[:, (i-1)*self.input_size: (i)*self.input_size]))
 
         if self.use_ids:
             others_score = self.mlp(torch.cat(

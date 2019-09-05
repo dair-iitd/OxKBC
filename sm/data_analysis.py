@@ -83,11 +83,19 @@ def SIDX(template_id):
 def EIDX(template_id):
     return (3 + (template_id-1)*7 + 7)
 
+# for i in val_loader.dataset.raw_data[:,SIDX(6)]:
+# 	print (i)
+# print (val_loader.dataset.raw_data[:,SIDX(2)])
+
+#my_score, max_score, similarity, rank, conditional_rank, mean, std
 for ln, loader in zip(['TRAIN UN','VAL','TRAIN LAB'],[train_loader, val_loader, labelled_train_loader]):
     for i in range(1,7):
         print('{}, Temp: {}, Mean: {}, Max Mean: {}'.format(ln,i,loader.dataset.raw_data[:,SIDX(i)].mean(),loader.dataset.raw_data[:,SIDX(i)+1].mean()))
 
 
+for ln, loader in zip(['TRAIN UN','VAL','TRAIN LAB'],[train_loader, val_loader, labelled_train_loader]):
+    for i in range(1,7):
+        print('{}, Temp: {}, Mean: {}, Max Mean: {}'.format(ln,i,loader.dataset.data[:,SIDX(i)].mean(),loader.dataset.raw_data[:,SIDX(i)+1].mean()))
 
 
 

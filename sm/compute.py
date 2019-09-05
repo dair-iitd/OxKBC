@@ -86,8 +86,12 @@ class Loss(object):
             elif mode == 'train_sup':
                 #template_score = F.softmax(template_score, dim=1)
                 #template_score = template_score * self.weights
+                #multilabel loss
                 if len(y.shape) > 1 and y.shape[1] > 1:
-                    loss = F.binary_cross_entropy_with_logits(template_score, y.float())
+                    logp = F.log_softmax(template_score, dim = 1)
+                    loss = -1.0*((logp*y.float()).sum(dim=1)/y.float().sum(dim=1)).mean()
+                    #loss = -1.0*((logp*y.float()).sum(dim=1)).mean()
+                    #loss = F.binary_cross_entropy_with_logits(template_score, y.float())
                 else:
                     loss = F.cross_entropy(template_score,y)
             else:

@@ -4,8 +4,8 @@ import argparse
 import os
 import pickle
 import numpy as np
-
-
+import utils
+from IPython.core.debugger import Pdb
 def create_dir(dir_path):
     os.makedirs(dir_path, exist_ok=True)
 
@@ -102,45 +102,49 @@ def main(args):
 
     val_log = os.path.join(args.dir, "val")
     test_log = os.path.join(args.dir, "test")
-    os.system("rm -rf "+val_log)
-    os.system("rm -rf "+test_log)
+    #os.system("rm -rf "+val_log)
+    #os.system("rm -rf "+test_log)
+
+    data_root = os.path.abspath(args.labelled_training_data_path)
+    
+    
+    for key in['exclude_t_ids','hidden_unit_list']:
+        args[key] = ' '.join(map(str,args[key]))
+    
+    common_arg_list =  ['val_data_path', 'labelled_training_data_path','exp_name','num_epochs','batch_size','each_input_size','num_templates','config','supervision','kldiv_lambda','label_distribution_file','neg_reward','rho','exclude_t_ids','train_labels_path','val_labels_path','train_ml','eval_ml','hidden_unit_list','exclude_default','default_value']
 
     for i in range(args.folds):
+        print("FOLD: {}".format(i))
         exp_name = "exp_"+str(i)
         directory = os.path.join(args.dir, exp_name)
         create_dir(directory)
 
-        train_data_path = os.path.join(os.path.abspath(
-            args.labelled_training_data_path), "train_"+str(i)+".pkl")
-        val_data_path = os.path.join(os.path.abspath(
-            args.labelled_training_data_path), "val_"+str(i)+".pkl")
-        test_data_path = os.path.join(os.path.abspath(
-            args.labelled_training_data_path), "test_"+str(i)+".pkl")
+        train_data_path = os.path.join(data_root, "train_"+str(i)+".pkl")
+        val_data_path = os.path.join(data_root, "val_"+str(i)+".pkl")
+        test_data_path = os.path.join(data_root, "test_"+str(i)+".pkl")
+
+        train_labels_path  = os.path.join(data_root, "train_label_{}.csv".format(i))
+        val_labels_path  = os.path.join(data_root, "val_label_{}.csv".format(i))
+        test_labels_path  = os.path.join(data_root, "test_label_{}.csv".format(i))
+        
+        args['train_labels_path'] = train_labels_path
+        args['val_labels_path'] = val_labels_path
+
+        args['val_data_path'] = val_data_path
+        args['labelled_training_data_path'] = train_data_path
+        args['exp_name'] = exp_name
 
         if not (os.path.isfile(train_data_path) and os.path.isfile(val_data_path) and os.path.isfile(test_data_path)):
             print("Valid data not present at {}, {}, {}".format(
                 train_data_path, val_data_path, test_data_path))
             exit(0)
 
-        command = args.python_path + " main.py --training_data_path " + \
-            args.unlabelled_training_data_path+" --val_data_path " + \
-            val_data_path+" --exp_name "+exp_name+" "
-        command += "--labelled_training_data_path " + \
-            train_data_path+" --output_path "+args.dir+" "
-        command += "--num_epochs "+str(args.num_epochs)+" --batch_size "+str(
-            args.batch_size)+" --each_input_size "+str(args.each_input_size)+" "
-        command += "--num_templates " + \
-            str(args.num_templates)+" --mil --config "+args.config+" --cuda "
-        command += "--supervision "+args.supervision+" "
-        if(args.kldiv_lambda != 0 and args.label_distribution_file != ''):
-            command += "--kldiv_lambda "+str(args.kldiv_lambda) +" --label_distribution_file "+args.label_distribution_file + " "
-
-        command += ' --neg_reward ' + str(args.neg_reward) + ' --rho ' + str(args.rho) 
-        if args.exclude_t_ids is not None:
-            command += ' --exclude_t_ids ' + ' '.join(map(str,args.exclude_t_ids)) + " "
-
-
-        print(command)
+        command = args.python_path + " main.py --training_data_path " + args.unlabelled_training_data_path + " "
+        command += "--output_path " + str(args.dir) + " --mil --cuda "
+        for key in common_arg_list:
+            command += ' --{} {}'.format(key,args[key])
+            
+        print('TRAIN: {}'.format(command))
         # continue
         os.system(command)
 
@@ -152,48 +156,40 @@ def main(args):
         if filename is None:
             continue
 
-        checkpoint_path = os.path.join(directory, filename)
-        command = args.python_path +  " main.py --training_data_path " + \
-            args.unlabelled_training_data_path+" --val_data_path " + \
-            val_data_path+" --exp_name "+exp_name+" "
-        command += "--labelled_training_data_path " + \
-            train_data_path+" --output_path "+args.dir+" "
-        command += "--num_epochs "+str(args.num_epochs)+" --batch_size "+str(
-            args.batch_size)+" --each_input_size "+str(args.each_input_size)+" "
-        command += "--num_templates " + \
-            str(args.num_templates)+" --mil --config "+args.config+" --cuda "
-        command += "--supervision "+args.supervision + " "
-        if(args.kldiv_lambda != 0 and args.label_distribution_file != ''):
-            command += "--kldiv_lambda "+str(args.kldiv_lambda) +" --label_distribution_file "+args.label_distribution_file + " "
-        command += "--only_eval --log_eval "+val_log+" --checkpoint "+checkpoint_path
-        command += ' --neg_reward ' + str(args.neg_reward) + ' --rho ' + str(args.rho) 
-        if args.exclude_t_ids is not None:
-            command += ' --exclude_t_ids ' + ' '.join(map(str,args.exclude_t_ids)) + " "
-        command += " --pred_file valid_preds.txt"
-        print(command)
+        checkpoint_path = os.path.join(directory, str(filename))
+       
+        for eval_ml in [0,1]:
+            this_val_log = '{}_ml_{}'.format(val_log ,eval_ml)
+            this_pred_file = 'val_pred_ml_{}.txt'.format(eval_ml)
+            command = args.python_path + " main.py --training_data_path " + args.unlabelled_training_data_path + " "
+            command += "--output_path " + str(args.dir) + " --mil --cuda "
+            command += "--only_eval --log_eval "+this_val_log+" --checkpoint "+checkpoint_path
+            command += " --pred_file "+this_pred_file
+            command += " --train_ml {} --eval_ml {}".format(eval_ml, eval_ml)
 
-        os.system(command)
+            for key in common_arg_list:
+                command += ' --{} {}'.format(key,args[key])
+        
+            print('VAL ML: {} {} '.format(eval_ml, command))
+            os.system(command)
 
-        command = args.python_path + " main.py --training_data_path " + \
-            args.unlabelled_training_data_path+" --val_data_path " + \
-            test_data_path+" --exp_name "+exp_name+" "
-        command += "--labelled_training_data_path " + \
-            train_data_path+" --output_path "+args.dir+" "
-        command += "--num_epochs "+str(args.num_epochs)+" --batch_size "+str(
-            args.batch_size)+" --each_input_size "+str(args.each_input_size)+" "
-        command += "--num_templates " + \
-            str(args.num_templates)+" --mil --config "+args.config+" --cuda "
-        command += "--supervision "+args.supervision+" "
-        if(args.kldiv_lambda != 0 and args.label_distribution_file != ''):
-            command += "--kldiv_lambda "+str(args.kldiv_lambda) +" --label_distribution_file "+args.label_distribution_file + " "
-        command += "--only_eval --log_eval "+test_log+" --checkpoint "+checkpoint_path
-        command += ' --neg_reward ' + str(args.neg_reward) + ' --rho ' + str(args.rho) 
-        if args.exclude_t_ids is not None:
-            command += ' --exclude_t_ids ' + ' '.join(map(str,args.exclude_t_ids)) + " "
-        command += " --pred_file test_preds.txt"
-        print(command)
+        args['val_data_path'] = test_data_path
+        args['val_labels_path'] = test_labels_path 
+        for eval_ml in [0,1]:
+            this_val_log = '{}_ml_{}'.format(test_log ,eval_ml)
+            this_pred_file = 'test_pred_ml_{}.txt'.format(eval_ml)
+            command = args.python_path + " main.py --training_data_path " + args.unlabelled_training_data_path + " "
+            command += "--output_path " + str(args.dir) + " --mil --cuda "
+            command += "--only_eval --log_eval "+this_val_log+" --checkpoint "+checkpoint_path
+            command += " --pred_file "+this_pred_file
+            command += " --train_ml {} --eval_ml {}".format(eval_ml, eval_ml)
 
-        os.system(command)
+            for key in common_arg_list:
+                command += ' --{} {}'.format(key,args[key])
+        
+            print('TEST ML: {} {} '.format(eval_ml, command))
+            os.system(command)
+
 
 
 if __name__ == '__main__':
@@ -236,7 +232,6 @@ if __name__ == '__main__':
     parser.add_argument('--label_distribution_file', help='KL Divergence distribution file', type=str, default='')
     parser.add_argument('--neg_reward', help='negative reward', default=-1, type=float)
     parser.add_argument('--rho', help='rho ', default=0.0125, type=float)
-    parser.add_argument('--multilabel', help='should do multilabel training ? ', default=0, type=int)
 
 
     parser.add_argument('--gen_data', help='Just Generate Data and exit',
@@ -246,8 +241,22 @@ if __name__ == '__main__':
         '--train_labels_path', help="Input Training data Labels path for multi-label training", type=str, default=None)
 
     parser.add_argument('--seed',help='seed to be used before shuffling', type=int, default = 42)
-    #parser.add_argument('--exclude_t_ids', type= str, default = None, help='List of templates to be excluded while making predictions')
-    parser.add_argument('--exclude_t_ids', nargs='+', type=int, required=False,default=None, help='List of templates to be excluded while making predictions')
-    args = parser.parse_args()
+    #parser.add_argument('--exclude_t_ids', type= str, default = '', help='List of templates to be excluded while making predictions')
+    parser.add_argument('--exclude_t_ids', nargs='*', type=int, required=False,default=[], help='List of templates to be excluded while making predictions')
+    
+    parser.add_argument('--default_value',help='default value of template score when it is undefined?', default = 0, type=float)
+    parser.add_argument('--exclude_default',help='should default value be excluded while computing stats?', default = 0, type=int)
 
+    parser.add_argument('--train_ml',help='should use multi label loss?', default = 1, type=int)
+    parser.add_argument('--eval_ml',help='should eval multi label ?', default = 1, type=int)
+ 
+    parser.add_argument('--hidden_unit_list', nargs='*', type=int, required=False,default=[], help='number of hidden neurons in each layer')
+    
+    
+    
+    args = parser.parse_args()
+    config = {}
+    config.update(vars(args))
+    args = utils.Map(config)
+    print(args)
     main(args)

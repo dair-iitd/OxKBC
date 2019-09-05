@@ -1,16 +1,4 @@
-"""
-This script is a modified version of cross_val_grid_search.py (21/08/2019)
-To support the updated: <YATIN_SCRIPT_FOR_TRAINING>
-New Directory structure assumed:
-	cross_val_base:
-				fb15k:
-					supervision_type:	(assumed this point is given in input)
-									run1:
-										exp_NR_rho_KL_arch:
-														exp_1(for folds)
-This generates a similar summary.csv for every (KL, arch) pair
-summary.csv: tables for rho, NR for each DATA_PREFIX and AGG_METRIC
-"""
+
 import os
 import pandas as pd
 import pprint
@@ -82,6 +70,69 @@ def get_string(x):
 
 
 def get_params():
+    return get_params2()
+
+def get_params2():
+    #COPIED FROM CREATE_MULTINODE_JOBS.PY
+    neg_reward = [-1, -2]
+    rho = [0.1, 0.125]
+    config = ['configs/fb15k_config.yml'] 
+    kldiv_lambda = [0, 1]
+    exclude_t_ids = ['2 5']
+    hidden_unit_list = ['90 40','7 5 5 3']
+    default_value = [0, -0.05, -0.1]
+    #
+    names = ['neg_reward','rho','kldiv_lambda','config','exclude_t_ids','hidden_unit_list','default_value']
+    all_params = [neg_reward,rho, kldiv_lambda, config,exclude_t_ids,hidden_unit_list,default_value]
+    short_names = ['n','r','k','c','ex','hul','df']
+    
+    assert len(names) == len(all_params)
+    assert len(all_params) == len(short_names)
+    
+    timing_key = 'hidden_unit_list'
+    timing = [10]*len(hidden_unit_list)
+    #assert(len(globals()[timing_key]) == len(timing))
+    assert len(all_params[names.index(timing_key)]) == len(timing),'len of timing should be same as len of timing_key param'
+    timing_dict = dict(zip(all_params[names.index(timing_key)],timing))
+    all_jobs = list(itertools.product(*all_params))
+    
+    additional_names = ['train_ml','eval_ml']
+    additional_job_list = [
+                    [0,0],
+                    [1,1]
+                    ]
+    
+    names = names + additional_names
+    additional_short_names = ['tml','eml']
+    short_names = short_names + additional_short_names
+    assert len(names) == len(short_names)
+    name2short = dict(zip(names,short_names))
+    all_jobs = list(itertools.product(all_jobs,additional_job_list))
+    sorted_names = copy.deepcopy(names)
+    sorted_names.sort()
+
+
+    #### WRITTEN AGAIN with MODIFICATION
+    for i,key in enumerate(additional_names):
+        all_params.append([x[i] for x in additional_job_list])
+    #
+    name2list = dict(zip(names,all_params))
+    for key in sorted_names:
+        name2list[key] = [ get_string(x) for x in name2list[key]]
+    
+    all_settings = {}
+    for i, setting in enumerate(all_jobs):
+        setting = list(itertools.chain(*setting))
+        name_setting = {n: get_string(s) for n, s in zip(names, setting)}
+        log_str = '_'.join(['%s-%s' % (name2short[n], name_setting[n]) for n in sorted_names])
+        all_settings[log_str] = name_setting 
+    #return all_settings, name2list, high level params, rows_cols
+    return all_settings, name2list,['config','exclude_t_ids','kldiv_lambda','train_ml','eval_ml','default_value','hidden_unit_list'],['rho','neg_reward']
+
+
+
+def get_params1():
+    #COPY FROM CREATE_MULTINODE_JOBS.PY
     neg_reward = [-1, -2]
     rho = [0.125]
     config = ['configs/fb15k_config_90_40.yml'] 
@@ -112,16 +163,32 @@ def get_params():
     return all_settings, name2list,['config','kldiv_lambda','rho'],['exclude_t_ids','neg_reward']
 
 
-
 def check_exp(directory, data, folds):
+    return check_exp2(directory, data, folds)
+    
+def check_exp2(directory, data, folds):
+    for el in DATA_PREFIX[1:]:
+        preds_fname = os.path.join(
+                directory, '{}_ml_{}'.format(el,args.eval_ml))
+        
+        if os.path.isfile(preds_fname):
+            return True
+        else:
+            logging.error("File {} does not exist".format(preds_fname))
+            return False
+    return True
+
+
+
+def check_exp1(directory, data, folds):
     for i in range(folds):
         for el in DATA_PREFIX[1:]:
             if el == 'val':
                 preds_fname = os.path.join(
-                    directory, 'exp_'+str(i), 'valid_preds.txt')
+                    directory, 'exp_'+str(i), 'val_pred_ml_{}.txt'.format(args.eval_ml))
             else:
                 preds_fname = os.path.join(
-                    directory, 'exp_'+str(i), 'test_preds.txt')
+                    directory, 'exp_'+str(i), 'test_pred_ml_{}.txt'.format(args.eval_ml))
             if os.path.isfile(preds_fname):
                 pred_data = np.loadtxt(preds_fname).tolist()
                 if len(data[el][i]) != len(pred_data):
@@ -169,7 +236,31 @@ def write_invalid(invalid_exps, fname):
         logging.error("Written invalid experiments to {}".format(fname))
 
 
+
 def calc_exp(directory, data, folds):
+    return calc_exp_read(directory, data,folds)
+
+
+def calc_exp_read(directory, data, folds):
+    #directory/test_ml_0
+    #directory/test_ml_1
+    #directory/val_ml_0
+    #directory/val_ml_1
+    rv = []
+    count = []
+    for el in DATA_PREFIX[1:]:
+        fname = os.path.join(directory, '{}_ml_{}'.format(el, args.eval_ml))
+        f = pd.read_csv(fname,header=None).to_numpy()
+        #assert f.shape[0] == 5
+        if f.shape[0] != folds:
+            print("Num folds: {}. #folds present: {}. ASSUMING 0 performance for them".format(folds, f.shape[0]))
+        rv.append(f[:,-1].sum()/folds)
+        count.append(f.shape[0])
+    #
+    return (rv[0], rv[1], count[0], count[1])
+
+
+def calc_exp_compute(directory, data, folds):
     predictions = {'val': [], 'test': []}
     true = {'val': [], 'test': []}
     logging.info("Calculating results for experiment {}".format(directory))
@@ -187,8 +278,6 @@ def calc_exp(directory, data, folds):
     mif_val = metrics.f1_score(true['val'], predictions['val'], labels = args.t_ids, average='micro')
     mif_test = metrics.f1_score(true['test'], predictions['test'], labels= args.t_ids, average='micro')
     return (mif_val, mif_test)
-
-
 
 
 
@@ -217,7 +306,7 @@ def calc_run_results(directory, all_settings, name2list, data, folds):
     for key in all_settings:
         this_setting = all_settings[key]
         exp_directory = os.path.join(directory,'exp_'+key)
-        val, test = calc_exp(exp_directory, data, folds)
+        val, test,val_count, test_count = calc_exp(exp_directory, data, folds)
         if results_one_run is None:
             results_one_run = {}
             param_keys = list(this_setting.keys())
@@ -226,12 +315,17 @@ def calc_run_results(directory, all_settings, name2list, data, folds):
             #
             results_one_run['val'] = [val]
             results_one_run['test'] = [test]
+            results_one_run['val_count'] = [val_count]
+            results_one_run['test_count'] = [test_count]
+
         else:
             for this_param in this_setting:
                 results_one_run[this_param].append(this_setting[this_param])
             #
             results_one_run['val'].append(val)
             results_one_run['test'].append(test)
+            results_one_run['val_count'].append(val_count)
+            results_one_run['test_count'].append(test_count)
     df = pd.DataFrame(data=results_one_run)
     return df, param_keys
 
@@ -250,6 +344,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '-d', '--dir', help="Path of the base directory", required=True)
     parser.add_argument('--folds', type=int, default=5, required=True)
+    parser.add_argument('--eval_ml', type=int, default=0, required=True, help='collate results of multi label evaluation?' )
     parser.add_argument('--runs', type=int, default=5, required=True)
     parser.add_argument(
         '--ifile', help='File to write the experiment names which failed', type=str, default=None)
@@ -280,11 +375,13 @@ if __name__ == "__main__":
 
     final_result = pd.concat(all_run_results)
     final_result = final_result.reset_index(drop=True) 
-    agg_table = final_result.groupby(param_keys).agg({DATA_PREFIX[1]:AGG_METRIC, DATA_PREFIX[2]: AGG_METRIC})
-    agg_table.columns = [d+"_"+a for d,
-                         a in itertools.product(DATA_PREFIX[1:], AGG_METRIC)]
+    agg_table = final_result.groupby(param_keys).agg({DATA_PREFIX[1]:AGG_METRIC, DATA_PREFIX[2]: AGG_METRIC, DATA_PREFIX[1]+'_count': 'sum', DATA_PREFIX[2]+'_count': 'sum'})
+    #agg_table.columns = [d+"_"+a for d,
+    #                     a in itertools.product(DATA_PREFIX[1:], AGG_METRIC)]
+    
+    agg_table.columns = ['_'.join(x) for x in agg_table.columns.to_flat_index()]
     agg_table = agg_table.reset_index()
-
+    agg_table.to_csv(os.path.join(args.dir, 'all_performance.csv'))
     fh = open(os.path.join(args.dir, 'summary.csv'), 'w')
 
     for this_param in itertools.product(*([name2list[x] for x in exp_classes] + [DATA_PREFIX[1:], AGG_METRIC])):

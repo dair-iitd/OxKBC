@@ -37,7 +37,7 @@ parser.add_argument('-num_seq',default = 1,type=int, help='how many blocks in se
 args = parser.parse_args(sys.argv[1:])
 
 working_dir = os.path.dirname(os.path.join(os.getcwd(),args.task_script))
-ack_dir = os.path.join(os.getcwd(),args.jobs_dir)
+ack_dir = os.path.join(os.getenv('PWD'),args.jobs_dir)
 
 
 ######################
@@ -61,18 +61,17 @@ def get_log_file_path(log_str, this_settings, base_logs,run_id):
     #
     return os.path.join(run_dir,'_LOGS')
 
-num_runs = 5
+num_runs = 3
 folds=5
 dataset='fb15k'
 supervision="semi"
 unlabelled_training_data_path='../logs/{}/sm_with_id.data.pkl'.format(dataset)
-labelled_training_data_path='../logs/{}/exp_words/sm_valid_with_id.data.pkl'.format(dataset)
 kldiv_dist_file='../data/{}/labelled_train/label_distribution_y6.yml'.format(dataset)
 base_model_file='../dumps/{}_distmult_dump_norm.pkl'.format(dataset)
-
+exclude_default = 1
 base_logs = 'cross_val/{}/{}'.format(dataset,supervision)
 
-common_setting_string = '--folds {} --labelled_training_data_path {} --unlabelled_training_data_path {} --num_epochs 20 --batch_size 2048 --num_templates 6 --each_input_size 7 --supervision {} --label_distribution_file {}'.format(folds, base_logs, unlabelled_training_data_path, supervision, kldiv_dist_file)  
+common_setting_string = '--folds {} --labelled_training_data_path {} --unlabelled_training_data_path {} --num_epochs 20 --batch_size 2048 --num_templates 6 --each_input_size 7 --supervision {} --label_distribution_file {} --exclude_default {}'.format(folds, base_logs, unlabelled_training_data_path, supervision, kldiv_dist_file, exclude_default)  
 
 
 #neg_reward = [-0.5, -1, -2]
@@ -80,24 +79,53 @@ common_setting_string = '--folds {} --labelled_training_data_path {} --unlabelle
 #config = ['configs/fb15k_config_90_40.yml', 'configs/fb15k_config_7_4.yml'] 
 #kldiv_lambda = [0, 1]
 
-neg_reward = [-1, -2, -3]
-rho = [0.05, 0.1, 0.125, 0.5]
-config = ['configs/fb15k_config_90_40.yml', 'configs/fb15k_config_7_4.yml'] 
+neg_reward = [-1, -2]
+rho = [0.1, 0.125]
+config = ['configs/fb15k_config.yml'] 
 kldiv_lambda = [0, 1]
-exclude_t_ids = ['2 5',None]
-
+exclude_t_ids = ['2 5']
+hidden_unit_list = ['90 40','7 5 5 3']
+default_value = [0, -0.05, -0.1]
 #
 
-names = ['neg_reward','rho','kldiv_lambda','config','exclude_t_ids']
-all_params = [neg_reward,rho, kldiv_lambda, config,exclude_t_ids]
-short_names = ['n','r','k','c','ex']
+names = ['neg_reward','rho','kldiv_lambda','config','exclude_t_ids','hidden_unit_list','default_value']
+all_params = [neg_reward,rho, kldiv_lambda, config,exclude_t_ids,hidden_unit_list,default_value]
+short_names = ['n','r','k','c','ex','hul','df']
 
-name2short = dict(zip(names,short_names))
+assert len(names) == len(all_params)
+assert len(all_params) == len(short_names)
 
-timing_key = 'config'
-timing = [10]*len(config)
+timing_key = 'hidden_unit_list'
+timing = [10]*len(hidden_unit_list)
 #assert(len(globals()[timing_key]) == len(timing))
 assert len(all_params[names.index(timing_key)]) == len(timing),'len of timing should be same as len of timing_key param'
+timing_dict = dict(zip(all_params[names.index(timing_key)],timing))
+all_jobs = list(itertools.product(*all_params))
+
+additional_names = ['train_ml','eval_ml']
+additional_job_list = [
+                [0,0],
+                [1,1]
+                ]
+
+names = names + additional_names
+additional_short_names = ['tml','eml']
+short_names = short_names + additional_short_names
+
+
+assert len(names) == len(short_names)
+
+
+name2short = dict(zip(names,short_names))
+all_jobs = list(itertools.product(all_jobs,additional_job_list))
+sorted_names = copy.deepcopy(names)
+sorted_names.sort()
+
+jobs_list = {}
+sorted_names = copy.deepcopy(names)
+all_settings = {}
+sorted_names.sort()
+job_name_to_time = {}
 
 ################################
 
@@ -124,32 +152,8 @@ multi_run_script = multi_run_script.replace('${exp_dir}',ack_dir)
 hpcpy  = '$HOME/anaconda3/bin/python'
 base_cmd = '{} {} {}'.format(hpcpy, os.path.join(os.getcwd(),args.task_script), common_setting_string) 
 
-timing_dict = dict(zip(all_params[names.index(timing_key)],timing))
-all_jobs = list(itertools.product(*all_params))
-
-
-"""
-additional_names = ['train_labels_path','val_labels_path']
-additional_job_list = [
-                ['',''],
-                [None,None]
-                ]
-
-names = names + additional_names
-short_names = short_names + additional_short_names
-
-all_jobs = list(itertools.product(jobs,additional_job_list))
-sorted_names = copy.deepcopy(names)
-sorted_names.sort()
-"""
-
-jobs_list = {}
-sorted_names = copy.deepcopy(names)
-all_settings = {}
-sorted_names.sort()
-job_name_to_time = {}
 for i, setting in enumerate(all_jobs):
-    setting = list(setting)
+    setting = list(itertools.chain(*setting))
     name_setting = {n: s for n, s in zip(names, setting)}
     setting_list = ['--%s %s' % (name, str(value)) for name, value in name_setting.items() if value is not None]
     setting_str = ' '.join(setting_list)
