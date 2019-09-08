@@ -119,7 +119,7 @@ We had two experiments on Amazon Mechanical Turk.
 We have an html file `turk_template.html` which is the form, which turkers have to fill. We need to generate a csv file containing information of HITs according to this HTML file. To do this use:
 
 ```
-python3 get_turk_data.py -d fb15k -w dumps/fb15k_distmult_dump_norm.pkl -l logs/fb15k/ -o logs/fb15k/turk_better/ -tf ./data/fb15k/test/test_hits1_x.txt -tp logs/sm/test_semi/preds.txt -rp [rule pred file] --data_repo_root ./data --num 5
+python3 get_turk_data.py -d fb15k -w dumps/fb15k_distmult_dump_norm.pkl -l logs/fb15k/ -o logs/fb15k/turk_better/ -tf ./data/fb15k/turk/test_hits1.txt -tp logs/sm/test_semi/preds.txt -rp [rule pred file] --data_repo_root ./data --num 5
 ```
 It will generate a book file (which is a html file for easy viewing) and a `logs/fb15k/turk_better/turk_better_hits.csv` which is to be uploaded while creating a batch.
 
@@ -138,7 +138,7 @@ It then generates an analysis html file (`logs/fb15k/turk_better/results_analysi
 We have an html file `turk_useful_template.html` which is the form, which turkers have to fill. We need to generate a csv file containing information of HITs according to this HTML file. To do this use:
 
 ```
-python3 get_turk_useful_data.py -d fb15k -w dumps/fb15k_distmult_dump_norm.pkl -l logs/fb15k/ -o logs/fb15k/turk_useful/ -tf ./data/fb15k/test/test_hits1_x.txt -tp logs/sm/test_semi/preds.txt --data_repo_root ./data --num 5
+python3 get_turk_useful_data.py -d fb15k -w dumps/fb15k_distmult_dump_norm.pkl -l logs/fb15k/ -o logs/fb15k/turk_useful/ -tf ./data/fb15k/turk/test_hits1.txt -tp logs/sm/test_semi/preds.txt --data_repo_root ./data --num 5
 ```
 
 Essentially it generates a book file (which is a html file for easy viewing) and a `logs/fb15k/turk_useful/turk_useful_exps_hits.csv` and `logs/fb15k/turk_useful/turk_useful_no_exps_hits.csv`.
