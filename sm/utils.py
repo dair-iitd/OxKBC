@@ -13,6 +13,28 @@ LOG_FILE = 'log.txt'
 _LOG_LEVEL_STRINGS = ['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG']
 EPSILON = 0.0000001
 
+def clean_label_list(ylist):
+    #remove duplicates without changing order
+    #remove intermittent zeros. We cant have 0 with others
+    #remove zeros
+    ylist = [x for x in ylist if x != 0]
+    if len(ylist) == 0:
+        return [0]
+    else:
+        #return duplicates
+        already_added = set()
+        ry = []
+        for y in ylist:
+            if y not in already_added:
+                ry.append(y)
+                already_added.add(y)
+
+        return ry
+
+
+
+
+
 def read_multilabel(filename, num_labels = 0): 
     lines = []
     with open(filename) as fh: 

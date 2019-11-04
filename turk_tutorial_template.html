@@ -1,0 +1,850 @@
+<script src="https://assets.crowd.aws/crowd-html-elements.js"></script>
+<section class="container" id="WebsiteDataCollection">
+    <div class="row">
+		<div class="col-xs-12 col-md-12">
+			<div style="background-color:#f5f5f5" class="panel panel-primary">
+				<!-- WARNING: the ids "collapseTrigger" and "instructionBody" are being used to enable expand/collapse feature --><a
+				 class="panel-heading" href="javascript:void(0);" id="collapseTrigger"><strong>Instructions</strong> <span class="collapse-text">(Click to collapse)</span> </a>
+				<div class="panel-body" id="instructionBody">
+					<p> <b>OBJECTIVE: </b> 
+						Which of the two explanations is better for explaining the given prediction?
+						<br>
+					</p>
+					<p>
+						<b>DETAILED INSTRUCTIONS: </b>
+						<p>Our Artificial Intelligence (AI) based Question Answering (QA) system predicts an answer to questions of type:
+						<br><span style="color:#428BCA"><b>Entity e1</b></span> is related via <span style="color:green"><b>relation r</b></span> to an entity _____?
+						<br>Or simply (<span style="color:#428BCA"><b>e1</b></span>, <span style="color:green"><b>r</b></span>, ? )</p> 
+						
+						For example, <b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Kate_Moss">Kate Moss</a></font> <font color="green">has profession</font></b> _____?
+						<br>Answer: <b><a target="_blank" href="https://en.wikipedia.org/wiki/Model_(people)">Model</a></font></b>
+			            <!-- For example, <b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Kate_Moss">Kate Moss</a></font> <font color="green">has profession</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Model_(people)">Model</a></font>)</b>. -->
+			            <br>This would be followed by two plausible explanations, which may not always imply the prediction, but they may increase our confidence about it. 
+			            For example, two explanations for the above prediction can be: 
+		          	  <ol>
+			                <li>
+			                	<b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Kate_Moss">Kate Moss</a></font> <font color="green">has profession</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Actor">Actor</a></font></b> and <b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Actor">Actor</a></font> <font color="green"> is profession of</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Brigitte_Nielsen">Brigitte Nielsen</a></font></b> and <b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Brigitte_Nielsen">Brigitte Nielsen</a></font> <font color="green">has profession</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Model_(people)">Model</a></font></b>
+			                </li>    
+			                <li>
+			                	<b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Keira_Knightley">Keira Knightley</a></font> <font color="green">has profession</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Model_(people)">Model</a></font></b> and <b><font color="blue">"<a target="_blank" href="https://en.wikipedia.org/wiki/Kate_Moss">Kate Moss</a>"</font></b> is <div class="tooltip">similar <span class="tooltiptext"><a target="_blank" href="https://en.wikipedia.org/wiki/Kate_Moss">Kate Moss</a> and <a target="_blank" href="https://en.wikipedia.org/wiki/Keira_Knightley">Keira Knightley</a> has nationality of (<a target="_blank" href="https://en.wikipedia.org/wiki/England">England</a> )<br><a target="_blank" href="https://en.wikipedia.org/wiki/Kate_Moss">Kate Moss</a> and <a target="_blank" href="https://en.wikipedia.org/wiki/Keira_Knightley">Keira Knightley</a> has profession (<a target="_blank" href="https://en.wikipedia.org/wiki/Actor">Actor</a> )<br><a target="_blank" href="https://en.wikipedia.org/wiki/Kate_Moss">Kate Moss</a> and <a target="_blank" href="https://en.wikipedia.org/wiki/Keira_Knightley">Keira Knightley</a> has lived in (<a target="_blank" href="https://en.wikipedia.org/wiki/London">London</a> )<br><a target="_blank" href="https://en.wikipedia.org/wiki/Kate_Moss">Kate Moss</a> and <a target="_blank" href="https://en.wikipedia.org/wiki/Keira_Knightley">Keira Knightley</a> celebrity participant (<a target="_blank" href="https://en.wikipedia.org/wiki/Lily_Allen">Lily Allen</a> )<br><br>(<a target="_blank" href="https://en.wikipedia.org/wiki/Model_(people)">Model</a> )  people_with_this_profession  <a target="_blank" href="https://en.wikipedia.org/wiki/Kate_Moss">Kate Moss</a> and <a target="_blank" href="https://en.wikipedia.org/wiki/Keira_Knightley">Keira Knightley</a><br>(<a target="_blank" href="https://en.wikipedia.org/wiki/Lily_Allen">Lily Allen</a> ) celebrity participant  <a target="_blank" href="https://en.wikipedia.org/wiki/Kate_Moss">Kate Moss</a> and <a target="_blank" href="https://en.wikipedia.org/wiki/Keira_Knightley">Keira Knightley</a><br><br></span></div> to <b><font color="blue">"<a target="_blank" href="https://en.wikipedia.org/wiki/Keira_Knightley">Keira Knightley</a>"</font></b>
+			                </li>
+			            </ol>
+			              
+			            Your job is to select which of the two explanations is better.
+			            <br> <b>In case only one explanation is generated</b>, you need to choose whether it is more helpful than having no explanation or not. 
+			            </p>
+			            
+			          <p>
+			              Please note the following -
+			              <ol>
+			                <li><b><a href="https://en.wikipedia.org/">Hyperlinks</a></span></b> on the objects would take you to the corresponding wiki page if it exists, otherwise, you will land on Wikipedia home page.</li>
+			                <li>Whenever an explanation has some bordered text like, <div class="tooltip">similar <span class="tooltiptext"><a target="_blank" href="https://en.wikipedia.org/wiki/Kansas_City_Royals">Kansas City Royals</a> and <a target="_blank" href="https://en.wikipedia.org/wiki/Baltimore_Orioles">Baltimore Orioles</a> baseball_team position (<a target="_blank" href="https://en.wikipedia.org/wiki/Center_fielder">Center fielder</a> , <a target="_blank" href="https://en.wikipedia.org/wiki/Center_fielder">Center fielder</a> and <div class="tooltip2">9 more...<span class="tooltiptext2"><a target="_blank" href="https://en.wikipedia.org/wiki/Shortstop">Shortstop</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Infielder">Infielder</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/First_baseman">First baseman</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/First_baseman">First baseman</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Catcher">Catcher</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Catcher">Catcher</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Pitcher">Pitcher</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Pitcher">Pitcher</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Outfielder">Outfielder</a><br></span></div></span></div>, you can hover over it to see additional supporting facts.</li>
+			                <li>Sometimes you might see an <b>empty list</b> on hovering, in which case system has no supporting facts to specify.</li>
+			                <li>There might be some relations in our Knowledge Base that have exactly the same meaning. For example <font color="green"> has genre </font> and <font color="green"> netflix title has genre </font></li>
+			              </ol>
+			                
+			          </p>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<b>NOTE</b>: This is a small <b>tutorial-cum-test</b> for the main HIT. You can practise the tutorial as many time as you want <b>without any penalty</b> before proceeding to the test. Passing the test successfully gives you the qualification required to attempt our <b>high-paying HITs</b>. 
+	<br>You only need to pass this tutorial once.  
+	<!-- <br><b>PLEASE RETURN IF YOU DO NOT WISH TO TAKE THE TEST, DO NOT SUBMIT. </b> -->
+	<br>
+	<br>
+	<span id="tutorial">
+	<p>Let us begin by giving you 6 questions as tutorial. Please select the best answer according to you and then we'll explain why are they correct or incorrect.</p>
+	<p>Tutorial question <span id="current_question"></span>/6</p>
+	<div style="display: block" id="tut0" class="withmargin">
+        <div>
+            <br><b>Question: </b><b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Desperate_Housewives">Desperate Housewives</a></font> <font color="green">was nominated for</font></b>  ______ ?
+            <br><b>Answer: </b><b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Primetime_Emmy_Award_for_Outstanding_Comedy_Series">Primetime Emmy Award for Outstanding Comedy Series</a></font></b>
+            <!-- <b>Question: </b> <b>(<font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Figure_skating">Figure skating</a></font>, <font color="green">is contested sport of</font>, <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/1952_Winter_Olympics">1952 Winter Olympics</a></font>)</b> -->
+            <br><b>Explanation A: </b><b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Desperate_Housewives">Desperate Housewives</a></font> <font color="green">is an award nominating work of</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Marc_Cherry">Marc Cherry</a></font></b> and <b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Marc_Cherry">Marc Cherry</a></font> <font color="green">was nominated for</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Primetime_Emmy_Award_for_Outstanding_Comedy_Series">Primetime Emmy Award for Outstanding Comedy Series</a></font></b>
+
+
+            <!-- <br><b>Explanation A: </b><b>(<font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Figure_skating">Figure skating</a></font>, <font color="green">was a sport played at</font>, <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/1952_Winter_Olympics">1952 Winter Olympics</a></font>)</b> -->
+            <br><b>Explanation B: </b><b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Desperate_Housewives">Desperate Housewives</a></font> <font color="green">has regular appearance of</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Lyndsy_Fonseca">Lyndsy Fonseca</a></font></b> and <b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Lyndsy_Fonseca">Lyndsy Fonseca</a></font> <font color="green">has regular appearance in</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/How_I_Met_Your_Mother">How I Met Your Mother</a></font></b> and <b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/How_I_Met_Your_Mother">How I Met Your Mother</a></font> <font color="green">was nominated for</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Primetime_Emmy_Award_for_Outstanding_Comedy_Series">Primetime Emmy Award for Outstanding Comedy Series</a></font></b>
+
+            <!-- <br><b>Explanation B: </b><b>(<font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Figure_skating">Figure skating</a></font>, <font color="green">is contested sport of</font>, <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/1976_Winter_Olympics">1976 Winter Olympics</a></font>)</b> and <b>(<font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/1976_Winter_Olympics">1976 Winter Olympics</a></font>, <font color="green"> participating_countries</font>, <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/United_States">United States of America</a></font>)</b> and <b>(<font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/United_States">United States of America</a></font>, <font color="green">has won medals at</font>, <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/1952_Winter_Olympics">1952 Winter Olympics</a></font>)</b> -->
+        </div>
+        <div>
+            <input type="radio" name="tut0" id="tut_0_0" value=""> A is better than B <br>
+            <input type="radio" name="tut0" id="tut_0_1" value=""> B is better than A <br>
+            <input type="radio" name="tut0" id="tut_0_2" value=""> Both A and B are equally good <br>
+            <input type="radio" name="tut0" id="tut_0_3" value=""> Both A and B are bad <br>
+    		<b><span id="explain0" style="border: black 1px solid;display: block;padding:5px";>Click on an option to see why is it correct or incorrect</span></b>
+        </div>
+	</div>
+
+	<div style="display: none" id="tut1" class="withmargin">
+        <div>
+            <br><b>Question: </b> <b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Turun_Palloseura">Turun Palloseura</a></font> <font color="green">football team has a play position</font></b> ______ ?
+            <br><b>Answer: </b><b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Midfielder">Midfielder</a></font></b>
+            <br><b>Explanation A: </b><b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Turun_Palloseura">Turun Palloseura</a></font> <font color="green">football team has a play position</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Defender_(association_football)">Defender</a></font></b> and <b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Defender_(association_football)">Defender</a></font> <font color="green">is a position in the football team</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Lierse_S.K.">Lierse S.K.</a></font></b> and <b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Lierse_S.K.">Lierse S.K.</a></font> <font color="green">has a position of</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Midfielder">Midfielder</a></font></b>
+            <br><b>Explanation B: </b>In our Knowledge Base,  <div class="tooltip">many football teams (598 of 745) <span class="tooltiptext">(<a target="_blank" href="https://en.wikipedia.org/wiki/Australia_national_soccer_team">Australia national soccer team</a> , <a target="_blank" href="https://en.wikipedia.org/wiki/Olympique_de_Marseille">Olympique de Marseille</a> and <div class="tooltip2">596 more...<span class="tooltiptext2"><a target="_blank" href="https://en.wikipedia.org/wiki/Evian_Thonon_Gaillard_F.C.">Evian Thonon Gaillard F.C.</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/FK_Partizan">FK Partizan</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Khazar_Lankaran_FK">Khazar Lankaran FK</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Maldives_national_football_team">Maldives national football team</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Turkey_national_football_team">Turkey national football team</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Halesowen_Town_F.C.">Halesowen Town F.C.</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Al_Ain_FC">Al Ain FC</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Santos_FC">Santos FC</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Baku_FC">Baku FC</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Panionios_F.C">Panionios F.C</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/FC_Universitatea_Craiova">FC Universitatea Craiova</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/PFC_CSKA_Sofia">PFC CSKA Sofia</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Sunderland_A.F.C.">Sunderland A.F.C.</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/NAC_Breda">NAC Breda</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Japan_national_football_team">Japan national football team</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Zambia_national_football_team">Zambia national football team</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Grenada_national_football_team">Grenada national football team</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/S.S._Lazio">S.S. Lazio</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/FC_Basel">FC Basel</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/IK_Start">IK Start</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/LA_Galaxy">LA Galaxy</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Club_Tijuana">Club Tijuana</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Southampton_F.C.">Southampton F.C.</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Torquay_United_F.C.">Torquay United F.C.</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Hannover_96">Hannover 96</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Esteghlal_F.C.">Esteghlal Tehran Football Club</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Dynamo_Dresden">Dynamo Dresden</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/S.C._Beira-Mar">S.C. Beira-Mar</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/FC_Schalke_04">FC Schalke 04</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Hibernian_F.C.">Hibernian F.C.</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/South_Korea_national_under-23_football_team">South Korea national under-23 football team</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Sangju_Sangmu_FC">Sangju Sangmu FC</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Burton_Albion_F.C.">Burton Albion F.C.</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Zimbabwe_national_football_team">Zimbabwe national football team</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Hednesford_Town_F.C.">Hednesford Town F.C.</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/KV_Mechelen">KV Mechelen</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/AFC_Wimbledon">AFC Wimbledon</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Cagliari_Calcio">Cagliari Calcio</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/PFC_Lokomotiv_Plovdiv">PFC Lokomotiv Plovdiv</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Borussia_Dortmund">Borussia Dortmund</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Grimsby_Town_F.C.">Grimsby Town F.C.</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/En_Avant_de_Guingamp">En Avant de Guingamp</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Bristol_City_F.C.">Bristol City F.C.</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/FC_St._Pauli">FC St. Pauli</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Coritiba_Foot_Ball_Club">Coritiba Foot Ball Club</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Singapore_national_football_team">Singapore national football team</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Brescia_Calcio">Brescia Calcio</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Botafogo_de_Futebol_e_Regatas">Botafogo de Futebol e Regatas</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/A.C._Milan">A.C. Milan</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/FC_Bayern_Munich">FC Bayern Munich</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/FC_Zenit_Saint_Petersburg">FC Zenit Saint Petersburg</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Seongnam_FC">Seongnam FC</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Suwon_Samsung_Bluewings">Suwon Samsung Bluewings</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Clube_de_Regatas_do_Flamengo">Clube de Regatas do Flamengo</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Stade_de_Reims">Stade de Reims</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Shrewsbury_Town_F.C.">Shrewsbury Town F.C.</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Sweden_national_football_team">Sweden national football team</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Austria_national_football_team">Austria national football team</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Boca_Juniors">Boca Juniors</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Puebla_F.C.">Puebla F.C.</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Venezuela_national_football_team">Venezuela national football team</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/CD_Tenerife">CD Tenerife</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Belarus_national_football_team">Belarus national football team</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/FC_BATE_Borisov">FC BATE Borisov</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Togo_national_football_team">Togo national football team</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/LDU_Quito">LDU Quito</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Hapoel_Be'er_Sheva_F.C.">Hapoel Be'er Sheva F.C.</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Germany_national_football_team">Germany national football team</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/F.C._Copenhagen">F.C. Copenhagen</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/AFC_Ajax">AFC Ajax</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Frosinone_Calcio">Frosinone Calcio</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Aston_Villa_F.C.">Aston Villa F.C.</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Olympiacos_F.C.">Olympiacos F.C.</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Preston_North_End_F.C.">Preston North End F.C.</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/South_Korea_national_football_team">South Korea national football team</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Queens_Park_Rangers_F.C.">Queens Park Rangers F.C. in European football</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Feyenoord">Feyenoord</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Recreativo_de_Huelva">Recreativo de Huelva</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Hapoel_Haifa_F.C.">Hapoel Haifa F.C.</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Newcastle_United_F.C.">Newcastle United F.C.</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/C.D._Guadalajara">C.D. Guadalajara</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Carolina_RailHawks">Carolina RailHawks</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Ethnikos_Piraeus_F.C.">Ethnikos Piraeus F.C.</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Raja_Casablanca">Raja Casablanca</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/K.S.C._Lokeren_Oost-Vlaanderen">K.S.C. Lokeren Oost-Vlaanderen</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Pohang_Steelers">Pohang Steelers</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/AS_Nancy">AS Nancy</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Le_Mans_FC">Le Mans FC</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/SV_Werder_Bremen">SV Werder Bremen</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Levadiakos_F.C.">Levadiakos F.C.</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Kidderminster_Harriers_F.C.">Kidderminster Harriers F.C.</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Ipswich_Town_F.C.">Ipswich Town F.C.</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/LASK_Linz">LASK Linz</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Lille_OSC">Lille OSC</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/F.C._Ironi_Ashdod">F.C. Ironi Ashdod</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Netherlands_national_football_team">Netherlands national football team</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Rot-Weiss_Essen">Rot-Weiss Essen</a><br><a target="_blank" href="https://en.wikipedia.org/wiki/Red_Star_Belgrade">Red Star Belgrade</a><br></span></div> ) football team has a play position  <a target="_blank" href="https://en.wikipedia.org/wiki/Midfielder">Midfielder</a><br></span></div>  have players at <a target="_blank" href="https://en.wikipedia.org/wiki/Midfielder">Midfielder</a> position
+        </div>
+        <div>
+            <input type="radio" name="tut1" id="tut_1_0" value=""> A is better than B <br>
+            <input type="radio" name="tut1" id="tut_1_1" value=""> B is better than A <br>
+            <input type="radio" name="tut1" id="tut_1_2" value=""> Both A and B are equally good <br>
+            <input type="radio" name="tut1" id="tut_1_3" value=""> Both A and B are bad <br>
+    		<b><span id="explain1" style="border: black 1px solid;display: block;padding:5px";>Click on an option to see why is it correct or incorrect</span></b>
+        </div>
+	</div>
+
+	<div style="display: none" id="tut2" class="withmargin">
+        <div>
+            <br><b>Question: </b><b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Portland_Timbers">Portland Timbers</a></font> <font color="green">sports team has a play position</font></b> ______ ? 
+            <br><b>Answer: </b><b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Defender_(association_football)">Defender</a></font></b>
+            <br><b>Explanation A: </b>No explanation for this fact
+            <br><b>Explanation B: </b><b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Portland_Timbers">Portland Timbers</a></font> <font color="green">football team has a play position</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Midfielder">Midfielder</a></font></b> and <b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Midfielder">Midfielder</a></font> <font color="green">is a position in the football team</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Deportivo_Cali">Deportivo Cali</a></font></b> and <b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Deportivo_Cali">Deportivo Cali</a></font> <font color="green">football team has a soccer play position</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Defender_(association_football)">Defender</a></font></b>
+        </div>
+        <div>
+            <input type="radio" name="tut2" id="tut_2_0" value=""> A is better than B <br>
+            <input type="radio" name="tut2" id="tut_2_1" value=""> B is better than A <br>
+    		<b><span id="explain2" style="border: black 1px solid;display: block;padding:5px";>Click on an option to see why is it correct or incorrect</span></b>
+        </div>
+	</div>
+
+	<div style="display: none" id="tut3" class="withmargin">
+        <div>
+            <br><b>Question: </b><b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Santa_Rosa,_California">Santa Rosa</a></font> <font color="green">total residential addresses source is</font></b> _____ ?
+            <br><b>Answer: </b><b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/United_States_Department_of_Housing_and_Urban_Development">United States Department of Housing and Urban Development</a></font></b>
+            <br><b>Explanation A: </b><b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Santa_Rosa,_California">Santa Rosa</a></font> <font color="green">list of residential addresses vacant for 90 days is available with</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/United_States_Department_of_Housing_and_Urban_Development">United States Department of Housing and Urban Development</a></font></b>
+            <br><b>Explanation B: </b><b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Santa_Rosa,_California">Santa Rosa</a></font> <font color="green">list of the total estimate of persons in households is available with</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/United_States_Department_of_Housing_and_Urban_Development">United States Department of Housing and Urban Development</a></font></b>
+        </div>
+        <div>
+            <input type="radio" name="tut3" id="tut_3_0" value=""> A is better than B <br>
+            <input type="radio" name="tut3" id="tut_3_1" value=""> B is better than A <br>
+            <input type="radio" name="tut3" id="tut_3_2" value=""> Both A and B are equally good <br>
+            <input type="radio" name="tut3" id="tut_3_3" value=""> Both A and B are bad <br>
+    		<b><span id="explain3" style="border: black 1px solid;display: block;padding:5px";>Click on an option to see why is it correct or incorrect</span></b>
+        </div>
+	</div>
+
+	<div style="display: none" id="tut4" class="withmargin">
+        <div>
+            <br><b>Question: </b> <b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Haiti_national_football_team">Haiti national football team</a></font> <font color="green">has a position of</font></b> ______ ?
+            <br><b>Answer: </b><b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Goalkeeper_(association_football)">Goalkeeper</a></font></b>
+            <br><b>Explanation A: </b><b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Haiti_national_football_team">Haiti national football team</a></font> <font color="green">football team has a play position</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Goalkeeper_(association_football)">Goalkeeper</a></font></b>
+            <br><b>Explanation B: </b><b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Haiti_national_football_team">Haiti national football team</a></font> <font color="green">football team has a play position</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Goalkeeper_(association_football)">Goalkeeper</a></font></b> and <b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Goalkeeper_(association_football)">Goalkeeper</a></font> <font color="green">is a position in the football team</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/ACF_Fiorentina">ACF Fiorentina</a></font></b> and <b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/ACF_Fiorentina">ACF Fiorentina</a></font> <font color="green">football team has a play position</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Goalkeeper_(association_football)">Goalkeeper</a></font></b>
+        </div>
+        <div>
+            <input type="radio" name="tut4" id="tut_4_0" value=""> A is better than B <br>
+            <input type="radio" name="tut4" id="tut_4_1" value=""> B is better than A <br>
+            <input type="radio" name="tut4" id="tut_4_2" value=""> Both A and B are equally good <br>
+            <input type="radio" name="tut4" id="tut_4_3" value=""> Both A and B are bad <br>
+    		<b><span id="explain4" style="border: black 1px solid;display: block;padding:5px";>Click on an option to see why is it correct or incorrect</span></b>
+        </div>
+	</div>
+
+	<div style="display: none" id="tut5" class="withmargin">
+        <div>
+            <br><b>Question: </b> <b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Retail">Retail</a></font> <font color="green">is a business line for</font></b> _____ ?
+            <br><b>Answer: </b><b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Walmart">Walmart</a></font></b> 
+            <br><b>Explanation A: </b>No explanation for this fact
+            <br><b>Explanation B: </b><b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Retail">Retail</a></font> <font color="green">is a business line for</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Target_Corporation">Target Corporation</a></font></b> and <b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Target_Corporation">Target Corporation</a></font> <font color="green">employs for the post of</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Chief_financial_officer">Chief Financial Officer</a></font></b> and <b><font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Chief_financial_officer">Chief Financial Officer</a></font> <font color="green">is a post in the company:</font> <font color="blue"><a target="_blank" href="https://en.wikipedia.org/wiki/Walmart">Walmart</a></font></b>
+        </div>
+        <div>
+            <input type="radio" name="tut5" id="tut_5_0" value=""> A is better than B <br>
+            <input type="radio" name="tut5" id="tut_5_1" value=""> B is better than A <br>
+    		<b><span id="explain5" style="border: black 1px solid;display: block;padding:5px";>Click on an option to see why is it correct or incorrect</span></b>
+        </div>
+	</div>
+
+	<button  type="button" id="prev_button" style="margin-left:10%" class="btn btn-primary" disabled>Previous</button>
+	<button  type="button" id="next_button" style="margin-left:50%" class="btn btn-primary">Next</button>
+	</span>
+	<!-- TUTORIAL COMPLETED -->
+	<crowd-form id="test" style="display:none"	answer-format="flatten-objects">
+	    <div id="ex0" class="withmargin">
+	        <div>
+	            <br>${fact_0}
+	            <br><b>Explanation A: </b>${exp_A_0}
+	            <br><b>Explanation B: </b>${exp_B_0}
+	            <span style="display:none">${qid_0}</span>
+	        </div>
+	        <div>
+	            <crowd-radio-group name="ans_0">
+	                ${opt_0_0}<br>
+	                ${opt_0_1}<br>
+	                ${opt_0_2}<br>
+	                ${opt_0_3}<br>
+	            </crowd-radio-group>
+	        </div>
+	        <br>
+	        <b><span id="feedback0">Please select an option</span></b>
+	        <crowd-input name="explanation0" label="Feedback" required></crowd-input>
+	    </div>
+
+	    <div id="ex1" class="withmargin">
+	        <div>
+	            <br>${fact_1}
+	            <br><b>Explanation A: </b>${exp_A_1}
+	            <br><b>Explanation B: </b>${exp_B_1}
+	            <span style="display:none">${qid_1}</span>
+	        </div>
+	        <div>
+	            <crowd-radio-group name="ans_1">
+	                ${opt_1_0}<br>
+	                ${opt_1_1}<br>
+	                ${opt_1_2}<br>
+	                ${opt_1_3}<br>
+	            </crowd-radio-group>
+	        </div>
+	        <br>
+	        <b><span id="feedback1">Please select an option</span></b>
+	        <crowd-input name="explanation1" label="Feedback" required></crowd-input>
+	    </div>
+
+	    <div id="ex2" class="withmargin">
+	        <div>
+	            <br>${fact_2}
+	            <br><b>Explanation A: </b>${exp_A_2}
+	            <br><b>Explanation B: </b>${exp_B_2}
+	            <span style="display:none">${qid_2}</span>
+	        </div>
+	        <div>
+	            <crowd-radio-group name="ans_2">
+	                ${opt_2_0}<br>
+	                ${opt_2_1}<br>
+	                ${opt_2_2}<br>
+	                ${opt_2_3}<br>
+	            </crowd-radio-group>
+	        </div>
+	        <br>
+	        <b><span id="feedback2">Please select an option</span></b>
+	        <crowd-input name="explanation2" label="Feedback" required></crowd-input>
+	    </div>
+	    
+
+	    <div id="ex3" class="withmargin">
+	        <div>
+	            <br>${fact_3}
+	            <br><b>Explanation A: </b>${exp_A_3}
+	            <br><b>Explanation B: </b>${exp_B_3}
+	            <span style="display:none">${qid_3}</span>
+	        </div>
+	        <div>
+	            <crowd-radio-group name="ans_3">
+	                ${opt_3_0}<br>
+	                ${opt_3_1}<br>
+	                ${opt_3_2}<br>
+	                ${opt_3_3}<br>
+	            </crowd-radio-group>
+	        </div>
+	        <br>
+	        <b><span id="feedback3">Please select an option</span></b>
+	        <crowd-input name="explanation3" label="Feedback" required></crowd-input>
+	    </div>
+
+	    <div id="ex4" class="withmargin">
+	        <div>
+	            <br>${fact_4}
+	            <br><b>Explanation A: </b>${exp_A_4}
+	            <br><b>Explanation B: </b>${exp_B_4}
+	            <span style="display:none">${qid_4}</span>
+	        </div>
+	        <div>
+	            <crowd-radio-group name="ans_4">
+	                ${opt_4_0}<br>
+	                ${opt_4_1}<br>
+	                ${opt_4_2}<br>
+	                ${opt_4_3}<br>
+	            </crowd-radio-group>
+	        </div>
+	        <br>
+	        <b><span id="feedback4">Please select an option</span></b>
+	        <crowd-input name="explanation4" label="Feedback" required></crowd-input>
+	    </div>
+
+	    <div id="ex5" class="withmargin">
+	        <div>
+	            <br>${fact_5}
+	            <br><b>Explanation A: </b>${exp_A_5}
+	            <br><b>Explanation B: </b>${exp_B_5}
+	            <span style="display:none">${qid_5}</span>
+	        </div>
+	        <div>
+	            <crowd-radio-group name="ans_4">
+	                ${opt_5_0}<br>
+	                ${opt_5_1}<br>
+	                ${opt_5_2}<br>
+	                ${opt_5_3}<br>
+	            </crowd-radio-group>
+	        </div>
+	        <br>
+	        <b><span id="feedback5">Please select an option</span></b>
+	        <crowd-input name="explanation5" label="Feedback" required></crowd-input>
+	    </div>
+
+	    <div id="ex6" class="withmargin">
+	        <div>
+	            <br>${fact_6}
+	            <br><b>Explanation A: </b>${exp_A_6}
+	            <br><b>Explanation B: </b>${exp_B_6}
+	            <span style="display:none">${qid_6}</span>
+	        </div>
+	        <div>
+	            <crowd-radio-group name="ans_6">
+	                ${opt_6_0}<br>
+	                ${opt_6_1}<br>
+	                ${opt_6_2}<br>
+	                ${opt_6_3}<br>
+	            </crowd-radio-group>
+	        </div>
+	        <br>
+	        <b><span id="feedback6">Please select an option</span></b>
+	        <crowd-input name="explanation6" label="Feedback" required></crowd-input>
+	    </div>
+
+	    <div id="ex7" class="withmargin">
+	        <div>
+	            <br>${fact_7}
+	            <br><b>Explanation A: </b>${exp_A_7}
+	            <br><b>Explanation B: </b>${exp_B_7}
+	            <span style="display:none">${qid_7}</span>
+	        </div>
+	        <div>
+	            <crowd-radio-group name="ans_7">
+	                ${opt_7_0}<br>
+	                ${opt_7_1}<br>
+	                ${opt_7_2}<br>
+	                ${opt_7_3}<br>
+	            </crowd-radio-group>
+	        </div>
+	        <br>
+	        <b><span id="feedback7">Please select an option</span></b>
+	        <crowd-input name="explanation7" label="Feedback" required></crowd-input>
+	    </div>
+
+	    <div id="ex8" class="withmargin">
+	        <div>
+	            <br><b>${fact_8}
+	            <br><b>Explanation A: </b>${exp_A_8}
+	            <br><b>Explanation B: </b>${exp_B_8}
+	            <span style="display:none">${qid_8}</span>
+	        </div>
+	        <div>
+	            <crowd-radio-group name="ans_8">
+	                ${opt_8_0}<br>
+	                ${opt_8_1}<br>
+	                ${opt_8_2}<br>
+	                ${opt_8_3}<br>
+	            </crowd-radio-group>
+	        </div>
+	        <br>
+	        <b><span id="feedback8">Please select an option</span></b>
+	        <crowd-input name="explanation8" label="Feedback" required></crowd-input>
+	    </div>
+
+	    <div id="ex9" class="withmargin">
+	        <div>
+	            <br>${fact_9}
+	            <br><b>Explanation A: </b>${exp_A_9}
+	            <br><b>Explanation B: </b>${exp_B_9}
+	            <span style="display:none">${qid_9}</span>
+	        </div>
+	        <div>
+	            <crowd-radio-group name="ans_9">
+	                ${opt_9_0}<br>
+	                ${opt_9_1}<br>
+	                ${opt_9_2}<br>
+	                ${opt_9_3}<br>
+	            </crowd-radio-group>
+	        </div>
+	        <br>
+	        <b><span id="feedback9">Please select an option</span></b>
+	        <crowd-input name="explanation9" label="Feedback" required></crowd-input>
+	    </div>
+	    <crowd-input name="comment" label="Optional Comment"></crowd-input>
+	    <br><br>
+	</crowd-form>
+</section>
+
+
+<link crossorigin="anonymous" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" integrity="sha384-IS73LIqjtYesmURkDE9MXKbXqYA8rvKEp/ghicjem7Vc3mGRdQRptJSz60tvrB6+"
+ rel="stylesheet" /><!-- Open internal style sheet -->
+<style type="text/css">
+	.withmargin{
+        margin: 40px;
+    }
+  .tooltip {
+    position: static;
+    display: inline-block;
+    border: 1px dotted black;
+    font-style: oblique;
+    opacity: 100;
+    font-size: 15px;
+  }
+  
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 1000px;
+    font-style: normal;
+    background-color: rgb(197, 192, 192);
+    color: rgb(10, 1, 1);
+    text-align: left;
+    border-radius: 6px;
+    padding: 5px;
+  
+    /* Position the tooltip */
+    position: absolute;
+    left: 50px;
+    z-index: 1;
+  }
+  
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+  }
+
+  .tooltip2 {
+    /*position: relative;*/
+    display: inline-block;
+    /*border: 1px dotted rgb(223, 209, 15);*/
+    border: 1px dotted black;
+    font-style: oblique;
+  }
+  
+  .tooltip2 .tooltiptext2 {
+    visibility: hidden;
+    width: 500px;
+    font-style: normal;
+    background-color: rgba(159, 223, 175, 0.877);
+    color: rgb(10, 1, 1);
+    text-align: left;
+    border-radius: 6px;
+    padding: 5px;
+  
+    /* Position the tooltip */
+    position: absolute;
+    left: 100px;
+    z-index: 2;
+  }
+  
+  .tooltip2:hover .tooltiptext2 {
+    visibility: visible;
+  }
+	.form-inline select.form-control {
+		width: 100%;
+	}
+	input.form-control {
+		width: 100%;
+	}
+	#collapseTrigger {
+		color: #fff;
+		display: block;
+		text-decoration: none;
+	}
+	#submitButton {
+		white-space: normal;
+	}
+	.image {
+		margin-bottom: 15px;
+	}
+	.group-label {
+		display: block;
+	}
+	.radio-inline>label {
+		font-weight: normal;
+	}
+	.col-margin {
+		padding: 0 2px 0 0;
+		margin-bottom: 5px;
+	}
+	.col-margin:last-child {
+		padding-right: 0;
+	}
+	.form-group,
+	.form-group.col-margin {
+		width: 100%;
+		margin-bottom: 5px;
+	}
+	.form-group.fieldset,
+	.fieldset {
+		margin-bottom: 15px;
+	}
+	.hour-label {
+		margin-top: 5px;
+		font-weight: normal;
+	}
+	/* CSS for breaking long words/urls */
+	.dont-break-out {
+		overflow-wrap: break-word;
+		word-wrap: break-word;
+		-ms-word-break: break-all;
+		word-break: break-all;
+		word-break: break-word;
+		-ms-hyphens: auto;
+		-moz-hyphens: auto;
+		-webkit-hyphens: auto;
+		hyphens: auto;
+	}
+	.arg1 {
+		color: #008F68;
+	}
+	
+	.rel {
+		color: #e60a87;
+	}
+	
+	.arg2 {
+		color: #0288AD;
+	}
+
+	.leftDiv
+	{
+		width: 50%;
+		float: left;
+	}
+	.rightDiv
+	{
+		width: 50%;
+		float: right;
+	}
+	.time {
+		color: #8B008B;
+	}
+
+	.loc {
+		color: #B8860B;
+	}
+</style>
+<!-- Close internal style sheet -->
+<script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s="
+ crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js" integrity="sha384-s1ITto93iSMDxlp/79qhWHi+LsIi9Gx6yL+cOKDuymvihkfol83TYbLbOw+W/wv4"
+ crossorigin="anonymous"></script>
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		var q0solved = false;
+		var q1solved = false;
+		var q2solved = false;
+		var q3solved = false;
+		var q4solved = false;
+		var q5solved = false;
+		var tut_completed = false;
+		var str_CONSTANT_WARN_COMPLETE_TUT = "Complete tutorial correctly before proceeding"
+
+		// Instructions expand/collapse
+		var content = $('#instructionBody');
+		var trigger = $('#collapseTrigger');
+		// content.hide();
+		$("#tutorial").hide()		
+		$('.collapse-text').text('(Click to collapse)');
+		trigger.click(function () {
+			content.toggle();
+			var isVisible = content.is(':visible');
+			if (isVisible) {
+				$("#tutorial").hide()	
+				$("#test").hide()		
+				$('.collapse-text').text('(Click to collapse)');
+			} else {
+				if(tut_completed){
+					$("#test").show()		
+				}else{
+					$("#tutorial").show()		
+				}
+				$('.collapse-text').text('(Click to expand)');
+			}
+		});
+		// end expand/collapse
+
+		//Tut 0 explanation begin
+		$("#tut_0_0").on("click",function(){
+			q0solved = true;
+	        $("#explain0").html(" Correct. <br>Explanation A not only gives an explanation, it also tells the writer / producer of Desperate Housewives (Marc Cherry) who was nominated.")
+	        $("#explain0").css('background-color','#cfffdf')
+	    })
+		$("#tut_0_1").on("click",function(){
+	        $("#explain0").html("Wrong. <br>Just because another show was nominated for an award and both have regular appearance of a common actor (Lyndsy Fonseca), it doesn’t indicate strongly that ‘Desperate Housewives’ should also be nominated for the same award. <br> Moreover, Explanation A not only gives an explanation, it also tells the writer / producer of Desperate Housewives (Marc Cherry) who was nominated.")
+	        $("#explain0").css('background-color','#ffcfcf')
+
+	    })
+		$("#tut_0_2").on("click",function(){
+	        $("#explain0").html("Wrong. Clearly explanation A is better than B.<br>Explanation A not only gives an explanation, it also tells the writer / producer of Desperate Housewives (Marc Cherry) who was nominated.<br>Just because another show was nominated for an award and both have regular appearance of a common actor (Lyndsy Fonseca), it doesn’t indicate strongly that ‘Desperate Housewives’ should also be nominated for the same award.")
+	        $("#explain0").css('background-color','#ffcfcf')
+	    })
+		$("#tut_0_3").on("click",function(){
+	        $("#explain0").html("Wrong. Cleary explanation A is better than having no explanation.<br>Explanation A not only gives an explanation, it also tells the writer / producer of Desperate Housewives (Marc Cherry) who was nominated.")
+	        $("#explain0").css('background-color','#ffcfcf')
+	    })
+		//Tut 1 explanation end
+		//Tut 1 explanation begin
+		$("#tut_1_0").on("click",function(){
+	        $("#explain1").html("Wrong. <br>Just because one another team has a play position of ‘Midfielder’ and the given team  (‘Turun Palloseura’) is similar to it due to a common play position of ‘Defender’, it doesn’t indicate with high confidence that ‘Turun Palloseura’ would also have a play position of ‘Midfielder’. Here the similarity is also very weak (only due to one supporting fact). <br>Moreover, Explanation B suggests that many teams have a play position of 'Midfielder', hence it is likely that the given team would also have play position of 'Midfielder'")
+	        $("#explain1").css('background-color','#ffcfcf')
+
+	    })
+		$("#tut_1_1").on("click",function(){
+			q1solved = true;
+	        $("#explain1").html("Correct. <br>Explanation B provides a statistical reason for selecting Midfielder as an answer: because many teams have ‘Midfielder’ position, our AI system believes that ‘Turun Palloseura’ also has a play position of Midfielder.<br>Moreover, Explanation A suggests that given team has play position 'Midfielder' because of only one another team having players in the same position and the two teams being similar due to a common play position of 'Defender'. Here the similarity is also very weak (only due to one supporting fact) ")
+	        $("#explain1").css('background-color','#cfffdf')
+	    })
+		$("#tut_1_2").on("click",function(){
+	        $("#explain1").html("Wrong. Explanation B is better than A. <br>Explanation B provides a statistical reason for selecting Midfielder as an answer: because many teams have ‘Midfielder’ position, our AI system believes that ‘Turun Palloseura’ also has a play position of Midfielder.<br>Moreover, Explanation A suggests that given team has play position 'Midfielder' because of only one another team having players in the same position and the two teams being similar due to a common play position of 'Defender'. Here the similarity is also very weak (only due to one supporting fact) ")
+	        $("#explain1").css('background-color','#ffcfcf')
+
+	    })
+		$("#tut_1_3").on("click",function(){
+	        $("#explain1").html("Wrong.<br> Explanation B increases our confidence in the model's prediction and is better than having no explanation. Explanation B provides a statistical reason for selecting Midfielder as an answer: because many teams have ‘Midfielder’ position, our AI system believes that ‘Turun Palloseura’ also has a play position of Midfielder.")
+	        $("#explain1").css('background-color','#ffcfcf')
+
+	    })
+		//Tut 1 explanation end
+		//Tut 2 explanation begin
+		$("#tut_2_0").on("click",function(){
+	        $("#explain2").html("Wrong. <br>Because another team has a play position of ‘Defender’ and the given team is related to it due to a common play position of Midfielder, it doesn’t indicate with high confidence that ‘Portland Timbers’ would also have a play position of Defender, but it is better than having no explanation.<br> It provides at least one plausible reason for the similarity between the two teams.")
+	        $("#explain2").css('background-color','#ffcfcf')
+	    })
+		$("#tut_2_1").on("click",function(){
+			q2solved = true;
+	        $("#explain2").html("Correct. <br>Because another team has a play position of ‘Defender’ and the given team is related to it due to a common play position of Midfielder, it doesn’t indicate with high confidence that ‘Portland Timbers’ would also have a play position of Defender, but it is better than having no explanation.<br> It provides at least one plausible reason for the similarity between the two teams.")
+	        $("#explain2").css('background-color','#cfffdf')
+	    })
+		//Tut 2 explanation end
+		//Tut 3 explanation begin
+		$("#tut_3_0").on("click",function(){
+	        $("#explain3").css('background-color','#ffcfcf')
+	        $("#explain3").html(" Wrong. <br>Because ‘United States Department of Housing and Urban Development’ is the source of a very similar information (list of total estimate of persons in households), it increases our confidence that ‘the list of total residential addresses’ would also be available with it.<br> Hence Explanation B is not bad.")
+	    })
+		$("#tut_3_1").on("click",function(){
+	        $("#explain3").css('background-color','#ffcfcf')
+	        $("#explain3").html("Wrong. <br>Because ‘United States Department of Housing and Urban Development’ is the source of a very similar information (list of residential addresses vacant for 90 days), it increases our confidence that the ‘the list of total residential addresses’ would also be available with it.<br> Hence Explanation A is not bad.")
+	    })
+		$("#tut_3_2").on("click",function(){
+			q3solved = true;
+	        $("#explain3").css('background-color','#cfffdf')
+	        $("#explain3").html("Correct.<br>Because ‘United States Department of Housing and Urban Development’ is the source of a very similar information (list of total estimate of persons in households), it increases our confidence that ‘the list of total residential addresses’ would also be available with it.<br> Similarly, because it is the source of another very similar information (list of residential addresses vacant for 90 days), it increases our confidence that the ‘the list of total residential addresses’ would also be available with it.")
+	    })
+		$("#tut_3_3").on("click",function(){
+	        $("#explain3").css('background-color','#ffcfcf')
+	        $("#explain3").html("Wrong.<br> ‘United States Department of Housing and Urban Development’ having a list of other related housing statistics or information like ‘list of residential addresses vacant for 90 days’ and ‘list of the total estimate of persons in households’ for Santa Rosa, increases our confidence about it having the list of total residential addresses.")
+	    })
+		//Tut 3 explanation end
+		//Tut 4 explanation begin
+		$("#tut_4_0").on("click",function(){
+			q4solved = true;
+	        $("#explain4").css('background-color','#cfffdf')
+	        $("#explain4").html(" Correct. <br>Because explanation A directly implies the question, i.e. it is just a different way of writing the relation.")
+	    })
+		$("#tut_4_1").on("click",function(){
+	        $("#explain4").css('background-color','#ffcfcf')
+	        $("#explain4").html("Wrong. <br>If you look carefully the first statement of explanation B is exactly what our explanation A is. But then we have some more irrelevant information in B.<br>Since explanation A is more precise, we say it is better than B.")
+	    })
+		$("#tut_4_2").on("click",function(){
+	        $("#explain4").css('background-color','#ffcfcf')
+	        $("#explain4").html("Wrong.<br> Because explanation A directly implies the question in different words. <br>Also it is better than B in the sense that it is more precise.")
+	    })
+		$("#tut_4_3").on("click",function(){
+	        $("#explain4").css('background-color','#ffcfcf')
+	        $("#explain4").html("Wrong.<br> Because both the explanations are able to explain the question.<br> Note that A is better.")
+	    })
+		//Tut 4 explanation end
+		//Tut 5 explanation begin
+		$("#tut_5_0").on("click",function(){
+			q5solved = true;
+			if(q0solved && q1solved && q2solved && q3solved && q4solved && q5solved){
+				$("#next_button").text("Finish tutorial and proceed to test")	
+           		$('#next_button').prop('disabled', false);	
+			}
+	        $("#explain5").css('background-color','#cfffdf')
+	        $("#explain5").html("Correct.<br> Just because Retail is the business line for Target Corporation and both Target Corporation and Walmart has a post of CFO, doesn’t at all indicate that retail would be a business line for Walmart.<br> Had the system chosen some fact other than both having CFO, for implying similarity between Target Corporaton and Walmart, it might have been better than having no explanation.")
+	    })
+		$("#tut_5_1").on("click",function(){
+	        $("#explain5").css('background-color','#ffcfcf')
+	        $("#explain5").html("Wrong.<br> Just because Retail is the business line for Target Corporation and both Target Corporation and Walmart has a post of CFO, doesn’t at all indicate that retail would be a business line for Walmart.<br> Had the system chosen some fact other than both having CFO, for implying similarity between Target Corporaton and Walmart, it might have been better than having no explanation.")
+	    })
+		//Tut 5 explanation end
+
+		//Next and Prev button logic begin
+		var current_tut = 0;
+		$("#current_question").text(current_tut+1);
+		$("#next_button").on("click",function(){
+           $('#prev_button').prop('disabled', false);
+			if(current_tut==4){
+				$("#next_button").removeClass('btn-primary')
+				$("#next_button").addClass('btn-warning')
+				if(q0solved && q1solved && q2solved && q3solved && q4solved && q5solved){
+					$("#next_button").text("Finish tutorial and proceed to test")	
+	           		$('#next_button').prop('disabled', false);
+				}else{
+					$("#next_button").text(str_CONSTANT_WARN_COMPLETE_TUT)
+	           		$('#next_button').prop('disabled', true);
+				}
+			}
+			if(current_tut<5){
+				current_tut++;
+				$("#tut0").hide()
+				$("#tut1").hide()
+				$("#tut2").hide()
+				$("#tut3").hide()
+				$("#tut4").hide()
+				$("#tut5").hide()
+				$("#tut"+current_tut).show()		
+			}else if(current_tut==5){
+				$("#tutorial").hide()
+				$("#test").show()
+				tut_completed = true
+				//SUBMIT TUT
+			}
+			$("#current_question").text(current_tut+1);
+		})
+		$("#prev_button").on("click",function(){
+            $("#next_button").text("Next")
+			$("#next_button").removeClass('btn-warning')
+			$("#next_button").addClass('btn-primary')
+       		$('#next_button').prop('disabled', false);		
+			if(current_tut==1){
+           		$('#prev_button').prop('disabled', true);
+			}
+			if(current_tut>0){
+				current_tut--;
+				$("#tut0").hide()
+				$("#tut1").hide()
+				$("#tut2").hide()
+				$("#tut3").hide()
+				$("#tut4").hide()
+				$("#tut5").hide()
+				$("#tut"+current_tut).show()		
+			}
+			$("#current_question").text(current_tut+1);
+		})
+		//Next and Prev button logic end
+		//feedback logic
+		$("crowd-radio-button[name='our_0']").on("click",function(){
+        $("#feedback0").text("Why do you think the other explanation is poor?")
+	    })
+	    $("crowd-radio-button[name='other_0']").on("click",function(){
+	        $("#feedback0").text("Why do you think the other explanation is poor?")
+	    })
+	    $("crowd-radio-button[name='both_0']").on("click",function(){
+	        $("#feedback0").text("Why do you think both are equally good?")
+	    })
+	    $("crowd-radio-button[name='none_0']").on("click",function(){
+	        $("#feedback0").text("Why do you think both are equally bad?")
+	    })
+	    
+	    $("crowd-radio-button[name='our_1']").on("click",function(){
+	        $("#feedback1").text("Why do you think the other explanation is poor?")
+	    })
+	    $("crowd-radio-button[name='other_1']").on("click",function(){
+	        $("#feedback1").text("Why do you think the other explanation is poor?")
+	    })
+	    $("crowd-radio-button[name='both_1']").on("click",function(){
+	        $("#feedback1").text("Why do you think both are equally good?")
+	    })
+	    $("crowd-radio-button[name='none_1']").on("click",function(){
+	        $("#feedback1").text("Why do you think both are equally bad?")
+	    })
+	    
+	    $("crowd-radio-button[name='our_2']").on("click",function(){
+	        $("#feedback2").text("Why do you think the other explanation is poor?")
+	    })
+	    $("crowd-radio-button[name='other_2']").on("click",function(){
+	        $("#feedback2").text("Why do you think the other explanation is poor?")
+	    })
+	    $("crowd-radio-button[name='both_2']").on("click",function(){
+	        $("#feedback2").text("Why do you think both are equally good?")
+	    })
+	    $("crowd-radio-button[name='none_2']").on("click",function(){
+	        $("#feedback2").text("Why do you think both are equally bad?")
+	    })
+	    
+	    $("crowd-radio-button[name='our_3']").on("click",function(){
+	        $("#feedback3").text("Why do you think the other explanation is poor?")
+	    })
+	    $("crowd-radio-button[name='other_3']").on("click",function(){
+	        $("#feedback3").text("Why do you think the other explanation is poor?")
+	    })
+	    $("crowd-radio-button[name='both_3']").on("click",function(){
+	        $("#feedback3").text("Why do you think both are equally good?")
+	    })
+	    $("crowd-radio-button[name='none_3']").on("click",function(){
+	        $("#feedback3").text("Why do you think both are equally bad?")
+	    })
+	    
+	    $("crowd-radio-button[name='our_4']").on("click",function(){
+	        $("#feedback4").text("Why do you think the other explanation is poor?")
+	    })
+	    $("crowd-radio-button[name='other_4']").on("click",function(){
+	        $("#feedback4").text("Why do you think the other explanation is poor?")
+	    })
+	    $("crowd-radio-button[name='both_4']").on("click",function(){
+	        $("#feedback4").text("Why do you think both are equally good?")
+	    })
+	    $("crowd-radio-button[name='none_4']").on("click",function(){
+	        $("#feedback4").text("Why do you think both are equally bad?")
+	    })
+
+	    $("crowd-radio-button[name='our_5']").on("click",function(){
+	        $("#feedback5").text("Why do you think the other explanation is poor?")
+	    })
+	    $("crowd-radio-button[name='other_5']").on("click",function(){
+	        $("#feedback5").text("Why do you think the other explanation is poor?")
+	    })
+	    $("crowd-radio-button[name='both_5']").on("click",function(){
+	        $("#feedback5").text("Why do you think both are equally good?")
+	    })
+	    $("crowd-radio-button[name='none_5']").on("click",function(){
+	        $("#feedback5").text("Why do you think both are equally bad?")
+	    })
+
+	    $("crowd-radio-button[name='our_6']").on("click",function(){
+	        $("#feedback6").text("Why do you think the other explanation is poor?")
+	    })
+	    $("crowd-radio-button[name='other_6']").on("click",function(){
+	        $("#feedback6").text("Why do you think the other explanation is poor?")
+	    })
+	    $("crowd-radio-button[name='both_6']").on("click",function(){
+	        $("#feedback6").text("Why do you think both are equally good?")
+	    })
+	    $("crowd-radio-button[name='none_6']").on("click",function(){
+	        $("#feedback6").text("Why do you think both are equally bad?")
+	    })
+
+	    $("crowd-radio-button[name='our_7']").on("click",function(){
+	        $("#feedback7").text("Why do you think the other explanation is poor?")
+	    })
+	    $("crowd-radio-button[name='other_7']").on("click",function(){
+	        $("#feedback7").text("Why do you think the other explanation is poor?")
+	    })
+	    $("crowd-radio-button[name='both_7']").on("click",function(){
+	        $("#feedback7").text("Why do you think both are equally good?")
+	    })
+	    $("crowd-radio-button[name='none_7']").on("click",function(){
+	        $("#feedback7").text("Why do you think both are equally bad?")
+	    })
+
+	    $("crowd-radio-button[name='our_8']").on("click",function(){
+	        $("#feedback8").text("Why do you think the other explanation is poor?")
+	    })
+	    $("crowd-radio-button[name='other_8']").on("click",function(){
+	        $("#feedback8").text("Why do you think the other explanation is poor?")
+	    })
+	    $("crowd-radio-button[name='both_8']").on("click",function(){
+	        $("#feedback8").text("Why do you think both are equally good?")
+	    })
+	    $("crowd-radio-button[name='none_8']").on("click",function(){
+	        $("#feedback8").text("Why do you think both are equally bad?")
+	    })
+
+	    $("crowd-radio-button[name='our_9']").on("click",function(){
+	        $("#feedback9").text("Why do you think the other explanation is poor?")
+	    })
+	    $("crowd-radio-button[name='other_9']").on("click",function(){
+	        $("#feedback9").text("Why do you think the other explanation is poor?")
+	    })
+	    $("crowd-radio-button[name='both_9']").on("click",function(){
+	        $("#feedback9").text("Why do you think both are equally good?")
+	    })
+	    $("crowd-radio-button[name='none_9']").on("click",function(){
+	        $("#feedback9").text("Why do you think both are equally bad?")
+	    })
+
+		});
+</script>

@@ -108,9 +108,10 @@ venv.bak/
 
 logs/
 dumps/
+dumps
 
 #Custom
 data/data.zip
 data/fb15k/*
 data/yago/*
-
+*.swp

@@ -1,0 +1,583 @@
+INFO :: 27/08/2019 06:09:01 PM - Beginning code for experiment train_ml_r0.125_p1_n-2.0_i4_k0.0 and storing stuff in temp/best_fb15k/run_3/train_ml
+INFO :: 27/08/2019 06:09:01 PM - Loaded arguments as 
+{'base_model_file': '',
+ 'batch_size': 2048,
+ 'checkpoint': '',
+ 'class_imbalance': 4,
+ 'config': 'configs/fb15k_config_90_40.yml',
+ 'cuda': True,
+ 'decay': 0,
+ 'each_input_size': 7,
+ 'embed_size': 0,
+ 'exclude_t_ids': [2, 5],
+ 'exp_name': 'train_ml',
+ 'hidden_unit_list': [90, 40],
+ 'kldiv_lambda': 0.0,
+ 'label_distribution_file': 'label_distrubution.yml',
+ 'labelled_training_data_path': '../logs/fb15k/sm_sup_train_with_id.pkl',
+ 'log_after': 200000,
+ 'log_eval': None,
+ 'log_level': 20,
+ 'lpf': <_io.TextIOWrapper name='temp/best_fb15k/run_3/train_ml/learning_curve.txt' mode='a' encoding='UTF-8'>,
+ 'lr': 0.001,
+ 'mil': True,
+ 'mil_reward': 1,
+ 'momentum': 0.9,
+ 'n2o': [0, 1, 3, 4, 6],
+ 'neg_reward': -2.0,
+ 'num_epochs': 20,
+ 'num_templates': 6,
+ 'o2n': [0, 1, 0, 2, 3, 0, 4],
+ 'only_eval': False,
+ 'optim': 'sgd',
+ 'output_path': 'temp/best_fb15k/run_3/train_ml',
+ 'pos_reward': 1,
+ 'pred_file': None,
+ 'rho': 0.125,
+ 'supervision': 'semi',
+ 'train_labels_path': '../logs/fb15k/sm_sup_train_multilabels.txt',
+ 'training_data_path': '../logs/fb15k/sm_with_id.data.pkl',
+ 'use_ids': False,
+ 'val_data_path': '../logs/fb15k/sm_sup_valid_with_id.pkl',
+ 'val_labels_path': '../logs/fb15k/sm_sup_valid_multilabels.txt'}
+INFO :: 27/08/2019 06:09:01 PM - Input file ../logs/fb15k/sm_with_id.data.pkl is a pkl file
+INFO :: 27/08/2019 06:10:38 PM - Loaded Input
+INFO :: 27/08/2019 06:10:40 PM - Calculated stats of the given input file, dumped stats to ../logs/fb15k/sm_with_id.data.pkl_stats
+INFO :: 27/08/2019 06:10:41 PM - Normalized and successfully loaded data. Size of dataset = (2415710, 46)
+INFO :: 27/08/2019 06:10:41 PM - Input file ../logs/fb15k/sm_sup_valid_with_id.pkl is a pkl file
+INFO :: 27/08/2019 06:10:41 PM - Loaded Input
+INFO :: 27/08/2019 06:10:41 PM - Normalized and successfully loaded data. Size of dataset = (21, 46)
+INFO :: 27/08/2019 06:10:41 PM - Dataset: Excluding following template ids from target and mapping them to 0: 2,5
+INFO :: 27/08/2019 06:10:41 PM - Multi-label evaluation on. Labels in : ../logs/fb15k/sm_sup_valid_multilabels.txt
+INFO :: 27/08/2019 06:10:41 PM - Input file ../logs/fb15k/sm_sup_train_with_id.pkl is a pkl file
+INFO :: 27/08/2019 06:10:41 PM - Loaded Input
+INFO :: 27/08/2019 06:10:41 PM - Normalized and successfully loaded data. Size of dataset = (84, 46)
+INFO :: 27/08/2019 06:10:41 PM - Dataset: Excluding following template ids from target and mapping them to 0: 2,5
+INFO :: 27/08/2019 06:10:41 PM - Multi-label evaluation on. Labels in : ../logs/fb15k/sm_sup_train_multilabels.txt
+INFO :: 27/08/2019 06:10:49 PM - Created an MIL model
+INFO :: 27/08/2019 06:10:49 PM - Saving checkpoints at temp/best_fb15k/run_3/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_checkpoint.pth and best checkpoint at : temp/best_fb15k/run_3/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_best_checkpoint.pth
+INFO :: 27/08/2019 06:10:49 PM - Beginning train/validate cycle
+INFO :: 27/08/2019 06:10:49 PM - Setting model mode to eval
+INFO :: 27/08/2019 06:10:51 PM - Multi task evaluation
+INFO :: 27/08/2019 06:10:51 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:10:51 PM - -1,eval,0.0,21,21,2.136641,0.0,0.333333,0.117647,0.285714,0.173913
+INFO :: 27/08/2019 06:10:51 PM - Beginning epoch 0
+INFO :: 27/08/2019 06:10:51 PM - Setting model mode to train
+INFO :: 27/08/2019 06:10:51 PM - Multi task evaluation
+INFO :: 27/08/2019 06:10:51 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:10:51 PM - 0,train_sup,0.589481,84,84,0.067827,0.0,0.375,0.125,0.238095,0.1875
+INFO :: 27/08/2019 06:10:51 PM - Setting model mode to train
+INFO :: 27/08/2019 06:10:54 PM - 0,train_un,-0.224262,200704,2415710,3.044224,Counts --> Counter({0: 2047, 4: 1}),0.0
+INFO :: 27/08/2019 06:10:56 PM - 0,train_un,-0.434205,401408,2415710,5.451175,Counts --> Counter({0: 2048}),0.0
+INFO :: 27/08/2019 06:10:58 PM - 0,train_un,-0.541605,602112,2415710,7.289122,Counts --> Counter({0: 2009, 2: 31, 4: 8}),0.0
+INFO :: 27/08/2019 06:11:00 PM - 0,train_un,-0.607447,802816,2415710,9.354458,Counts --> Counter({0: 1902, 3: 62, 2: 37, 1: 27, 4: 20}),0.0
+INFO :: 27/08/2019 06:11:02 PM - 0,train_un,-0.656575,1003520,2415710,11.214773,Counts --> Counter({0: 1845, 3: 79, 1: 58, 2: 36, 4: 30}),0.0
+INFO :: 27/08/2019 06:11:04 PM - 0,train_un,-0.696163,1204224,2415710,13.161297,Counts --> Counter({0: 1769, 3: 88, 1: 74, 4: 63, 2: 54}),0.0
+INFO :: 27/08/2019 06:11:06 PM - 0,train_un,-0.729401,1404928,2415710,15.309449,Counts --> Counter({0: 1712, 3: 122, 1: 81, 4: 71, 2: 62}),0.0
+INFO :: 27/08/2019 06:11:08 PM - 0,train_un,-0.757534,1605632,2415710,17.186646,Counts --> Counter({0: 1711, 3: 134, 1: 73, 4: 66, 2: 64}),0.0
+INFO :: 27/08/2019 06:12:03 PM - 0,train_un,-0.782092,1806336,2415710,72.166318,Counts --> Counter({0: 1673, 3: 184, 1: 75, 4: 68, 2: 48}),0.0
+INFO :: 27/08/2019 06:12:05 PM - 0,train_un,-0.804997,2007040,2415710,74.521025,Counts --> Counter({0: 1667, 3: 199, 1: 74, 2: 57, 4: 51}),0.0
+INFO :: 27/08/2019 06:12:08 PM - 0,train_un,-0.826359,2207744,2415710,76.870694,Counts --> Counter({0: 1654, 3: 225, 2: 79, 4: 46, 1: 44}),0.0
+INFO :: 27/08/2019 06:12:11 PM - 0,train_un,-0.846493,2408448,2415710,79.657195,Counts --> Counter({0: 1657, 3: 224, 2: 78, 1: 49, 4: 40}),0.0
+INFO :: 27/08/2019 06:12:11 PM - epoch,mode,loss,count,dataset_size,time,kl_loss
+INFO :: 27/08/2019 06:12:11 PM - 0,train_un,-0.847241,2415710,2415710,79.764881,0.0
+INFO :: 27/08/2019 06:12:11 PM - Setting model mode to eval
+INFO :: 27/08/2019 06:12:11 PM - Multi task evaluation
+INFO :: 27/08/2019 06:12:11 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:12:11 PM - 0,eval,0.0,21,21,0.003672,0.0,0.466667,0.411765,0.47619,0.4375
+INFO :: 27/08/2019 06:12:11 PM - Best score: -9999999, This score: 0.43749999999999994
+INFO :: 27/08/2019 06:12:11 PM - Saving checkpoint to temp/best_fb15k/run_3/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_checkpoint.pth
+INFO :: 27/08/2019 06:12:11 PM - Beginning epoch 1
+INFO :: 27/08/2019 06:12:11 PM - Setting model mode to train
+INFO :: 27/08/2019 06:12:11 PM - Multi task evaluation
+INFO :: 27/08/2019 06:12:11 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:12:11 PM - 1,train_sup,0.530779,84,84,0.022041,0.0,0.5,0.444444,0.452381,0.470588
+INFO :: 27/08/2019 06:12:11 PM - Setting model mode to train
+INFO :: 27/08/2019 06:12:13 PM - 1,train_un,-1.0258,200704,2415710,2.700962,Counts --> Counter({0: 1857, 3: 74, 2: 61, 1: 29, 4: 27}),0.0
+INFO :: 27/08/2019 06:12:16 PM - 1,train_un,-0.980867,401408,2415710,5.214893,Counts --> Counter({0: 1814, 3: 100, 2: 71, 1: 35, 4: 28}),0.0
+INFO :: 27/08/2019 06:12:18 PM - 1,train_un,-0.981147,602112,2415710,7.286536,Counts --> Counter({0: 1721, 3: 171, 2: 78, 1: 51, 4: 27}),0.0
+INFO :: 27/08/2019 06:12:20 PM - 1,train_un,-0.991093,802816,2415710,9.775361,Counts --> Counter({0: 1689, 3: 189, 2: 79, 1: 52, 4: 39}),0.0
+INFO :: 27/08/2019 06:12:22 PM - 1,train_un,-1.003663,1003520,2415710,11.717215,Counts --> Counter({0: 1689, 3: 223, 2: 61, 4: 39, 1: 36}),0.0
+INFO :: 27/08/2019 06:12:24 PM - 1,train_un,-1.017573,1204224,2415710,13.557658,Counts --> Counter({0: 1644, 3: 253, 2: 79, 4: 43, 1: 29}),0.0
+INFO :: 27/08/2019 06:12:26 PM - 1,train_un,-1.031466,1404928,2415710,15.446265,Counts --> Counter({0: 1639, 3: 249, 2: 103, 4: 29, 1: 28}),0.0
+INFO :: 27/08/2019 06:12:28 PM - 1,train_un,-1.043945,1605632,2415710,17.332479,Counts --> Counter({0: 1674, 3: 240, 2: 81, 4: 32, 1: 21}),0.0
+INFO :: 27/08/2019 06:12:30 PM - 1,train_un,-1.05519,1806336,2415710,19.236072,Counts --> Counter({0: 1656, 3: 229, 2: 101, 1: 33, 4: 29}),0.0
+INFO :: 27/08/2019 06:12:32 PM - 1,train_un,-1.065044,2007040,2415710,21.147149,Counts --> Counter({0: 1681, 3: 203, 2: 119, 1: 28, 4: 17}),0.0
+INFO :: 27/08/2019 06:12:34 PM - 1,train_un,-1.067905,2207744,2415710,23.094095,Counts --> Counter({0: 1750, 3: 135, 2: 123, 1: 22, 4: 18}),0.0
+INFO :: 27/08/2019 06:12:36 PM - 1,train_un,-1.067442,2408448,2415710,25.202055,Counts --> Counter({0: 1695, 3: 195, 2: 107, 4: 31, 1: 20}),0.0
+INFO :: 27/08/2019 06:12:36 PM - epoch,mode,loss,count,dataset_size,time,kl_loss
+INFO :: 27/08/2019 06:12:36 PM - 1,train_un,-1.067565,2415710,2415710,25.296385,0.0
+INFO :: 27/08/2019 06:12:36 PM - Setting model mode to eval
+INFO :: 27/08/2019 06:12:36 PM - Multi task evaluation
+INFO :: 27/08/2019 06:12:36 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:12:36 PM - 1,eval,0.0,21,21,0.002712,0.0,0.428571,0.352941,0.47619,0.387097
+INFO :: 27/08/2019 06:12:36 PM - Best score: 0.43749999999999994, This score: 0.3870967741935484
+INFO :: 27/08/2019 06:12:36 PM - Saving checkpoint to temp/best_fb15k/run_3/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_checkpoint.pth
+INFO :: 27/08/2019 06:12:36 PM - Beginning epoch 2
+INFO :: 27/08/2019 06:12:36 PM - Setting model mode to train
+INFO :: 27/08/2019 06:12:36 PM - Multi task evaluation
+INFO :: 27/08/2019 06:12:36 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:12:36 PM - 2,train_sup,0.499339,84,84,0.009185,0.0,0.6,0.541667,0.547619,0.569343
+INFO :: 27/08/2019 06:12:36 PM - Setting model mode to train
+INFO :: 27/08/2019 06:12:38 PM - 2,train_un,-1.106905,200704,2415710,2.399118,Counts --> Counter({0: 1655, 3: 240, 2: 108, 1: 25, 4: 20}),0.0
+INFO :: 27/08/2019 06:12:41 PM - 2,train_un,-1.121318,401408,2415710,5.000092,Counts --> Counter({0: 1646, 3: 243, 2: 108, 4: 28, 1: 23}),0.0
+INFO :: 27/08/2019 06:12:44 PM - 2,train_un,-1.130895,602112,2415710,7.638691,Counts --> Counter({0: 1650, 3: 231, 2: 116, 4: 31, 1: 20}),0.0
+INFO :: 27/08/2019 06:12:46 PM - 2,train_un,-1.139321,802816,2415710,10.315686,Counts --> Counter({0: 1640, 3: 257, 2: 95, 1: 34, 4: 22}),0.0
+INFO :: 27/08/2019 06:12:49 PM - 2,train_un,-1.146697,1003520,2415710,13.016203,Counts --> Counter({0: 1668, 3: 229, 2: 100, 4: 30, 1: 21}),0.0
+INFO :: 27/08/2019 06:12:52 PM - 2,train_un,-1.152293,1204224,2415710,15.751176,Counts --> Counter({0: 1627, 3: 256, 2: 120, 1: 23, 4: 22}),0.0
+INFO :: 27/08/2019 06:12:54 PM - 2,train_un,-1.156636,1404928,2415710,18.299662,Counts --> Counter({0: 1671, 3: 214, 2: 113, 1: 30, 4: 20}),0.0
+INFO :: 27/08/2019 06:12:56 PM - 2,train_un,-1.160719,1605632,2415710,20.135493,Counts --> Counter({0: 1670, 3: 204, 2: 115, 4: 30, 1: 29}),0.0
+INFO :: 27/08/2019 06:12:58 PM - 2,train_un,-1.163154,1806336,2415710,22.022096,Counts --> Counter({0: 1605, 3: 265, 2: 126, 4: 27, 1: 25}),0.0
+INFO :: 27/08/2019 06:13:00 PM - 2,train_un,-1.166027,2007040,2415710,23.949358,Counts --> Counter({0: 1629, 3: 243, 2: 140, 4: 25, 1: 11}),0.0
+INFO :: 27/08/2019 06:13:02 PM - 2,train_un,-1.168309,2207744,2415710,25.96908,Counts --> Counter({0: 1629, 3: 234, 2: 130, 1: 30, 4: 25}),0.0
+INFO :: 27/08/2019 06:13:04 PM - 2,train_un,-1.170159,2408448,2415710,28.084918,Counts --> Counter({0: 1647, 3: 184, 2: 152, 4: 38, 1: 27}),0.0
+INFO :: 27/08/2019 06:13:04 PM - epoch,mode,loss,count,dataset_size,time,kl_loss
+INFO :: 27/08/2019 06:13:04 PM - 2,train_un,-1.170284,2415710,2415710,28.18056,0.0
+INFO :: 27/08/2019 06:13:04 PM - Setting model mode to eval
+INFO :: 27/08/2019 06:13:04 PM - Multi task evaluation
+INFO :: 27/08/2019 06:13:04 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:13:04 PM - 2,eval,0.0,21,21,0.002616,0.0,0.307692,0.235294,0.333333,0.266667
+INFO :: 27/08/2019 06:13:04 PM - Best score: 0.43749999999999994, This score: 0.26666666666666666
+INFO :: 27/08/2019 06:13:04 PM - Saving checkpoint to temp/best_fb15k/run_3/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_checkpoint.pth
+INFO :: 27/08/2019 06:13:04 PM - Beginning epoch 3
+INFO :: 27/08/2019 06:13:04 PM - Setting model mode to train
+INFO :: 27/08/2019 06:13:04 PM - Multi task evaluation
+INFO :: 27/08/2019 06:13:04 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:13:04 PM - 3,train_sup,0.552892,84,84,0.007844,0.0,0.650794,0.569444,0.583333,0.607407
+INFO :: 27/08/2019 06:13:04 PM - Setting model mode to train
+INFO :: 27/08/2019 06:13:06 PM - 3,train_un,-0.986102,200704,2415710,2.030035,Counts --> Counter({0: 1801, 3: 102, 2: 96, 1: 31, 4: 18}),0.0
+INFO :: 27/08/2019 06:13:08 PM - 3,train_un,-1.003659,401408,2415710,3.911502,Counts --> Counter({0: 1781, 3: 123, 2: 107, 1: 20, 4: 17}),0.0
+INFO :: 27/08/2019 06:13:10 PM - 3,train_un,-1.023125,602112,2415710,5.803187,Counts --> Counter({0: 1712, 3: 151, 2: 128, 1: 37, 4: 20}),0.0
+INFO :: 27/08/2019 06:13:12 PM - 3,train_un,-1.041829,802816,2415710,7.692003,Counts --> Counter({0: 1692, 3: 165, 2: 116, 1: 43, 4: 32}),0.0
+INFO :: 27/08/2019 06:13:14 PM - 3,train_un,-1.058914,1003520,2415710,9.57202,Counts --> Counter({0: 1639, 3: 191, 2: 153, 1: 35, 4: 30}),0.0
+INFO :: 27/08/2019 06:13:16 PM - 3,train_un,-1.073434,1204224,2415710,11.458337,Counts --> Counter({0: 1690, 3: 178, 2: 126, 4: 34, 1: 20}),0.0
+INFO :: 27/08/2019 06:13:18 PM - 3,train_un,-1.086196,1404928,2415710,13.339101,Counts --> Counter({0: 1653, 3: 210, 2: 136, 4: 25, 1: 24}),0.0
+INFO :: 27/08/2019 06:13:20 PM - 3,train_un,-1.096795,1605632,2415710,15.987534,Counts --> Counter({0: 1633, 3: 209, 2: 150, 4: 30, 1: 26}),0.0
+INFO :: 27/08/2019 06:13:22 PM - 3,train_un,-1.105765,1806336,2415710,17.954014,Counts --> Counter({0: 1656, 3: 214, 2: 136, 1: 21, 4: 21}),0.0
+INFO :: 27/08/2019 06:13:25 PM - 3,train_un,-1.108351,2007040,2415710,20.433102,Counts --> Counter({0: 1576, 3: 136, 1: 123, 2: 123, 4: 90}),0.0
+INFO :: 27/08/2019 06:13:26 PM - 3,train_un,-1.108183,2207744,2415710,22.298999,Counts --> Counter({0: 1704, 3: 148, 2: 129, 1: 37, 4: 30}),0.0
+INFO :: 27/08/2019 06:13:28 PM - 3,train_un,-1.110534,2408448,2415710,24.126524,Counts --> Counter({0: 1667, 2: 161, 3: 155, 4: 40, 1: 25}),0.0
+INFO :: 27/08/2019 06:13:28 PM - epoch,mode,loss,count,dataset_size,time,kl_loss
+INFO :: 27/08/2019 06:13:28 PM - 3,train_un,-1.110647,2415710,2415710,24.25646,0.0
+INFO :: 27/08/2019 06:13:28 PM - Setting model mode to eval
+INFO :: 27/08/2019 06:13:28 PM - Multi task evaluation
+INFO :: 27/08/2019 06:13:28 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:13:28 PM - 3,eval,0.0,21,21,0.003199,0.0,0.461538,0.352941,0.428571,0.4
+INFO :: 27/08/2019 06:13:28 PM - Best score: 0.43749999999999994, This score: 0.4000000000000001
+INFO :: 27/08/2019 06:13:28 PM - Saving checkpoint to temp/best_fb15k/run_3/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_checkpoint.pth
+INFO :: 27/08/2019 06:13:28 PM - Beginning epoch 4
+INFO :: 27/08/2019 06:13:28 PM - Setting model mode to train
+INFO :: 27/08/2019 06:13:28 PM - Multi task evaluation
+INFO :: 27/08/2019 06:13:28 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:13:28 PM - 4,train_sup,0.486331,84,84,0.021302,0.0,0.65625,0.583333,0.595238,0.617647
+INFO :: 27/08/2019 06:13:28 PM - Setting model mode to train
+INFO :: 27/08/2019 06:13:31 PM - 4,train_un,-1.16584,200704,2415710,2.958041,Counts --> Counter({0: 1632, 3: 203, 2: 157, 4: 29, 1: 27}),0.0
+INFO :: 27/08/2019 06:13:34 PM - 4,train_un,-1.169868,401408,2415710,5.549529,Counts --> Counter({0: 1640, 3: 181, 2: 173, 1: 31, 4: 23}),0.0
+INFO :: 27/08/2019 06:13:36 PM - 4,train_un,-1.174778,602112,2415710,7.653354,Counts --> Counter({0: 1625, 2: 190, 3: 187, 1: 26, 4: 20}),0.0
+INFO :: 27/08/2019 06:13:38 PM - 4,train_un,-1.179844,802816,2415710,9.908755,Counts --> Counter({0: 1611, 3: 203, 2: 181, 1: 31, 4: 22}),0.0
+INFO :: 27/08/2019 06:13:41 PM - 4,train_un,-1.184592,1003520,2415710,12.180742,Counts --> Counter({0: 1611, 2: 204, 3: 172, 1: 32, 4: 29}),0.0
+INFO :: 27/08/2019 06:13:43 PM - 4,train_un,-1.187164,1204224,2415710,14.313816,Counts --> Counter({0: 1603, 2: 201, 3: 188, 1: 31, 4: 25}),0.0
+INFO :: 27/08/2019 06:13:45 PM - 4,train_un,-1.190072,1404928,2415710,16.195924,Counts --> Counter({0: 1649, 2: 181, 3: 125, 1: 52, 4: 41}),0.0
+INFO :: 27/08/2019 06:13:47 PM - 4,train_un,-1.186576,1605632,2415710,18.070369,Counts --> Counter({0: 1645, 2: 173, 3: 162, 4: 38, 1: 30}),0.0
+INFO :: 27/08/2019 06:13:48 PM - 4,train_un,-1.186559,1806336,2415710,19.939416,Counts --> Counter({0: 1606, 2: 196, 3: 183, 1: 35, 4: 28}),0.0
+INFO :: 27/08/2019 06:13:50 PM - 4,train_un,-1.187439,2007040,2415710,21.898846,Counts --> Counter({0: 1633, 2: 190, 3: 167, 4: 31, 1: 27}),0.0
+INFO :: 27/08/2019 06:13:53 PM - 4,train_un,-1.189002,2207744,2415710,24.196528,Counts --> Counter({0: 1607, 2: 196, 3: 174, 4: 41, 1: 30}),0.0
+INFO :: 27/08/2019 06:13:55 PM - 4,train_un,-1.19066,2408448,2415710,26.94711,Counts --> Counter({0: 1628, 2: 190, 3: 182, 1: 26, 4: 22}),0.0
+INFO :: 27/08/2019 06:13:56 PM - epoch,mode,loss,count,dataset_size,time,kl_loss
+INFO :: 27/08/2019 06:13:56 PM - 4,train_un,-1.190689,2415710,2415710,27.07276,0.0
+INFO :: 27/08/2019 06:13:56 PM - Setting model mode to eval
+INFO :: 27/08/2019 06:13:56 PM - Multi task evaluation
+INFO :: 27/08/2019 06:13:56 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:13:56 PM - 4,eval,0.0,21,21,0.002931,0.0,0.4375,0.411765,0.428571,0.424242
+INFO :: 27/08/2019 06:13:56 PM - Best score: 0.43749999999999994, This score: 0.42424242424242425
+INFO :: 27/08/2019 06:13:56 PM - Saving checkpoint to temp/best_fb15k/run_3/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_checkpoint.pth
+INFO :: 27/08/2019 06:13:56 PM - Beginning epoch 5
+INFO :: 27/08/2019 06:13:56 PM - Setting model mode to train
+INFO :: 27/08/2019 06:13:56 PM - Multi task evaluation
+INFO :: 27/08/2019 06:13:56 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:13:56 PM - 5,train_sup,0.464348,84,84,0.011405,0.0,0.666667,0.611111,0.607143,0.637681
+INFO :: 27/08/2019 06:13:56 PM - Setting model mode to train
+INFO :: 27/08/2019 06:13:58 PM - 5,train_un,-1.213695,200704,2415710,2.887941,Counts --> Counter({0: 1600, 2: 211, 3: 174, 1: 39, 4: 24}),0.0
+INFO :: 27/08/2019 06:14:01 PM - 5,train_un,-1.215987,401408,2415710,5.213931,Counts --> Counter({0: 1615, 2: 196, 3: 171, 1: 34, 4: 32}),0.0
+INFO :: 27/08/2019 06:14:03 PM - 5,train_un,-1.216826,602112,2415710,7.728972,Counts --> Counter({0: 1589, 2: 236, 3: 158, 4: 36, 1: 29}),0.0
+INFO :: 27/08/2019 06:14:06 PM - 5,train_un,-1.218314,802816,2415710,10.149631,Counts --> Counter({0: 1613, 2: 235, 3: 142, 4: 31, 1: 27}),0.0
+INFO :: 27/08/2019 06:14:08 PM - 5,train_un,-1.219238,1003520,2415710,12.031122,Counts --> Counter({0: 1620, 2: 217, 3: 154, 4: 32, 1: 25}),0.0
+INFO :: 27/08/2019 06:14:10 PM - 5,train_un,-1.220395,1204224,2415710,13.959964,Counts --> Counter({0: 1614, 2: 231, 3: 146, 1: 30, 4: 27}),0.0
+INFO :: 27/08/2019 06:14:11 PM - 5,train_un,-1.221473,1404928,2415710,15.784131,Counts --> Counter({0: 1651, 2: 221, 3: 120, 4: 30, 1: 26}),0.0
+INFO :: 27/08/2019 06:14:13 PM - 5,train_un,-1.222956,1605632,2415710,17.664196,Counts --> Counter({0: 1634, 2: 224, 3: 133, 4: 30, 1: 27}),0.0
+INFO :: 27/08/2019 06:14:16 PM - 5,train_un,-1.224138,1806336,2415710,20.328005,Counts --> Counter({0: 1627, 2: 220, 3: 160, 1: 22, 4: 19}),0.0
+INFO :: 27/08/2019 06:14:19 PM - 5,train_un,-1.225224,2007040,2415710,22.968147,Counts --> Counter({0: 1643, 2: 220, 3: 143, 4: 22, 1: 20}),0.0
+INFO :: 27/08/2019 06:14:21 PM - 5,train_un,-1.226347,2207744,2415710,25.212241,Counts --> Counter({0: 1646, 2: 210, 3: 136, 1: 30, 4: 26}),0.0
+INFO :: 27/08/2019 06:14:23 PM - 5,train_un,-1.227712,2408448,2415710,27.097015,Counts --> Counter({0: 1623, 2: 248, 3: 133, 1: 25, 4: 19}),0.0
+INFO :: 27/08/2019 06:14:23 PM - epoch,mode,loss,count,dataset_size,time,kl_loss
+INFO :: 27/08/2019 06:14:23 PM - 5,train_un,-1.227745,2415710,2415710,27.192025,0.0
+INFO :: 27/08/2019 06:14:23 PM - Setting model mode to eval
+INFO :: 27/08/2019 06:14:23 PM - Multi task evaluation
+INFO :: 27/08/2019 06:14:23 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:14:23 PM - 5,eval,0.0,21,21,0.002704,0.0,0.571429,0.470588,0.47619,0.516129
+INFO :: 27/08/2019 06:14:23 PM - Best score: 0.43749999999999994, This score: 0.5161290322580646
+INFO :: 27/08/2019 06:14:23 PM - Saving checkpoint to temp/best_fb15k/run_3/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_checkpoint.pth
+INFO :: 27/08/2019 06:14:23 PM - Beginning epoch 6
+INFO :: 27/08/2019 06:14:23 PM - Setting model mode to train
+INFO :: 27/08/2019 06:14:23 PM - Multi task evaluation
+INFO :: 27/08/2019 06:14:23 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:14:23 PM - 6,train_sup,0.428894,84,84,0.009852,0.0,0.692308,0.625,0.630952,0.656934
+INFO :: 27/08/2019 06:14:23 PM - Setting model mode to train
+INFO :: 27/08/2019 06:14:25 PM - 6,train_un,-1.245028,200704,2415710,2.074635,Counts --> Counter({0: 1610, 2: 267, 3: 113, 1: 30, 4: 28}),0.0
+INFO :: 27/08/2019 06:14:27 PM - 6,train_un,-1.242251,401408,2415710,3.942991,Counts --> Counter({0: 1631, 2: 236, 3: 128, 1: 27, 4: 26}),0.0
+INFO :: 27/08/2019 06:14:29 PM - 6,train_un,-1.244302,602112,2415710,5.77999,Counts --> Counter({0: 1629, 2: 233, 3: 130, 1: 28, 4: 28}),0.0
+INFO :: 27/08/2019 06:14:31 PM - 6,train_un,-1.246259,802816,2415710,8.104225,Counts --> Counter({0: 1635, 2: 251, 3: 111, 1: 26, 4: 25}),0.0
+INFO :: 27/08/2019 06:14:34 PM - 6,train_un,-1.246929,1003520,2415710,10.93834,Counts --> Counter({0: 1620, 2: 248, 3: 119, 4: 31, 1: 30}),0.0
+INFO :: 27/08/2019 06:14:36 PM - 6,train_un,-1.247871,1204224,2415710,13.545775,Counts --> Counter({0: 1621, 2: 272, 3: 111, 4: 22, 1: 22}),0.0
+INFO :: 27/08/2019 06:14:39 PM - 6,train_un,-1.24939,1404928,2415710,16.24212,Counts --> Counter({0: 1633, 2: 240, 3: 114, 4: 32, 1: 29}),0.0
+INFO :: 27/08/2019 06:14:42 PM - 6,train_un,-1.250565,1605632,2415710,18.977537,Counts --> Counter({0: 1588, 2: 282, 3: 126, 1: 28, 4: 24}),0.0
+INFO :: 27/08/2019 06:14:44 PM - 6,train_un,-1.251501,1806336,2415710,21.695428,Counts --> Counter({0: 1646, 2: 267, 3: 92, 1: 23, 4: 20}),0.0
+INFO :: 27/08/2019 06:14:47 PM - 6,train_un,-1.252747,2007040,2415710,24.31487,Counts --> Counter({0: 1623, 2: 281, 3: 109, 1: 18, 4: 17}),0.0
+INFO :: 27/08/2019 06:14:50 PM - 6,train_un,-1.2541,2207744,2415710,26.983376,Counts --> Counter({0: 1610, 2: 305, 3: 90, 4: 23, 1: 20}),0.0
+INFO :: 27/08/2019 06:14:52 PM - 6,train_un,-1.255234,2408448,2415710,29.646959,Counts --> Counter({0: 1617, 2: 288, 3: 92, 4: 26, 1: 25}),0.0
+INFO :: 27/08/2019 06:14:53 PM - epoch,mode,loss,count,dataset_size,time,kl_loss
+INFO :: 27/08/2019 06:14:53 PM - 6,train_un,-1.255308,2415710,2415710,29.775565,0.0
+INFO :: 27/08/2019 06:14:53 PM - Setting model mode to eval
+INFO :: 27/08/2019 06:14:53 PM - Multi task evaluation
+INFO :: 27/08/2019 06:14:53 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:14:53 PM - 6,eval,0.0,21,21,0.002844,0.0,0.533333,0.470588,0.47619,0.5
+INFO :: 27/08/2019 06:14:53 PM - Best score: 0.5161290322580646, This score: 0.5
+INFO :: 27/08/2019 06:14:53 PM - Saving checkpoint to temp/best_fb15k/run_3/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_checkpoint.pth
+INFO :: 27/08/2019 06:14:53 PM - Beginning epoch 7
+INFO :: 27/08/2019 06:14:53 PM - Setting model mode to train
+INFO :: 27/08/2019 06:14:53 PM - Multi task evaluation
+INFO :: 27/08/2019 06:14:53 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:14:53 PM - 7,train_sup,0.386867,84,84,0.012627,0.0,0.741935,0.638889,0.654762,0.686567
+INFO :: 27/08/2019 06:14:53 PM - Setting model mode to train
+INFO :: 27/08/2019 06:14:55 PM - 7,train_un,-1.27348,200704,2415710,2.913766,Counts --> Counter({0: 1634, 2: 282, 3: 80, 4: 28, 1: 24}),0.0
+INFO :: 27/08/2019 06:14:58 PM - 7,train_un,-1.273931,401408,2415710,5.767072,Counts --> Counter({0: 1634, 2: 267, 3: 97, 4: 32, 1: 18}),0.0
+INFO :: 27/08/2019 06:15:00 PM - 7,train_un,-1.274047,602112,2415710,7.650088,Counts --> Counter({0: 1599, 2: 282, 3: 117, 4: 27, 1: 23}),0.0
+INFO :: 27/08/2019 06:15:02 PM - 7,train_un,-1.275665,802816,2415710,9.542467,Counts --> Counter({0: 1612, 2: 285, 3: 96, 1: 30, 4: 25}),0.0
+INFO :: 27/08/2019 06:15:04 PM - 7,train_un,-1.275812,1003520,2415710,11.432254,Counts --> Counter({0: 1613, 2: 302, 3: 98, 4: 23, 1: 12}),0.0
+INFO :: 27/08/2019 06:15:06 PM - 7,train_un,-1.276107,1204224,2415710,13.318065,Counts --> Counter({0: 1623, 2: 284, 3: 88, 1: 29, 4: 24}),0.0
+INFO :: 27/08/2019 06:15:08 PM - 7,train_un,-1.27746,1404928,2415710,15.204954,Counts --> Counter({0: 1624, 2: 279, 3: 73, 4: 42, 1: 30}),0.0
+INFO :: 27/08/2019 06:15:10 PM - 7,train_un,-1.278389,1605632,2415710,17.618509,Counts --> Counter({0: 1623, 2: 298, 3: 83, 4: 28, 1: 16}),0.0
+INFO :: 27/08/2019 06:15:13 PM - 7,train_un,-1.279407,1806336,2415710,19.964589,Counts --> Counter({0: 1628, 2: 287, 3: 78, 4: 28, 1: 27}),0.0
+INFO :: 27/08/2019 06:15:15 PM - 7,train_un,-1.28064,2007040,2415710,21.977422,Counts --> Counter({0: 1621, 2: 284, 3: 89, 4: 40, 1: 14}),0.0
+INFO :: 27/08/2019 06:15:17 PM - 7,train_un,-1.281703,2207744,2415710,24.530007,Counts --> Counter({0: 1630, 2: 275, 3: 91, 4: 33, 1: 19}),0.0
+INFO :: 27/08/2019 06:15:20 PM - 7,train_un,-1.283052,2408448,2415710,27.215519,Counts --> Counter({0: 1597, 2: 310, 3: 97, 4: 22, 1: 22}),0.0
+INFO :: 27/08/2019 06:15:20 PM - epoch,mode,loss,count,dataset_size,time,kl_loss
+INFO :: 27/08/2019 06:15:20 PM - 7,train_un,-1.28316,2415710,2415710,27.341048,0.0
+INFO :: 27/08/2019 06:15:20 PM - Setting model mode to eval
+INFO :: 27/08/2019 06:15:20 PM - Multi task evaluation
+INFO :: 27/08/2019 06:15:20 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:15:20 PM - 7,eval,0.0,21,21,0.003139,0.0,0.5,0.470588,0.428571,0.484848
+INFO :: 27/08/2019 06:15:20 PM - Best score: 0.5161290322580646, This score: 0.48484848484848486
+INFO :: 27/08/2019 06:15:20 PM - Saving checkpoint to temp/best_fb15k/run_3/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_checkpoint.pth
+INFO :: 27/08/2019 06:15:20 PM - Beginning epoch 8
+INFO :: 27/08/2019 06:15:20 PM - Setting model mode to train
+INFO :: 27/08/2019 06:15:20 PM - Multi task evaluation
+INFO :: 27/08/2019 06:15:20 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:15:20 PM - 8,train_sup,0.350974,84,84,0.012191,0.0,0.772727,0.708333,0.714286,0.73913
+INFO :: 27/08/2019 06:15:20 PM - Setting model mode to train
+INFO :: 27/08/2019 06:15:23 PM - 8,train_un,-1.295621,200704,2415710,2.815149,Counts --> Counter({0: 1614, 2: 314, 3: 81, 4: 26, 1: 13}),0.0
+INFO :: 27/08/2019 06:15:25 PM - 8,train_un,-1.299472,401408,2415710,5.143324,Counts --> Counter({0: 1604, 2: 311, 3: 79, 4: 36, 1: 18}),0.0
+INFO :: 27/08/2019 06:15:28 PM - 8,train_un,-1.302348,602112,2415710,7.780879,Counts --> Counter({0: 1604, 2: 315, 3: 79, 4: 35, 1: 15}),0.0
+INFO :: 27/08/2019 06:15:30 PM - 8,train_un,-1.302492,802816,2415710,10.464354,Counts --> Counter({0: 1610, 2: 316, 3: 75, 4: 29, 1: 18}),0.0
+INFO :: 27/08/2019 06:15:33 PM - 8,train_un,-1.303259,1003520,2415710,13.139973,Counts --> Counter({0: 1592, 2: 328, 3: 88, 4: 22, 1: 18}),0.0
+INFO :: 27/08/2019 06:15:36 PM - 8,train_un,-1.304752,1204224,2415710,15.932933,Counts --> Counter({0: 1620, 2: 300, 3: 72, 4: 34, 1: 22}),0.0
+INFO :: 27/08/2019 06:15:39 PM - 8,train_un,-1.306164,1404928,2415710,18.652399,Counts --> Counter({0: 1626, 2: 284, 3: 85, 4: 36, 1: 17}),0.0
+INFO :: 27/08/2019 06:15:41 PM - 8,train_un,-1.306973,1605632,2415710,21.208473,Counts --> Counter({0: 1637, 2: 301, 3: 75, 4: 29, 1: 6}),0.0
+INFO :: 27/08/2019 06:15:44 PM - 8,train_un,-1.308388,1806336,2415710,23.974535,Counts --> Counter({0: 1632, 2: 314, 3: 64, 4: 21, 1: 17}),0.0
+INFO :: 27/08/2019 06:15:47 PM - 8,train_un,-1.309637,2007040,2415710,26.726156,Counts --> Counter({0: 1661, 2: 290, 3: 63, 4: 19, 1: 15}),0.0
+INFO :: 27/08/2019 06:15:49 PM - 8,train_un,-1.310871,2207744,2415710,29.360367,Counts --> Counter({0: 1626, 2: 317, 3: 65, 4: 24, 1: 16}),0.0
+INFO :: 27/08/2019 06:15:52 PM - 8,train_un,-1.311563,2408448,2415710,32.014261,Counts --> Counter({0: 1609, 2: 317, 3: 81, 4: 28, 1: 13}),0.0
+INFO :: 27/08/2019 06:15:52 PM - epoch,mode,loss,count,dataset_size,time,kl_loss
+INFO :: 27/08/2019 06:15:52 PM - 8,train_un,-1.311525,2415710,2415710,32.142685,0.0
+INFO :: 27/08/2019 06:15:52 PM - Setting model mode to eval
+INFO :: 27/08/2019 06:15:52 PM - Multi task evaluation
+INFO :: 27/08/2019 06:15:52 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:15:52 PM - 8,eval,0.0,21,21,0.003027,0.0,0.5,0.470588,0.47619,0.484848
+INFO :: 27/08/2019 06:15:52 PM - Best score: 0.5161290322580646, This score: 0.48484848484848486
+INFO :: 27/08/2019 06:15:52 PM - Saving checkpoint to temp/best_fb15k/run_3/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_checkpoint.pth
+INFO :: 27/08/2019 06:15:52 PM - Beginning epoch 9
+INFO :: 27/08/2019 06:15:52 PM - Setting model mode to train
+INFO :: 27/08/2019 06:15:52 PM - Multi task evaluation
+INFO :: 27/08/2019 06:15:52 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:15:52 PM - 9,train_sup,0.33556,84,84,0.016774,0.0,0.87931,0.708333,0.738095,0.784615
+INFO :: 27/08/2019 06:15:52 PM - Setting model mode to train
+INFO :: 27/08/2019 06:15:55 PM - 9,train_un,-1.3193,200704,2415710,2.742626,Counts --> Counter({0: 1633, 2: 310, 3: 61, 4: 30, 1: 14}),0.0
+INFO :: 27/08/2019 06:15:57 PM - 9,train_un,-1.322326,401408,2415710,5.345478,Counts --> Counter({0: 1609, 2: 327, 3: 74, 4: 31, 1: 7}),0.0
+INFO :: 27/08/2019 06:16:00 PM - 9,train_un,-1.323736,602112,2415710,8.083741,Counts --> Counter({0: 1598, 2: 330, 3: 77, 4: 32, 1: 11}),0.0
+INFO :: 27/08/2019 06:16:03 PM - 9,train_un,-1.325384,802816,2415710,10.722289,Counts --> Counter({0: 1624, 2: 314, 3: 67, 4: 26, 1: 17}),0.0
+INFO :: 27/08/2019 06:16:06 PM - 9,train_un,-1.32695,1003520,2415710,13.56144,Counts --> Counter({0: 1620, 2: 308, 3: 81, 4: 24, 1: 15}),0.0
+INFO :: 27/08/2019 06:16:08 PM - 9,train_un,-1.327923,1204224,2415710,16.210134,Counts --> Counter({0: 1647, 2: 327, 3: 52, 4: 17, 1: 5}),0.0
+INFO :: 27/08/2019 06:16:11 PM - 9,train_un,-1.329442,1404928,2415710,18.81608,Counts --> Counter({0: 1605, 2: 353, 3: 55, 4: 26, 1: 9}),0.0
+INFO :: 27/08/2019 06:16:14 PM - 9,train_un,-1.331123,1605632,2415710,21.445673,Counts --> Counter({0: 1585, 2: 362, 3: 64, 4: 25, 1: 12}),0.0
+INFO :: 27/08/2019 06:16:16 PM - 9,train_un,-1.332547,1806336,2415710,24.133425,Counts --> Counter({0: 1624, 2: 333, 3: 52, 4: 28, 1: 11}),0.0
+INFO :: 27/08/2019 06:16:19 PM - 9,train_un,-1.334251,2007040,2415710,26.966653,Counts --> Counter({0: 1609, 2: 353, 3: 61, 4: 20, 1: 5}),0.0
+INFO :: 27/08/2019 06:16:22 PM - 9,train_un,-1.335774,2207744,2415710,29.571296,Counts --> Counter({0: 1628, 2: 328, 3: 59, 4: 18, 1: 15}),0.0
+INFO :: 27/08/2019 06:16:24 PM - 9,train_un,-1.336904,2408448,2415710,31.642859,Counts --> Counter({0: 1617, 2: 339, 3: 63, 4: 21, 1: 8}),0.0
+INFO :: 27/08/2019 06:16:24 PM - epoch,mode,loss,count,dataset_size,time,kl_loss
+INFO :: 27/08/2019 06:16:24 PM - 9,train_un,-1.336927,2415710,2415710,31.736062,0.0
+INFO :: 27/08/2019 06:16:24 PM - Setting model mode to eval
+INFO :: 27/08/2019 06:16:24 PM - Multi task evaluation
+INFO :: 27/08/2019 06:16:24 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:16:24 PM - 9,eval,0.0,21,21,0.002753,0.0,0.470588,0.470588,0.47619,0.470588
+INFO :: 27/08/2019 06:16:24 PM - Best score: 0.5161290322580646, This score: 0.47058823529411764
+INFO :: 27/08/2019 06:16:24 PM - Saving checkpoint to temp/best_fb15k/run_3/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_checkpoint.pth
+INFO :: 27/08/2019 06:16:24 PM - Beginning epoch 10
+INFO :: 27/08/2019 06:16:24 PM - Setting model mode to train
+INFO :: 27/08/2019 06:16:24 PM - Multi task evaluation
+INFO :: 27/08/2019 06:16:24 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:16:24 PM - 10,train_sup,0.313633,84,84,0.008375,0.0,0.9,0.75,0.77381,0.818182
+INFO :: 27/08/2019 06:16:24 PM - Setting model mode to train
+INFO :: 27/08/2019 06:16:26 PM - 10,train_un,-1.347478,200704,2415710,2.02407,Counts --> Counter({0: 1571, 2: 389, 3: 53, 4: 22, 1: 13}),0.0
+INFO :: 27/08/2019 06:16:29 PM - 10,train_un,-1.350836,401408,2415710,4.631958,Counts --> Counter({0: 1575, 2: 373, 3: 54, 4: 31, 1: 15}),0.0
+INFO :: 27/08/2019 06:16:31 PM - 10,train_un,-1.353571,602112,2415710,7.089148,Counts --> Counter({0: 1622, 2: 357, 3: 47, 4: 17, 1: 5}),0.0
+INFO :: 27/08/2019 06:16:33 PM - 10,train_un,-1.35345,802816,2415710,9.290643,Counts --> Counter({0: 1556, 2: 416, 3: 46, 4: 21, 1: 9}),0.0
+INFO :: 27/08/2019 06:16:35 PM - 10,train_un,-1.355142,1003520,2415710,11.625527,Counts --> Counter({0: 1594, 2: 374, 3: 49, 4: 20, 1: 11}),0.0
+INFO :: 27/08/2019 06:16:37 PM - 10,train_un,-1.356652,1204224,2415710,13.504294,Counts --> Counter({0: 1585, 2: 380, 3: 54, 4: 23, 1: 6}),0.0
+INFO :: 27/08/2019 06:16:40 PM - 10,train_un,-1.357975,1404928,2415710,15.721502,Counts --> Counter({0: 1574, 2: 379, 3: 56, 4: 29, 1: 10}),0.0
+INFO :: 27/08/2019 06:16:42 PM - 10,train_un,-1.359153,1605632,2415710,18.145629,Counts --> Counter({0: 1583, 2: 383, 3: 47, 4: 23, 1: 12}),0.0
+INFO :: 27/08/2019 06:16:45 PM - 10,train_un,-1.360339,1806336,2415710,20.739651,Counts --> Counter({0: 1596, 2: 361, 3: 53, 4: 24, 1: 14}),0.0
+INFO :: 27/08/2019 06:16:47 PM - 10,train_un,-1.362129,2007040,2415710,23.377958,Counts --> Counter({0: 1576, 2: 381, 3: 58, 4: 26, 1: 7}),0.0
+INFO :: 27/08/2019 06:16:50 PM - 10,train_un,-1.363152,2207744,2415710,25.905386,Counts --> Counter({0: 1593, 2: 382, 3: 46, 4: 23, 1: 4}),0.0
+INFO :: 27/08/2019 06:16:52 PM - 10,train_un,-1.364551,2408448,2415710,28.492968,Counts --> Counter({0: 1587, 2: 380, 3: 54, 4: 24, 1: 3}),0.0
+INFO :: 27/08/2019 06:16:52 PM - epoch,mode,loss,count,dataset_size,time,kl_loss
+INFO :: 27/08/2019 06:16:52 PM - 10,train_un,-1.364598,2415710,2415710,28.621997,0.0
+INFO :: 27/08/2019 06:16:52 PM - Setting model mode to eval
+INFO :: 27/08/2019 06:16:53 PM - Multi task evaluation
+INFO :: 27/08/2019 06:16:53 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:16:53 PM - 10,eval,0.0,21,21,0.004384,0.0,0.5,0.470588,0.47619,0.484848
+INFO :: 27/08/2019 06:16:53 PM - Best score: 0.5161290322580646, This score: 0.48484848484848486
+INFO :: 27/08/2019 06:16:53 PM - Saving checkpoint to temp/best_fb15k/run_3/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_checkpoint.pth
+INFO :: 27/08/2019 06:16:53 PM - Beginning epoch 11
+INFO :: 27/08/2019 06:16:53 PM - Setting model mode to train
+INFO :: 27/08/2019 06:16:53 PM - Multi task evaluation
+INFO :: 27/08/2019 06:16:53 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:16:53 PM - 11,train_sup,0.320922,84,84,0.011582,0.0,0.931034,0.75,0.77381,0.830769
+INFO :: 27/08/2019 06:16:53 PM - Setting model mode to train
+INFO :: 27/08/2019 06:16:56 PM - 11,train_un,-1.378077,200704,2415710,2.981513,Counts --> Counter({0: 1555, 2: 397, 3: 67, 4: 21, 1: 8}),0.0
+INFO :: 27/08/2019 06:16:58 PM - 11,train_un,-1.377529,401408,2415710,5.593831,Counts --> Counter({0: 1599, 2: 366, 3: 47, 4: 30, 1: 6}),0.0
+INFO :: 27/08/2019 06:17:01 PM - 11,train_un,-1.377043,602112,2415710,8.165107,Counts --> Counter({0: 1596, 2: 381, 3: 47, 4: 21, 1: 3}),0.0
+INFO :: 27/08/2019 06:17:03 PM - 11,train_un,-1.37824,802816,2415710,10.29469,Counts --> Counter({0: 1620, 2: 358, 3: 48, 4: 18, 1: 4}),0.0
+INFO :: 27/08/2019 06:17:06 PM - 11,train_un,-1.378305,1003520,2415710,12.985173,Counts --> Counter({0: 1597, 2: 375, 3: 51, 4: 19, 1: 6}),0.0
+INFO :: 27/08/2019 06:17:08 PM - 11,train_un,-1.379163,1204224,2415710,15.479429,Counts --> Counter({0: 1570, 2: 411, 3: 34, 4: 28, 1: 5}),0.0
+INFO :: 27/08/2019 06:17:10 PM - 11,train_un,-1.379582,1404928,2415710,17.716359,Counts --> Counter({0: 1580, 2: 395, 3: 49, 4: 22, 1: 2}),0.0
+INFO :: 27/08/2019 06:17:12 PM - 11,train_un,-1.380662,1605632,2415710,19.890442,Counts --> Counter({0: 1572, 2: 393, 3: 58, 4: 20, 1: 5}),0.0
+INFO :: 27/08/2019 06:17:14 PM - 11,train_un,-1.381209,1806336,2415710,21.779502,Counts --> Counter({0: 1621, 2: 366, 3: 38, 4: 17, 1: 6}),0.0
+INFO :: 27/08/2019 06:17:16 PM - 11,train_un,-1.38152,2007040,2415710,23.674411,Counts --> Counter({0: 1537, 2: 411, 3: 65, 4: 28, 1: 7}),0.0
+INFO :: 27/08/2019 06:17:18 PM - 11,train_un,-1.381561,2207744,2415710,25.70026,Counts --> Counter({0: 1608, 2: 349, 3: 58, 4: 26, 1: 7}),0.0
+INFO :: 27/08/2019 06:17:21 PM - 11,train_un,-1.382326,2408448,2415710,28.320413,Counts --> Counter({0: 1597, 2: 382, 3: 41, 4: 23, 1: 5}),0.0
+INFO :: 27/08/2019 06:17:21 PM - epoch,mode,loss,count,dataset_size,time,kl_loss
+INFO :: 27/08/2019 06:17:21 PM - 11,train_un,-1.382308,2415710,2415710,28.451929,0.0
+INFO :: 27/08/2019 06:17:21 PM - Setting model mode to eval
+INFO :: 27/08/2019 06:17:21 PM - Multi task evaluation
+INFO :: 27/08/2019 06:17:21 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:17:21 PM - 11,eval,0.0,21,21,0.002825,0.0,0.470588,0.470588,0.47619,0.470588
+INFO :: 27/08/2019 06:17:21 PM - Best score: 0.5161290322580646, This score: 0.47058823529411764
+INFO :: 27/08/2019 06:17:21 PM - Saving checkpoint to temp/best_fb15k/run_3/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_checkpoint.pth
+INFO :: 27/08/2019 06:17:21 PM - Beginning epoch 12
+INFO :: 27/08/2019 06:17:21 PM - Setting model mode to train
+INFO :: 27/08/2019 06:17:21 PM - Multi task evaluation
+INFO :: 27/08/2019 06:17:21 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:17:21 PM - 12,train_sup,0.292464,84,84,0.011595,0.0,0.934426,0.791667,0.809524,0.857143
+INFO :: 27/08/2019 06:17:21 PM - Setting model mode to train
+INFO :: 27/08/2019 06:17:24 PM - 12,train_un,-1.390606,200704,2415710,2.571932,Counts --> Counter({0: 1586, 2: 380, 3: 55, 4: 25, 1: 2}),0.0
+INFO :: 27/08/2019 06:17:26 PM - 12,train_un,-1.389946,401408,2415710,5.004056,Counts --> Counter({0: 1583, 2: 374, 3: 51, 4: 34, 1: 6}),0.0
+INFO :: 27/08/2019 06:17:28 PM - 12,train_un,-1.389999,602112,2415710,7.448791,Counts --> Counter({0: 1571, 2: 406, 3: 53, 4: 14, 1: 4}),0.0
+INFO :: 27/08/2019 06:17:31 PM - 12,train_un,-1.388637,802816,2415710,9.805025,Counts --> Counter({0: 1565, 2: 398, 3: 61, 4: 19, 1: 5}),0.0
+INFO :: 27/08/2019 06:17:33 PM - 12,train_un,-1.389408,1003520,2415710,12.388343,Counts --> Counter({0: 1610, 2: 370, 3: 42, 4: 23, 1: 3}),0.0
+INFO :: 27/08/2019 06:17:36 PM - 12,train_un,-1.389669,1204224,2415710,15.020352,Counts --> Counter({0: 1600, 2: 386, 3: 43, 4: 16, 1: 3}),0.0
+INFO :: 27/08/2019 06:17:39 PM - 12,train_un,-1.389787,1404928,2415710,17.683985,Counts --> Counter({0: 1557, 2: 394, 3: 62, 4: 30, 1: 5}),0.0
+INFO :: 27/08/2019 06:17:41 PM - 12,train_un,-1.390092,1605632,2415710,19.669821,Counts --> Counter({0: 1587, 2: 394, 3: 47, 4: 17, 1: 3}),0.0
+INFO :: 27/08/2019 06:17:43 PM - 12,train_un,-1.391011,1806336,2415710,22.0222,Counts --> Counter({0: 1564, 2: 409, 3: 48, 4: 20, 1: 7}),0.0
+INFO :: 27/08/2019 06:17:45 PM - 12,train_un,-1.391639,2007040,2415710,24.298855,Counts --> Counter({0: 1576, 2: 389, 3: 47, 4: 26, 1: 10}),0.0
+INFO :: 27/08/2019 06:17:48 PM - 12,train_un,-1.392159,2207744,2415710,27.005369,Counts --> Counter({0: 1614, 2: 351, 3: 56, 4: 22, 1: 5}),0.0
+INFO :: 27/08/2019 06:17:50 PM - 12,train_un,-1.392666,2408448,2415710,29.212053,Counts --> Counter({0: 1586, 2: 395, 3: 33, 4: 27, 1: 7}),0.0
+INFO :: 27/08/2019 06:17:50 PM - epoch,mode,loss,count,dataset_size,time,kl_loss
+INFO :: 27/08/2019 06:17:50 PM - 12,train_un,-1.392706,2415710,2415710,29.304277,0.0
+INFO :: 27/08/2019 06:17:50 PM - Setting model mode to eval
+INFO :: 27/08/2019 06:17:50 PM - Multi task evaluation
+INFO :: 27/08/2019 06:17:50 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:17:50 PM - 12,eval,0.0,21,21,0.002675,0.0,0.470588,0.470588,0.47619,0.470588
+INFO :: 27/08/2019 06:17:50 PM - Best score: 0.5161290322580646, This score: 0.47058823529411764
+INFO :: 27/08/2019 06:17:50 PM - Saving checkpoint to temp/best_fb15k/run_3/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_checkpoint.pth
+INFO :: 27/08/2019 06:17:50 PM - Beginning epoch 13
+INFO :: 27/08/2019 06:17:50 PM - Setting model mode to train
+INFO :: 27/08/2019 06:17:50 PM - Multi task evaluation
+INFO :: 27/08/2019 06:17:50 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:17:50 PM - 13,train_sup,0.285617,84,84,0.0088,0.0,0.934426,0.791667,0.809524,0.857143
+INFO :: 27/08/2019 06:17:50 PM - Setting model mode to train
+INFO :: 27/08/2019 06:17:53 PM - 13,train_un,-1.398306,200704,2415710,2.610234,Counts --> Counter({0: 1610, 2: 382, 3: 34, 4: 19, 1: 3}),0.0
+INFO :: 27/08/2019 06:17:55 PM - 13,train_un,-1.399098,401408,2415710,4.915273,Counts --> Counter({0: 1591, 2: 366, 3: 51, 4: 28, 1: 12}),0.0
+INFO :: 27/08/2019 06:17:58 PM - 13,train_un,-1.397755,602112,2415710,7.611881,Counts --> Counter({0: 1587, 2: 379, 3: 51, 4: 22, 1: 9}),0.0
+INFO :: 27/08/2019 06:18:00 PM - 13,train_un,-1.398537,802816,2415710,9.930008,Counts --> Counter({0: 1588, 2: 372, 3: 54, 4: 28, 1: 6}),0.0
+INFO :: 27/08/2019 06:18:03 PM - 13,train_un,-1.398652,1003520,2415710,12.226779,Counts --> Counter({0: 1607, 2: 351, 3: 57, 4: 31, 1: 2}),0.0
+INFO :: 27/08/2019 06:18:04 PM - 13,train_un,-1.399504,1204224,2415710,14.122489,Counts --> Counter({0: 1635, 2: 337, 3: 37, 4: 28, 1: 11}),0.0
+INFO :: 27/08/2019 06:18:06 PM - 13,train_un,-1.399719,1404928,2415710,15.988664,Counts --> Counter({0: 1564, 2: 395, 3: 47, 4: 32, 1: 10}),0.0
+INFO :: 27/08/2019 06:18:08 PM - 13,train_un,-1.400198,1605632,2415710,17.847384,Counts --> Counter({0: 1580, 2: 408, 3: 39, 4: 18, 1: 3}),0.0
+INFO :: 27/08/2019 06:18:10 PM - 13,train_un,-1.400653,1806336,2415710,19.723632,Counts --> Counter({0: 1575, 2: 395, 3: 50, 4: 17, 1: 11}),0.0
+INFO :: 27/08/2019 06:18:12 PM - 13,train_un,-1.401051,2007040,2415710,21.893131,Counts --> Counter({0: 1593, 2: 380, 3: 47, 4: 23, 1: 5}),0.0
+INFO :: 27/08/2019 06:18:14 PM - 13,train_un,-1.401202,2207744,2415710,23.772242,Counts --> Counter({0: 1617, 2: 355, 3: 44, 4: 25, 1: 7}),0.0
+INFO :: 27/08/2019 06:18:16 PM - 13,train_un,-1.401381,2408448,2415710,25.708748,Counts --> Counter({0: 1602, 2: 384, 3: 41, 4: 18, 1: 3}),0.0
+INFO :: 27/08/2019 06:18:16 PM - epoch,mode,loss,count,dataset_size,time,kl_loss
+INFO :: 27/08/2019 06:18:16 PM - 13,train_un,-1.40136,2415710,2415710,25.800116,0.0
+INFO :: 27/08/2019 06:18:16 PM - Setting model mode to eval
+INFO :: 27/08/2019 06:18:16 PM - Multi task evaluation
+INFO :: 27/08/2019 06:18:16 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:18:16 PM - 13,eval,0.0,21,21,0.002639,0.0,0.444444,0.470588,0.428571,0.457143
+INFO :: 27/08/2019 06:18:16 PM - Best score: 0.5161290322580646, This score: 0.45714285714285713
+INFO :: 27/08/2019 06:18:16 PM - Saving checkpoint to temp/best_fb15k/run_3/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_checkpoint.pth
+INFO :: 27/08/2019 06:18:16 PM - Beginning epoch 14
+INFO :: 27/08/2019 06:18:16 PM - Setting model mode to train
+INFO :: 27/08/2019 06:18:16 PM - Multi task evaluation
+INFO :: 27/08/2019 06:18:16 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:18:16 PM - 14,train_sup,0.266531,84,84,0.009229,0.0,0.95082,0.805556,0.833333,0.87218
+INFO :: 27/08/2019 06:18:16 PM - Setting model mode to train
+INFO :: 27/08/2019 06:18:18 PM - 14,train_un,-1.40503,200704,2415710,2.030804,Counts --> Counter({0: 1578, 2: 403, 3: 40, 4: 22, 1: 5}),0.0
+INFO :: 27/08/2019 06:18:20 PM - 14,train_un,-1.404637,401408,2415710,3.905346,Counts --> Counter({0: 1571, 2: 387, 3: 54, 4: 24, 1: 12}),0.0
+INFO :: 27/08/2019 06:18:22 PM - 14,train_un,-1.403444,602112,2415710,6.026147,Counts --> Counter({0: 1606, 2: 373, 3: 44, 4: 20, 1: 5}),0.0
+INFO :: 27/08/2019 06:18:24 PM - 14,train_un,-1.403415,802816,2415710,7.919375,Counts --> Counter({0: 1585, 2: 388, 3: 43, 4: 22, 1: 10}),0.0
+INFO :: 27/08/2019 06:18:26 PM - 14,train_un,-1.40453,1003520,2415710,9.832657,Counts --> Counter({0: 1586, 2: 380, 3: 42, 4: 31, 1: 9}),0.0
+INFO :: 27/08/2019 06:18:28 PM - 14,train_un,-1.405335,1204224,2415710,12.102319,Counts --> Counter({0: 1577, 2: 390, 3: 53, 4: 22, 1: 6}),0.0
+INFO :: 27/08/2019 06:18:31 PM - 14,train_un,-1.406334,1404928,2415710,14.945558,Counts --> Counter({0: 1588, 2: 375, 3: 53, 4: 23, 1: 9}),0.0
+INFO :: 27/08/2019 06:18:33 PM - 14,train_un,-1.406678,1605632,2415710,17.00595,Counts --> Counter({0: 1583, 2: 380, 3: 52, 4: 29, 1: 4}),0.0
+INFO :: 27/08/2019 06:18:35 PM - 14,train_un,-1.407108,1806336,2415710,19.183391,Counts --> Counter({0: 1565, 2: 396, 3: 48, 4: 33, 1: 6}),0.0
+INFO :: 27/08/2019 06:18:38 PM - 14,train_un,-1.40703,2007040,2415710,21.5703,Counts --> Counter({0: 1631, 2: 342, 3: 43, 4: 29, 1: 3}),0.0
+INFO :: 27/08/2019 06:18:40 PM - 14,train_un,-1.407117,2207744,2415710,24.116495,Counts --> Counter({0: 1613, 2: 376, 3: 33, 4: 21, 1: 5}),0.0
+INFO :: 27/08/2019 06:18:43 PM - 14,train_un,-1.407725,2408448,2415710,26.820121,Counts --> Counter({0: 1571, 2: 390, 3: 49, 4: 32, 1: 6}),0.0
+INFO :: 27/08/2019 06:18:43 PM - epoch,mode,loss,count,dataset_size,time,kl_loss
+INFO :: 27/08/2019 06:18:43 PM - 14,train_un,-1.407744,2415710,2415710,26.975333,0.0
+INFO :: 27/08/2019 06:18:43 PM - Setting model mode to eval
+INFO :: 27/08/2019 06:18:43 PM - Multi task evaluation
+INFO :: 27/08/2019 06:18:43 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:18:43 PM - 14,eval,0.0,21,21,0.003128,0.0,0.529412,0.529412,0.52381,0.529412
+INFO :: 27/08/2019 06:18:43 PM - Best score: 0.5161290322580646, This score: 0.5294117647058824
+INFO :: 27/08/2019 06:18:43 PM - Saving checkpoint to temp/best_fb15k/run_3/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_checkpoint.pth
+INFO :: 27/08/2019 06:18:43 PM - Beginning epoch 15
+INFO :: 27/08/2019 06:18:43 PM - Setting model mode to train
+INFO :: 27/08/2019 06:18:43 PM - Multi task evaluation
+INFO :: 27/08/2019 06:18:43 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:18:43 PM - 15,train_sup,0.258212,84,84,0.010169,0.0,0.95082,0.805556,0.833333,0.87218
+INFO :: 27/08/2019 06:18:43 PM - Setting model mode to train
+INFO :: 27/08/2019 06:18:46 PM - 15,train_un,-1.405271,200704,2415710,2.371527,Counts --> Counter({0: 1572, 2: 397, 3: 50, 4: 20, 1: 9}),0.0
+INFO :: 27/08/2019 06:18:48 PM - 15,train_un,-1.40954,401408,2415710,4.71373,Counts --> Counter({0: 1529, 2: 431, 3: 54, 4: 24, 1: 10}),0.0
+INFO :: 27/08/2019 06:18:50 PM - 15,train_un,-1.409467,602112,2415710,6.816517,Counts --> Counter({0: 1618, 2: 365, 3: 42, 4: 18, 1: 5}),0.0
+INFO :: 27/08/2019 06:18:53 PM - 15,train_un,-1.409842,802816,2415710,9.504853,Counts --> Counter({0: 1606, 2: 360, 3: 50, 4: 21, 1: 11}),0.0
+INFO :: 27/08/2019 06:18:55 PM - 15,train_un,-1.410704,1003520,2415710,11.576919,Counts --> Counter({0: 1628, 2: 355, 3: 34, 4: 27, 1: 4}),0.0
+INFO :: 27/08/2019 06:18:57 PM - 15,train_un,-1.411626,1204224,2415710,14.010563,Counts --> Counter({0: 1612, 2: 357, 3: 47, 4: 25, 1: 7}),0.0
+INFO :: 27/08/2019 06:19:00 PM - 15,train_un,-1.411756,1404928,2415710,16.730032,Counts --> Counter({0: 1597, 2: 399, 3: 31, 4: 17, 1: 4}),0.0
+INFO :: 27/08/2019 06:19:03 PM - 15,train_un,-1.411769,1605632,2415710,19.485664,Counts --> Counter({0: 1573, 2: 397, 3: 48, 4: 23, 1: 7}),0.0
+INFO :: 27/08/2019 06:19:05 PM - 15,train_un,-1.412282,1806336,2415710,22.166462,Counts --> Counter({0: 1623, 2: 371, 3: 29, 4: 19, 1: 6}),0.0
+INFO :: 27/08/2019 06:19:08 PM - 15,train_un,-1.412242,2007040,2415710,25.191511,Counts --> Counter({0: 1593, 2: 391, 3: 31, 4: 22, 1: 11}),0.0
+INFO :: 27/08/2019 06:19:11 PM - 15,train_un,-1.412452,2207744,2415710,28.007695,Counts --> Counter({0: 1609, 2: 369, 3: 43, 4: 23, 1: 4}),0.0
+INFO :: 27/08/2019 06:19:14 PM - 15,train_un,-1.412569,2408448,2415710,30.725881,Counts --> Counter({0: 1578, 2: 392, 3: 46, 4: 25, 1: 7}),0.0
+INFO :: 27/08/2019 06:19:14 PM - epoch,mode,loss,count,dataset_size,time,kl_loss
+INFO :: 27/08/2019 06:19:14 PM - 15,train_un,-1.412586,2415710,2415710,30.852632,0.0
+INFO :: 27/08/2019 06:19:14 PM - Setting model mode to eval
+INFO :: 27/08/2019 06:19:14 PM - Multi task evaluation
+INFO :: 27/08/2019 06:19:14 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:19:14 PM - 15,eval,0.0,21,21,0.003088,0.0,0.473684,0.529412,0.428571,0.5
+INFO :: 27/08/2019 06:19:14 PM - Best score: 0.5294117647058824, This score: 0.5
+INFO :: 27/08/2019 06:19:14 PM - Saving checkpoint to temp/best_fb15k/run_3/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_checkpoint.pth
+INFO :: 27/08/2019 06:19:14 PM - Beginning epoch 16
+INFO :: 27/08/2019 06:19:14 PM - Setting model mode to train
+INFO :: 27/08/2019 06:19:14 PM - Multi task evaluation
+INFO :: 27/08/2019 06:19:14 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:19:14 PM - 16,train_sup,0.237876,84,84,0.012376,0.0,0.926471,0.875,0.869048,0.9
+INFO :: 27/08/2019 06:19:14 PM - Setting model mode to train
+INFO :: 27/08/2019 06:19:17 PM - 16,train_un,-1.418045,200704,2415710,2.906554,Counts --> Counter({0: 1602, 2: 371, 3: 38, 4: 27, 1: 10}),0.0
+INFO :: 27/08/2019 06:19:20 PM - 16,train_un,-1.415337,401408,2415710,5.738479,Counts --> Counter({0: 1558, 2: 395, 3: 64, 4: 24, 1: 7}),0.0
+INFO :: 27/08/2019 06:19:22 PM - 16,train_un,-1.415263,602112,2415710,8.39697,Counts --> Counter({0: 1529, 2: 446, 3: 48, 4: 19, 1: 6}),0.0
+INFO :: 27/08/2019 06:19:25 PM - 16,train_un,-1.415766,802816,2415710,11.085221,Counts --> Counter({0: 1568, 2: 407, 3: 41, 4: 25, 1: 7}),0.0
+INFO :: 27/08/2019 06:19:28 PM - 16,train_un,-1.415705,1003520,2415710,13.746988,Counts --> Counter({0: 1563, 2: 411, 3: 39, 4: 26, 1: 9}),0.0
+INFO :: 27/08/2019 06:19:30 PM - 16,train_un,-1.416602,1204224,2415710,16.30792,Counts --> Counter({0: 1571, 2: 392, 3: 46, 4: 30, 1: 9}),0.0
+INFO :: 27/08/2019 06:19:33 PM - 16,train_un,-1.417979,1404928,2415710,18.853336,Counts --> Counter({0: 1606, 2: 376, 3: 41, 4: 24, 1: 1}),0.0
+INFO :: 27/08/2019 06:19:35 PM - 16,train_un,-1.417921,1605632,2415710,20.746303,Counts --> Counter({0: 1579, 2: 386, 3: 47, 4: 30, 1: 6}),0.0
+INFO :: 27/08/2019 06:19:37 PM - 16,train_un,-1.417501,1806336,2415710,22.629004,Counts --> Counter({0: 1556, 2: 410, 3: 48, 4: 28, 1: 6}),0.0
+INFO :: 27/08/2019 06:19:39 PM - 16,train_un,-1.417008,2007040,2415710,24.585223,Counts --> Counter({0: 1572, 2: 393, 3: 47, 4: 26, 1: 10}),0.0
+INFO :: 27/08/2019 06:19:41 PM - 16,train_un,-1.417292,2207744,2415710,26.75533,Counts --> Counter({0: 1604, 2: 387, 3: 28, 4: 20, 1: 9}),0.0
+INFO :: 27/08/2019 06:19:44 PM - 16,train_un,-1.41722,2408448,2415710,29.542373,Counts --> Counter({0: 1570, 2: 404, 3: 41, 4: 30, 1: 3}),0.0
+INFO :: 27/08/2019 06:19:44 PM - epoch,mode,loss,count,dataset_size,time,kl_loss
+INFO :: 27/08/2019 06:19:44 PM - 16,train_un,-1.417343,2415710,2415710,29.671517,0.0
+INFO :: 27/08/2019 06:19:44 PM - Setting model mode to eval
+INFO :: 27/08/2019 06:19:44 PM - Multi task evaluation
+INFO :: 27/08/2019 06:19:44 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:19:44 PM - 16,eval,0.0,21,21,0.003188,0.0,0.473684,0.529412,0.428571,0.5
+INFO :: 27/08/2019 06:19:44 PM - Best score: 0.5294117647058824, This score: 0.5
+INFO :: 27/08/2019 06:19:44 PM - Saving checkpoint to temp/best_fb15k/run_3/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_checkpoint.pth
+INFO :: 27/08/2019 06:19:44 PM - Beginning epoch 17
+INFO :: 27/08/2019 06:19:44 PM - Setting model mode to train
+INFO :: 27/08/2019 06:19:44 PM - Multi task evaluation
+INFO :: 27/08/2019 06:19:44 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:19:44 PM - 17,train_sup,0.227043,84,84,0.011297,0.0,0.926471,0.875,0.880952,0.9
+INFO :: 27/08/2019 06:19:44 PM - Setting model mode to train
+INFO :: 27/08/2019 06:19:46 PM - 17,train_un,-1.416507,200704,2415710,2.035772,Counts --> Counter({0: 1619, 2: 373, 3: 36, 4: 17, 1: 3}),0.0
+INFO :: 27/08/2019 06:19:48 PM - 17,train_un,-1.419627,401408,2415710,3.937971,Counts --> Counter({0: 1558, 2: 416, 3: 39, 4: 26, 1: 9}),0.0
+INFO :: 27/08/2019 06:19:50 PM - 17,train_un,-1.420124,602112,2415710,5.830895,Counts --> Counter({0: 1583, 2: 381, 3: 47, 4: 27, 1: 10}),0.0
+INFO :: 27/08/2019 06:19:51 PM - 17,train_un,-1.419166,802816,2415710,7.724702,Counts --> Counter({0: 1590, 2: 395, 3: 36, 4: 21, 1: 6}),0.0
+INFO :: 27/08/2019 06:19:53 PM - 17,train_un,-1.419009,1003520,2415710,9.6111,Counts --> Counter({0: 1606, 2: 370, 3: 37, 4: 29, 1: 6}),0.0
+INFO :: 27/08/2019 06:19:55 PM - 17,train_un,-1.419434,1204224,2415710,11.512123,Counts --> Counter({0: 1575, 2: 398, 3: 50, 4: 15, 1: 10}),0.0
+INFO :: 27/08/2019 06:19:58 PM - 17,train_un,-1.419755,1404928,2415710,14.188764,Counts --> Counter({0: 1584, 2: 398, 3: 38, 4: 23, 1: 5}),0.0
+INFO :: 27/08/2019 06:20:00 PM - 17,train_un,-1.42042,1605632,2415710,16.074365,Counts --> Counter({0: 1594, 2: 388, 3: 42, 4: 21, 1: 3}),0.0
+INFO :: 27/08/2019 06:20:02 PM - 17,train_un,-1.420266,1806336,2415710,17.961847,Counts --> Counter({0: 1573, 2: 400, 3: 44, 4: 27, 1: 4}),0.0
+INFO :: 27/08/2019 06:20:04 PM - 17,train_un,-1.420275,2007040,2415710,19.839326,Counts --> Counter({0: 1596, 2: 379, 3: 51, 4: 16, 1: 6}),0.0
+INFO :: 27/08/2019 06:20:06 PM - 17,train_un,-1.420357,2207744,2415710,22.172699,Counts --> Counter({0: 1542, 2: 386, 3: 64, 4: 44, 1: 12}),0.0
+INFO :: 27/08/2019 06:20:09 PM - 17,train_un,-1.420673,2408448,2415710,24.815643,Counts --> Counter({0: 1587, 2: 393, 3: 42, 4: 22, 1: 4}),0.0
+INFO :: 27/08/2019 06:20:09 PM - epoch,mode,loss,count,dataset_size,time,kl_loss
+INFO :: 27/08/2019 06:20:09 PM - 17,train_un,-1.420665,2415710,2415710,24.973413,0.0
+INFO :: 27/08/2019 06:20:09 PM - Setting model mode to eval
+INFO :: 27/08/2019 06:20:09 PM - Multi task evaluation
+INFO :: 27/08/2019 06:20:09 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:20:09 PM - 17,eval,0.0,21,21,0.003293,0.0,0.470588,0.470588,0.428571,0.470588
+INFO :: 27/08/2019 06:20:09 PM - Best score: 0.5294117647058824, This score: 0.47058823529411764
+INFO :: 27/08/2019 06:20:09 PM - Saving checkpoint to temp/best_fb15k/run_3/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_checkpoint.pth
+INFO :: 27/08/2019 06:20:09 PM - Beginning epoch 18
+INFO :: 27/08/2019 06:20:09 PM - Setting model mode to train
+INFO :: 27/08/2019 06:20:09 PM - Multi task evaluation
+INFO :: 27/08/2019 06:20:09 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:20:09 PM - 18,train_sup,0.220888,84,84,0.022489,0.0,1.0,0.916667,0.928571,0.956522
+INFO :: 27/08/2019 06:20:09 PM - Setting model mode to train
+INFO :: 27/08/2019 06:20:12 PM - 18,train_un,-1.425748,200704,2415710,2.92716,Counts --> Counter({0: 1590, 2: 391, 3: 36, 4: 23, 1: 8}),0.0
+INFO :: 27/08/2019 06:20:14 PM - 18,train_un,-1.426344,401408,2415710,4.824693,Counts --> Counter({0: 1584, 2: 385, 3: 50, 4: 25, 1: 4}),0.0
+INFO :: 27/08/2019 06:20:15 PM - 18,train_un,-1.425394,602112,2415710,6.701664,Counts --> Counter({0: 1567, 2: 409, 3: 42, 4: 27, 1: 3}),0.0
+INFO :: 27/08/2019 06:20:18 PM - 18,train_un,-1.425761,802816,2415710,9.38242,Counts --> Counter({0: 1595, 2: 373, 3: 41, 4: 34, 1: 5}),0.0
+INFO :: 27/08/2019 06:20:20 PM - 18,train_un,-1.426436,1003520,2415710,11.263584,Counts --> Counter({0: 1583, 2: 387, 3: 40, 4: 27, 1: 11}),0.0
+INFO :: 27/08/2019 06:20:22 PM - 18,train_un,-1.426223,1204224,2415710,13.618805,Counts --> Counter({0: 1567, 2: 410, 4: 33, 3: 30, 1: 8}),0.0
+INFO :: 27/08/2019 06:20:24 PM - 18,train_un,-1.42483,1404928,2415710,15.495529,Counts --> Counter({0: 1634, 2: 363, 3: 27, 4: 20, 1: 4}),0.0
+INFO :: 27/08/2019 06:20:26 PM - 18,train_un,-1.42483,1605632,2415710,17.376507,Counts --> Counter({0: 1633, 2: 355, 3: 36, 4: 21, 1: 3}),0.0
+INFO :: 27/08/2019 06:20:28 PM - 18,train_un,-1.424656,1806336,2415710,19.253157,Counts --> Counter({0: 1611, 2: 381, 3: 33, 4: 18, 1: 5}),0.0
+INFO :: 27/08/2019 06:20:30 PM - 18,train_un,-1.424755,2007040,2415710,21.16785,Counts --> Counter({0: 1568, 2: 356, 3: 57, 4: 56, 1: 11}),0.0
+INFO :: 27/08/2019 06:20:33 PM - 18,train_un,-1.424519,2207744,2415710,23.881954,Counts --> Counter({0: 1584, 2: 392, 3: 46, 4: 22, 1: 4}),0.0
+INFO :: 27/08/2019 06:20:35 PM - 18,train_un,-1.424136,2408448,2415710,26.600662,Counts --> Counter({0: 1556, 2: 417, 3: 46, 4: 26, 1: 3}),0.0
+INFO :: 27/08/2019 06:20:35 PM - epoch,mode,loss,count,dataset_size,time,kl_loss
+INFO :: 27/08/2019 06:20:35 PM - 18,train_un,-1.424137,2415710,2415710,26.728407,0.0
+INFO :: 27/08/2019 06:20:35 PM - Setting model mode to eval
+INFO :: 27/08/2019 06:20:35 PM - Multi task evaluation
+INFO :: 27/08/2019 06:20:35 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:20:35 PM - 18,eval,0.0,21,21,0.002697,0.0,0.5,0.529412,0.428571,0.514286
+INFO :: 27/08/2019 06:20:35 PM - Best score: 0.5294117647058824, This score: 0.5142857142857143
+INFO :: 27/08/2019 06:20:35 PM - Saving checkpoint to temp/best_fb15k/run_3/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_checkpoint.pth
+INFO :: 27/08/2019 06:20:35 PM - Beginning epoch 19
+INFO :: 27/08/2019 06:20:35 PM - Setting model mode to train
+INFO :: 27/08/2019 06:20:35 PM - Multi task evaluation
+INFO :: 27/08/2019 06:20:35 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:20:35 PM - 19,train_sup,0.21702,84,84,0.020082,0.0,0.971014,0.930556,0.928571,0.950355
+INFO :: 27/08/2019 06:20:35 PM - Setting model mode to train
+INFO :: 27/08/2019 06:20:38 PM - 19,train_un,-1.424917,200704,2415710,2.977558,Counts --> Counter({0: 1575, 2: 394, 3: 39, 4: 32, 1: 8}),0.0
+INFO :: 27/08/2019 06:20:41 PM - 19,train_un,-1.426078,401408,2415710,5.60093,Counts --> Counter({0: 1571, 2: 420, 3: 25, 4: 24, 1: 8}),0.0
+INFO :: 27/08/2019 06:20:44 PM - 19,train_un,-1.426318,602112,2415710,8.19881,Counts --> Counter({0: 1589, 2: 384, 4: 41, 3: 33, 1: 1}),0.0
+INFO :: 27/08/2019 06:20:46 PM - 19,train_un,-1.426475,802816,2415710,10.743141,Counts --> Counter({0: 1595, 2: 378, 3: 37, 4: 35, 1: 3}),0.0
+INFO :: 27/08/2019 06:20:49 PM - 19,train_un,-1.426212,1003520,2415710,13.333858,Counts --> Counter({0: 1593, 2: 392, 3: 37, 4: 18, 1: 8}),0.0
+INFO :: 27/08/2019 06:20:51 PM - 19,train_un,-1.42565,1204224,2415710,15.967783,Counts --> Counter({0: 1603, 2: 367, 3: 38, 4: 33, 1: 7}),0.0
+INFO :: 27/08/2019 06:20:54 PM - 19,train_un,-1.425834,1404928,2415710,18.535069,Counts --> Counter({0: 1568, 2: 425, 3: 27, 4: 24, 1: 4}),0.0
+INFO :: 27/08/2019 06:20:57 PM - 19,train_un,-1.426338,1605632,2415710,21.158932,Counts --> Counter({0: 1589, 2: 406, 3: 33, 4: 17, 1: 3}),0.0
+INFO :: 27/08/2019 06:20:59 PM - 19,train_un,-1.426592,1806336,2415710,23.784512,Counts --> Counter({0: 1585, 2: 383, 3: 54, 4: 20, 1: 6}),0.0
+INFO :: 27/08/2019 06:21:02 PM - 19,train_un,-1.426896,2007040,2415710,26.401973,Counts --> Counter({0: 1594, 2: 377, 3: 43, 4: 29, 1: 5}),0.0
+INFO :: 27/08/2019 06:21:05 PM - 19,train_un,-1.426869,2207744,2415710,29.093592,Counts --> Counter({0: 1600, 2: 385, 3: 34, 4: 21, 1: 8}),0.0
+INFO :: 27/08/2019 06:21:07 PM - 19,train_un,-1.426975,2408448,2415710,31.688053,Counts --> Counter({0: 1605, 2: 384, 3: 30, 4: 20, 1: 9}),0.0
+INFO :: 27/08/2019 06:21:07 PM - epoch,mode,loss,count,dataset_size,time,kl_loss
+INFO :: 27/08/2019 06:21:07 PM - 19,train_un,-1.426982,2415710,2415710,31.81412,0.0
+INFO :: 27/08/2019 06:21:07 PM - Setting model mode to eval
+INFO :: 27/08/2019 06:21:07 PM - Multi task evaluation
+INFO :: 27/08/2019 06:21:07 PM - epoch,mode,loss,count,dataset_size,time,kl_lossp1,r1,f1,s1,p3,r3,f3,s3,p4,r4,f4,s4,p6,r6,f6,s6,acc,mip,mir,mif
+INFO :: 27/08/2019 06:21:07 PM - 19,eval,0.0,21,21,0.002646,0.0,0.4375,0.411765,0.380952,0.424242
+INFO :: 27/08/2019 06:21:07 PM - Best score: 0.5294117647058824, This score: 0.42424242424242425
+INFO :: 27/08/2019 06:21:07 PM - Saving checkpoint to temp/best_fb15k/run_3/train_ml/train_ml_r0.125_p1_n-2.0_i4_k0.0_checkpoint.pth

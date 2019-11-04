@@ -15,7 +15,8 @@ import os
 import bs4 as bs
 import itertools
 
-ANSWER_OPTIONS = ['true','false','na']
+#ANSWER_OPTIONS = ['true','false','na']
+ANSWER_OPTIONS = ['true','false'] 
 REASON_OPTIONS = ['know','exp','guess','web']
 
 def get_key_answer(key,id):
@@ -82,7 +83,7 @@ def get_winner(answers):
     else:
         return ['na']
 
-def get_book(book_filename):
+def get_book(book_filename,args):
     # TODO: Change this to have a clean pipeline
     with open(book_filename,'r') as f:
         soup = bs.BeautifulSoup(f, 'lxml')
@@ -94,7 +95,14 @@ def get_book(book_filename):
             cols = row.find_all('td')
             cols = [ele.text for ele in cols]
             data.append([ele for ele in cols if ele])
-    return pd.DataFrame(data,columns=['fact','exp','true?'])
+        #
+        df = pd.DataFrame(data,columns=['fact','exp','true?'])
+        if args.all_true:
+            df['true?'] = True
+        elif args.all_false:
+            df['true?'] = False
+        #
+    return df
 
 def get_results(df,book,reason):
     df = df.fillna(False)
@@ -152,11 +160,14 @@ if __name__ == "__main__":
     parser.add_argument('-bf', '--book_file', help="Original HTML (Book) written by get_turk_useful_data",required=False,default=None)
     parser.add_argument('--reason', action='store_true', required=False,
                         help='Use the flag to know the reason of users',default=False)
+    parser.add_argument('--all_true',action='store_true',required=False,default=False)
+    parser.add_argument('--all_false',action='store_true',required=False,default=False)
     args = parser.parse_args()
+    assert not(args.all_true and args.all_false)
 
     book = None
     if(args.book_file is not None):
-        book = get_book(args.book_file)
+        book = get_book(args.book_file,args)
 
     if(args.reason):
         ANSWER_OPTIONS = ANSWER_OPTIONS[:-1]
@@ -168,19 +179,22 @@ if __name__ == "__main__":
     invalid_hits = get_invalid_hits(df,os.path.join(args.output_path,res_file_last_part+'_rejected.csv'),book)
     if(len(invalid_hits)!=0):
         print('There are {} invalid assignments which have id \n{}'.format(len(list(itertools.chain(*list(invalid_hits.values())))),pprint.pformat(invalid_hits)))
-        exit(-1)
-
+       # exit(-1)
     results = get_results(df,book,args.reason)
-
+    #print("------")
+    #print(results)
+    #print("------")
     answers_list = []
     winner_list = []
     avg_time_list = []
     reason_list = []
     accuracy = 0
     for k in results:
+        print(results[k])
         answers_list.extend(results[k]['answers'])
         winner_list.extend(results[k]['winner'])
         avg_time_list.extend(results[k]['time_taken'])
+
         if book is not None:
             if(float(results[k]['our_true?']) == 1 and results[k]['winner'][0] == 'true'):
                 accuracy +=1

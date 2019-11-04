@@ -8,7 +8,7 @@ import numpy as np
 
 import utils
 from templates.template import TemplateBaseClass
-
+import re
 
 class Template1(TemplateBaseClass):
     """
@@ -147,7 +147,40 @@ class Template1(TemplateBaseClass):
                             best_answer, z_score]
         return features
 
+
     def get_english_explanation(self, fact, explainer):
+        template_expln = explainer.get_template_string('template1.txt',fact[1])
+        if template_expln is None:
+            return self.get_english_explanation_0(fact, explainer)
+        #
+        named_fact = explainer.name_fact(fact)
+        count = self.relation_map[fact[1]]["cts"].get(fact[2], 0)
+        #total_count = self.relation_map[fact[1]]['len']
+        total_count = explainer.total_freq_for_relation(fact[1])
+        named_fact_wowiki = explainer.name_fact(fact,add_wiki=False)
+        
+        out_string = string.Template(template_expln).substitute(e1 = named_fact[0], e2 = named_fact[2], r = named_fact[1], count = count, total_count = total_count)
+        out_string_wo_wiki = string.Template(template_expln).substitute(e1 = named_fact_wowiki[0], e2 = named_fact_wowiki[2], r = named_fact_wowiki[1], count = count, total_count = total_count)
+
+        logging.info("***NEW TEMPlate 1 pred: @ {} @ ****. Fact:@ {} @ {} @ {} @ ".format(out_string_wo_wiki, named_fact_wowiki[0], named_fact_wowiki[1], named_fact_wowiki[2]))
+        
+        #now need to replace the hower string
+        out_string_list = re.split(r'[<>]',out_string, maxsplit = 2)
+        if len(out_string_list) > 1:
+            assert len(out_string_list) == 3
+            out_string_list[1] = explainer.get_relation_frequent(fact,custom_string = out_string_list[1])
+        
+        out_string = ' '.join(out_string_list)
+        return out_string
+        
+        #logging.info("*** Template 1 pred: @ {} is most freq seen with {}. e1: {} @ Actual relation: @ {} @**** ".format(named_fact_wowiki[2],named_fact_wowiki[1], named_fact_wowiki[0], explainer.get_raw_relation(fact[1]))) 
+        #return string.Template(self.exp_template).substitute(e1=named_fact[0], r=named_fact[1], e2=named_fact[2], why_frequent=why_frequent)
+
+
+    def get_english_explanation_0(self, fact, explainer):
         why_frequent = explainer.get_relation_frequent(fact)
         named_fact = explainer.name_fact(fact)
+        named_fact_wowiki = explainer.name_fact(fact,add_wiki=False)
+
+        logging.info("*** Template 1 pred: @ {} is most freq seen with {}. e1: {} @ Actual relation: @ {} @**** ".format(named_fact_wowiki[2],named_fact_wowiki[1], named_fact_wowiki[0], explainer.get_raw_relation(fact[1]))) 
         return string.Template(self.exp_template).substitute(e1=named_fact[0], r=named_fact[1], e2=named_fact[2], why_frequent=why_frequent)

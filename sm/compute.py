@@ -105,11 +105,11 @@ class Loss(object):
             #Pdb().set_trace()
             logging.info("Multi task evaluation")
             ypred_cpu = np.ravel(ypred_cpu)
-            correct_count = ycpu[np.arange(ycpu.shape[0]),ypred_cpu.astype(int)].sum()
+            correct_count = (ycpu[np.arange(ycpu.shape[0]),ypred_cpu.astype(int)] > 0).sum()
             #return [correct_count*1.0/len(ypred_cpu)]
             total_acc = correct_count*1.0/len(ypred_cpu)
 
-            acc = ycpu[np.arange(ycpu.shape[0]),ypred_cpu.astype(int)]
+            acc = ycpu[np.arange(ycpu.shape[0]),ypred_cpu.astype(int)] > 0
             ind_color = ycpu[:,1:].sum(axis=1) > 0
             correct_color = acc[ind_color].sum()
             recall = 1.0*correct_color/ind_color.sum()

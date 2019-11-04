@@ -31,6 +31,7 @@ def english_exp_rules(mapped_data, predictions, explainer):
             else:
                 explaining_fact = explainer.html_fact(
                     [fact[0], pred[0], fact[2]])
+                explainer.check_relation(pred[0],fact, 'rules1')
                 explanations.append(explaining_fact)
         else:
             if len(pred[0]) == 2:
@@ -38,6 +39,9 @@ def english_exp_rules(mapped_data, predictions, explainer):
                     [fact[0], pred[0][0], pred[1]])
                 explaining_fact2 = explainer.html_fact(
                     [pred[1], pred[0][1], fact[2]])
+                
+                explainer.check_relation(pred[0][0],fact, 'rules2.1')
+                explainer.check_relation(pred[0][1],fact, 'rules2.2')
                 explanations.append(explaining_fact1+" and "+explaining_fact2)
             else:
                 explaining_fact1 = explainer.html_fact(
@@ -46,6 +50,9 @@ def english_exp_rules(mapped_data, predictions, explainer):
                     [pred[1][0], pred[0][1], pred[1][1]])
                 explaining_fact3 = explainer.html_fact(
                     [pred[1][1], pred[0][2], fact[2]])
+                explainer.check_relation(pred[0][0],fact, 'rules3.1')
+                explainer.check_relation(pred[0][1],fact, 'rules3.2')
+                explainer.check_relation(pred[0][2],fact, 'rules3.3')
                 explanations.append(
                     explaining_fact1+" and "+explaining_fact2+" and "+explaining_fact3)
     return explanations
@@ -57,13 +64,15 @@ def english_exp_template(mapped_data, predictions, template_objs, explainer):
         if(pred == 0):
             explanations.append(explainer.NO_EXPLANATION)
         else:
+            #hacks to extract information
+            explainer.check_relation(fact[1],fact, source='input')
             explanations.append(
                 template_objs[pred-1].get_english_explanation(fact, explainer))
     return explanations
 
 
-def get_options(iter_id, our_is_A, one_is_no):
-    iter_id = iter_id % 5
+def get_options(iter_id, our_is_A, one_is_no, num_per_hit):
+    iter_id = iter_id % num_per_hit
     opt1_id = ('our_' if our_is_A else 'other_') + str(iter_id)
     opt2_id = ('other_' if our_is_A else 'our_') + str(iter_id)
     opt3_id = 'both_' + str(iter_id)
@@ -85,19 +94,24 @@ def get_options(iter_id, our_is_A, one_is_no):
     return [opt1_str, opt2_str, opt3_str, opt4_str]
 
 
-def write_english_exps(mapped_data, template_exps, rule_exps, output_path, num_per_hit, explainer):
+def write_english_exps(mapped_data, template_exps, rule_exps, output_path, num_per_hit, explainer,qids):
     raw_data = queue.Queue(0)
     both_no = 0
     both_same = 0
+    not_in_qidlist = 0
     qlty_ctrl = queue.Queue(0)
-    total_exp_data = list(zip(mapped_data, template_exps, rule_exps))
+    total_exp_data = list(zip(mapped_data, template_exps, rule_exps, list(range(len(mapped_data)))))
     random.shuffle(total_exp_data)
-    for fact, t_exp, r_exp in total_exp_data:
+    for fact, t_exp, r_exp,q_id in total_exp_data:
+        if q_id not in qids:
+            not_in_qidlist += 1
+            continue
+        #
         if(t_exp == explainer.NO_EXPLANATION and r_exp == explainer.NO_EXPLANATION):
             both_no += 1
             continue
-        htmled_fact = explainer.html_fact(fact)
-        row = [htmled_fact, t_exp, r_exp]
+        htmled_fact = explainer.html_question(fact)
+        row = [htmled_fact, t_exp, r_exp, q_id]
         if(t_exp == r_exp):
             both_same += 1
             qlty_ctrl.put(row)
@@ -116,9 +130,11 @@ def write_english_exps(mapped_data, template_exps, rule_exps, output_path, num_p
     _ = [random.shuffle(el) for el in html_data_chunked]
     html_data = list(itertools.chain(*html_data_chunked))
 
-    df_html = pd.DataFrame(html_data, columns=['fact', 'our', 'other'])
+    df_html = pd.DataFrame(html_data, columns=['fact', 'our', 'other','qid'])
     pd.set_option('display.max_colwidth', -1)
     last_out_part = os.path.basename(os.path.normpath(output_path))
+    assert not os.path.exists(os.path.join(output_path, last_out_part+"_book.html"))
+
     with open(os.path.join(output_path, last_out_part+"_book.html"), 'w') as html_file:
         html_file.write(explainer.CSS_STYLE+'\n')
         df_html.to_html(html_file, escape=False, justify='center')
@@ -126,25 +142,27 @@ def write_english_exps(mapped_data, template_exps, rule_exps, output_path, num_p
     logging.info('Total Facts = {}'.format(len(mapped_data)))
     logging.info('Both No explanations = {}'.format(both_no))
     logging.info('Both Same explanations = {}'.format(both_same))
+    logging.info('Not in given question id list = {}'.format(not_in_qidlist))
 
     csv_data = []
     iter_id = 0
-    for htmled_fact, t_exp, r_exp in html_data:
+    for htmled_fact, t_exp, r_exp,q_id in html_data:
         r = random.uniform(0, 1)
         row = [htmled_fact]
         one_is_no = (t_exp == explainer.NO_EXPLANATION or r_exp ==
                      explainer.NO_EXPLANATION)
         if(r <= 0.5):
-            row.extend([t_exp, r_exp])
-            row.extend(get_options(iter_id, True, one_is_no))
+            row.extend([t_exp, r_exp,q_id])
+            row.extend(get_options(iter_id, True, one_is_no,num_per_hit))
         else:
-            row.extend([r_exp, t_exp])
-            row.extend(get_options(iter_id, False, one_is_no))
+            row.extend([r_exp, t_exp, q_id])
+            row.extend(get_options(iter_id, False, one_is_no, num_per_hit))
+        #
         csv_data.append(row)
         iter_id += 1
     columns = []
     for i in range(num_per_hit):
-        columns.extend(['fact_'+str(i), 'exp_A_'+str(i), 'exp_B_'+str(i)])
+        columns.extend(['fact_'+str(i), 'exp_A_'+str(i), 'exp_B_'+str(i),'qid_'+str(i)])
         for j in range(4):
             columns.append('opt_'+str(i)+'_'+str(j))
     print('Generated columns {}'.format(columns))
@@ -153,6 +171,7 @@ def write_english_exps(mapped_data, template_exps, rule_exps, output_path, num_p
     csv_data = np.array(csv_data[:reqd])
     csv_data = csv_data.reshape((-1, len(columns)))
     df = pd.DataFrame(csv_data, columns=columns)
+    assert not os.path.exists(os.path.join(output_path, last_out_part+"_hits.csv"))
     df.to_csv(os.path.join(output_path, last_out_part +
                            "_hits.csv"), index=False, sep=',')
 
@@ -185,17 +204,29 @@ if __name__ == "__main__":
                         nargs='?',
                         help='Set the logging output level. {0}'.format(utils._LOG_LEVEL_STRINGS))
 
+    parser.add_argument('--t_ids', nargs='+', type=int, required=True,
+                        help='List of templates to build objects for')
+    
+    parser.add_argument('--qid_list',
+                        required=False, default=None)
+
     args = parser.parse_args()
 
+    os.makedirs(args.output_path, exist_ok=True)
     logging.basicConfig(format='%(levelname)s :: %(asctime)s - %(message)s',
-                        level=args.log_level, datefmt='%d/%m/%Y %I:%M:%S %p')
+                        level=args.log_level, datefmt='%d/%m/%Y %I:%M:%S %p',filename=os.path.join(args.output_path,"GET_TURK_DATA_LOG"),filemode='w')
 
     data_root = os.path.join(args.data_repo_root, args.dataset)
 
     distmult_dump = utils.read_pkl(args.model_weights)
     logging.info("Read Model Dump")
-
+    
     data = utils.read_data(args.test_file)
+    qids = set(range(len(data)))
+    if args.qid_list is not None:
+        qids = set(np.loadtxt(args.qid_list,dtype=int).ravel().tolist())
+        assert max(qids) < len(data)
+    #
 
     mapped_data = np.array(utils.map_data(
         data, distmult_dump['entity_to_id'], distmult_dump['relation_to_id'])).astype(np.int32)
@@ -223,10 +254,10 @@ if __name__ == "__main__":
         distmult_dump['relation_to_id'])
 
     template_objs = template_builder.template_obj_builder(
-        data_root, args.model_weights, args.template_load_dir, None, "distmult", [1, 2, 3, 4, 5, 6], True)
+        data_root, args.model_weights, args.template_load_dir, None, "distmult", args.t_ids, True)
 
     explainer = Explainer(
-        data_root, template_objs[0].kb, template_objs[0].base_model, entity_inverse_map, relation_inverse_map)
+        data_root, template_objs[0].kb, template_objs[0].base_model, entity_inverse_map, relation_inverse_map,list_of_different_template_files = ['template1.txt'])
 
     if(args.template_pred is not None):
         template_exps = english_exp_template(
@@ -247,7 +278,6 @@ if __name__ == "__main__":
             len(rule_exps), len(template_exps)))
         exit(-1)
 
-    os.makedirs(args.output_path, exist_ok=True)
     write_english_exps(mapped_data, template_exps, rule_exps,
-                       args.output_path, args.num, explainer)
+                       args.output_path, args.num, explainer, qids)
     logging.info("Written explanations to %s" % (args.output_path))

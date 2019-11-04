@@ -139,6 +139,9 @@ if __name__ == "__main__":
     parser.add_argument(
         '-y', '--y_label', help="Optional y_label specifying if the fact is true or false", required=False, default=None)
 
+    parser.add_argument('--t_ids', nargs='+', type=int, required=True,
+                        help='List of templates to build objects for')
+    
     args = parser.parse_args()
 
     logging.basicConfig(format='%(levelname)s :: %(asctime)s - %(message)s',
@@ -179,7 +182,7 @@ if __name__ == "__main__":
         distmult_dump['relation_to_id'])
 
     template_objs = template_builder.template_obj_builder(
-        data_root, args.model_weights, args.template_load_dir, None, "distmult", [1, 2, 3, 4, 5], True)
+        data_root, args.model_weights, args.template_load_dir, None, "distmult", args.t_ids, True)
 
     explainer = Explainer(
         data_root, template_objs[0].kb, template_objs[0].base_model, entity_inverse_map, relation_inverse_map)

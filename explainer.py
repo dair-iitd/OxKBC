@@ -13,7 +13,7 @@ class Explainer:
         This is also responsible for parsing wikipedia links and generating an explanation for a fact based on a template in English
     """
 
-    def __init__(self, dataset_root, kb, model, enum_to_id, rnum_to_id):
+    def __init__(self, dataset_root, kb, model, enum_to_id, rnum_to_id, list_of_different_template_files =[]):
 
         self.WIKI_PREFIX_URL = 'https://en.wikipedia.org/wiki/'
         self.WIKI_NAME_TEMPLATE = '<a target=\"_blank\" href=\"' + self.WIKI_PREFIX_URL+'$wiki_id\">$name</a>'
@@ -31,12 +31,20 @@ class Explainer:
             lambda: collections.defaultdict(list))
         self.r_e2_e1 = collections.defaultdict(
             lambda: collections.defaultdict(list))
+        
+        _r_e1 = collections.defaultdict(set)
+        self.r_e1 = collections.defaultdict(int)
+
+
         for e1, r, e2 in kb.facts:
             self.e1_e2_r[e1][e2].append(r)
             self.e2_e1_r[e2][e1].append(r)
             self.r_e2_e1[r][e2].append(e1)
+            _r_e1[r].add(e1)
         logging.info("Initialized data structures for fast lookup")
-
+        for k in _r_e1:
+            self.r_e1[k] = len(_r_e1[k])
+        
         self.entity_names = self.read_entity_names(
             os.path.join(dataset_root, "mid2wikipedia_cleaned.tsv"))
         logging.info("Read entity names")
@@ -44,8 +52,40 @@ class Explainer:
             os.path.join(dataset_root, "relation_names.txt"))
         logging.info("Read relation names and made heuristic purge for them")
 
+        #we may have multiple ways of mapping a relation id to a template string: it depends on the way we want to use it in explanation.
+        #different templates can access different template strings by providing: <template_type, relation_id>.
+        #use file name as template_type.
+        self.dict_of_relation_to_template_strings = {}
+        for template_file in set(list_of_different_template_files):
+            self.dict_of_relation_to_template_strings[template_file] = self.read_relation_templates(os.path.join(dataset_root, template_file))
+
+    def get_template_string(self, template_id, r):
+        if template_id in self.dict_of_relation_to_template_strings:
+            this_template_strings = self.dict_of_relation_to_template_strings[template_id]
+            rid = self.get_raw_relation(r)
+            if rid in this_template_strings:
+                return this_template_strings[rid]
+    
+        logging.warn('Explainer: get_template_string: Could not find: {}, {}'.format(template_id, r))
+        return None
+
+
+    def read_relation_templates(self,path):
+        relation_names = {}
+        with open(path, "r", errors='ignore', encoding='ascii') as f:
+            lines = f.readlines()
+            for line in lines:
+                content = line.split()
+                if content[0] in relation_names:
+                    logging.warn('Duplicate Entity found %s in line %s' %
+                                 (content[0], ' '.join(line)))
+                relation_names[content[0]] = ' '.join(content[1:])
+        return relation_names
+
+
     def read_relation_names(self, path):
         relation_names = {}
+        self.good_relation_names = {}
         ## Need to do this for yago TODO: Change it for a relation_names.txt file in yago
         if not os.path.isfile(path):
             for _, r in self.rnum_to_id.items():
@@ -60,6 +100,7 @@ class Explainer:
                     logging.warn('Duplicate Entity found %s in line %s' %
                                  (content[0], ' '.join(line)))
                 relation_names[content[0]] = ' '.join(content[1:])
+                self.good_relation_names[content[0]] = ' '.join(content[1:])
 
         # heuristic_purge_relations:
         for _, r in self.rnum_to_id.items():
@@ -144,6 +185,9 @@ class Explainer:
             e1, e2, True, self.e2_e1_r, hard_match)
         return list1, list2
 
+    def total_freq_for_relation(self,r):
+        return self.r_e1[r]
+
     def freq_for_relation(self, r, e2):
         if r in self.r_e2_e1 and e2 in self.r_e2_e1[r]:
             return self.r_e2_e1[r][e2]
@@ -167,12 +211,33 @@ class Explainer:
             string_more += "</span></div>"
         return string_more
 
+    def check_relation(self,r,fact, source=''):
+        try:
+            rnum = int(r)
+            rid = self.rnum_to_id[rnum]
+        except ValueError:
+            rid = r
+        #
+        if rid not in self.good_relation_names:
+            name_fact = self.name_fact(fact, add_wiki=False)
+            logging.warn("*****MISSING RELATION @ {} @ in @ {} @. Using:@ {} @. Fact is: {}, {}, {} ****".format(rid, source, self.relation_names.get(rid,rid), name_fact[0],name_fact[1],name_fact[2]))
+
+    def get_raw_relation(self,r):
+        try:
+            rnum = int(r)
+            rid = self.rnum_to_id[rnum]
+        except ValueError:
+            rid = r
+        return (rid)
+
     def get_r_name(self, r):
         try:
             rnum = int(r)
             rid = self.rnum_to_id[rnum]
         except ValueError:
             rid = r
+        #
+        #if self.good_relation_names:
         return self.relation_names.get(rid, rid)
 
     def get_e_name(self, e, add_wiki=True):
@@ -193,19 +258,24 @@ class Explainer:
         e2_name = self.get_e_name(fact[2], add_wiki)
         return [e1_name,r_name,e2_name]
 
+    def html_question(self,fact):
+        fact_html_template = '<b>Question: <font color="blue">$e1</font> <font color="green">$r</font> _______ ? <br> Answer: <font color="blue">$e2</font></b>'
+        named_fact = self.name_fact(fact)
+        return string.Template(fact_html_template).substitute(e1=named_fact[0], r=named_fact[1], e2=named_fact[2])
+    
     def html_fact(self,fact):
-        fact_html_template = '<b>(<font color="blue">$e1</font>, <font color="green">$r</font>, <font color="blue">$e2</font>)</b>'
+        fact_html_template = '<b> <font color="blue">$e1</font> <font color="green">$r</font> <font color="blue">$e2</font></b>'
         named_fact = self.name_fact(fact)
         return string.Template(fact_html_template).substitute(e1=named_fact[0], r=named_fact[1], e2=named_fact[2])
 
-    def get_relation_frequent(self, fact):
+    def get_relation_frequent(self, fact, custom_string= 'frequently seen'):
         r_name = self.get_r_name(fact[1])
         e2_name = self.get_e_name(fact[2])
 
         other_part = self.freq_for_relation(fact[1], fact[2])
         other_knowledge = [self.get_e_name(el) for el in other_part]
 
-        string_frequent = "<div class=\"tooltip\">frequently seen <span class=\"tooltiptext\">"
+        string_frequent = "<div class=\"tooltip\">{} <span class=\"tooltiptext\">".format(custom_string)
         cs_string = self.get_cs_string(other_knowledge)
         string_frequent += "(" + cs_string + " ) " + r_name + "  " + e2_name + "<br>"
         string_frequent += "</span></div>"

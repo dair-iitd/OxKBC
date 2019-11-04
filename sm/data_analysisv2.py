@@ -10,9 +10,40 @@ import numpy as np
 import yaml
 import utils
 import settings
-import dataset1 as dataset
+import dataset_for_data_analysisv2 as dataset
 import models
 from collections import Counter
+
+def get_inverse_dict(mydict):
+    inverse_dict = {}
+    for k in mydict.keys():
+        if mydict[k] in inverse_dict:
+            raise "Cannot Construct inverse dictionary, as function not one-one"
+        inverse_dict[mydict[k]] = k
+    return inverse_dict
+
+
+
+def read_entity_names(path):
+    entity_names = {}
+    with open(path, "r", errors='ignore', encoding='ascii') as f:
+        lines = f.readlines()
+        for line in lines:
+            content_raw = line.split('\t')
+            content = [el.strip() for el in content_raw]
+            if content[0] in entity_names:
+                logging.warn('Duplicate Entity found %s in line %s' %
+                                (content[0], line))
+            name = content[1]
+            wiki_id = content[2]
+            # entity_names[content[0]] = {"name": name, "wiki_id": wiki_id}
+            entity_names[content[0]] = name
+    return entity_names
+
+
+
+
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--training_data_path',
                     help="Training data path (pkl file)", type=str, 
@@ -157,7 +188,7 @@ if loglin:
     print('My Score, Max Score, Similarity, Rank, Conditional Rank, Mean, Std',file=fh)
     printmat([d[i]['model'][wt].cpu().numpy() for  i in range(1,6)],file =fh )
 
-i = 1
+i = 5
 loader = train_loader 
 model.load_state_dict(d[1]['model'])
 
@@ -210,54 +241,124 @@ if loglin:
     print('My Score, Max Score, Similarity, Rank, Conditional Rank, Mean, Std, Bias, Total',file=fh)
     printmat(score_of_avg_features, file = fh)
 
-Y = np.array(loader.dataset.Y.todense())
+
+Y = None
+if loader.dataset.Y is not None:
+    Y = np.array(loader.dataset.Y)
 
 model = model.cuda()
-with torch.no_grad():
-    model.eval()
-    for template_id in range(0,args.num_templates+1):
-        if template_id not in args.exclude_t_ids: 
-            new_template_id = args.o2n[template_id]
-            pos_ind = (Y[:,new_template_id] == 1)
-            neg_ind = (Y[:,new_template_id] != 1)
-            pos_data = torch.FloatTensor(loader.dataset.data[pos_ind,3:-1]).cuda()
-            neg_data = torch.FloatTensor(loader.dataset.data[neg_ind,3:-1]).cuda()
-            
-            print("TEMPLATE {}".format(template_id), file = fh)
-            if pos_data.size(0) > 0: 
+if Y is not None:
+    with torch.no_grad():
+        model.eval()
+        for template_id in range(0,args.num_templates+1):
+            if template_id not in args.exclude_t_ids: 
+                new_template_id = args.o2n[template_id]
+                pos_ind = (Y[:,new_template_id] == 1)
+                neg_ind = (Y[:,new_template_id] != 1)
+                pos_data = torch.FloatTensor(loader.dataset.data[pos_ind,3:-1]).cuda()
+                neg_data = torch.FloatTensor(loader.dataset.data[neg_ind,3:-1]).cuda()
+                
+                print("TEMPLATE {}".format(template_id), file = fh)
+                if pos_data.size(0) > 0: 
+                    pos_score = model(pos_data)
+                    pos_prediction = pos_score.max(dim=1)[1]
+                    pos_counter = Counter(pos_prediction.detach().cpu().numpy())  
+                    print("Total Positives: {}.  Predicted as: ".format(pos_data.size(0)), file = fh)
+                    printmat(np.array([[pos_counter[args.o2n[x]] for x in range(0,args.num_templates+1)]]),file =fh)
+                    avg_pos_score = pos_score.mean(dim=0)
+                    avg_pos_feature = pos_data.mean(dim=0)
+                    pos_score_avg_feat = model(avg_pos_feature.unsqueeze(0))
+                    print("AVG score POSITIVE ", file = fh)
+                    printmat(avg_pos_score.detach().cpu().numpy()[args.o2n].reshape(1,-1),file = fh)
+                    print("score At Avg Features POSITIVE ", file = fh)
+                    printmat(pos_score_avg_feat.detach().cpu().numpy()[0][args.o2n].reshape(1,-1),file = fh)
+                    print("AVG FEATUREs when POSITIVE", file = fh)
+                    printmat(avg_pos_feature.reshape(args.num_templates,args.each_input_size).cpu().numpy(), file= fh)
+        
+                if neg_data.size(0) > 0: 
+                    neg_score = model(neg_data)
+                    neg_prediction = neg_score.max(dim=1)[1]
+                    neg_counter = Counter(neg_prediction.detach().cpu().numpy())
+                    avg_neg_score = neg_score.mean(dim=0)
+                    avg_neg_feature = neg_data.mean(dim=0)
+                    neg_score_avg_feat = model(avg_neg_feature.unsqueeze(0))
+                    print("Total Negatives: {}.  Predicted as: ".format(neg_data.size(0)), file = fh)
+                    printmat(np.array([[neg_counter[args.o2n[x]] for x in range(0,args.num_templates+1)]]),file =fh)
+                    print("AVG score NEGATIVE ", file = fh)
+                    printmat(avg_neg_score.detach().cpu().numpy()[args.o2n].reshape(1,-1),file = fh)
+                    print("score At Avg Features NEGATIVE ", file = fh)
+                    printmat(neg_score_avg_feat.detach().cpu().numpy()[0][args.o2n].reshape(1,-1),file = fh)
+                    print("AVG FEATUREs when NEGATIVE", file = fh)
+                    printmat(avg_neg_feature.reshape(args.num_templates, args.each_input_size).cpu().numpy(), file= fh)
+    
+                #Positive prediction(TEST) average features
+                print("AVG FEATUREs when POSITIVE PREDICTIONS TEST", file = fh)
+                pos_data = torch.FloatTensor(val_loader.dataset.data[:,3:-1]).cuda()
                 pos_score = model(pos_data)
                 pos_prediction = pos_score.max(dim=1)[1]
-                pos_counter = Counter(pos_prediction.detach().cpu().numpy())  
-                print("Total Positives: {}.  Predicted as: ".format(pos_data.size(0)), file = fh)
-                printmat(np.array([[pos_counter[args.o2n[x]] for x in range(0,args.num_templates+1)]]),file =fh)
-                avg_pos_score = pos_score.mean(dim=0)
-                avg_pos_feature = pos_data.mean(dim=0)
-                pos_score_avg_feat = model(avg_pos_feature.unsqueeze(0))
-                print("AVG score POSITIVE ", file = fh)
-                printmat(avg_pos_score.detach().cpu().numpy()[args.o2n].reshape(1,-1),file = fh)
-                print("score At Avg Features POSITIVE ", file = fh)
-                printmat(pos_score_avg_feat.detach().cpu().numpy()[0][args.o2n].reshape(1,-1),file = fh)
-                print("AVG FEATUREs when POSITIVE", file = fh)
-                printmat(avg_pos_feature.reshape(args.num_templates,args.each_input_size).cpu().numpy(), file= fh)
+                bool_arr = (pos_prediction == new_template_id)
+                printmat((((pos_data*bool_arr.reshape(pos_data.size(0),1).float()).mean(dim=0)).reshape(args.num_templates,args.each_input_size)).cpu().numpy(), file=fh)
     
-            if neg_data.size(0) > 0: 
-                neg_score = model(neg_data)
-                neg_prediction = neg_score.max(dim=1)[1]
-                neg_counter = Counter(neg_prediction.detach().cpu().numpy())
-                avg_neg_score = neg_score.mean(dim=0)
-                avg_neg_feature = neg_data.mean(dim=0)
-                neg_score_avg_feat = model(avg_neg_feature.unsqueeze(0))
-                print("Total Negatives: {}.  Predicted as: ".format(neg_data.size(0)), file = fh)
-                printmat(np.array([[neg_counter[args.o2n[x]] for x in range(0,args.num_templates+1)]]),file =fh)
-                print("AVG score NEGATIVE ", file = fh)
-                printmat(avg_neg_score.detach().cpu().numpy()[args.o2n].reshape(1,-1),file = fh)
-                print("score At Avg Features NEGATIVE ", file = fh)
-                printmat(neg_score_avg_feat.detach().cpu().numpy()[0][args.o2n].reshape(1,-1),file = fh)
-                print("AVG FEATUREs when NEGATIVE", file = fh)
-                printmat(avg_neg_feature.reshape(args.num_templates, args.each_input_size).cpu().numpy(), file= fh)
+                #Negative prediction(TEST) average features
+                print("AVG FEATUREs when NEGATIVE PREDICTIONS TEST", file = fh)
+                pos_data = torch.FloatTensor(val_loader.dataset.data[:,3:-1]).cuda()
+                pos_score = model(pos_data)
+                pos_prediction = pos_score.max(dim=1)[1]
+                bool_arr = (pos_prediction != new_template_id)
+                printmat((((pos_data*bool_arr.reshape(pos_data.size(0),1).float()).mean(dim=0)).reshape(args.num_templates,args.each_input_size)).cpu().numpy(), file=fh)
     
 
 fh.close()
+
+distdump = pickle.load(open('../dumps/fb15k_distmult_dump_norm.pkl','rb'))
+entity_names = read_entity_names('../../data/fb15k/mid2wikipedia_cleaned.tsv')
+import sys
+sys.path.insert(0,'..')
+import models as dm
+reload(dm)
+base_model = dm.TypedDM('../dumps/fb15k_distmult_dump_norm.pkl')
+
+#analyze a datapoint
+model.eval()
+fh  = None 
+ind = 36
+dat = loader.dataset.data[ind:(ind+1)]
+pos_data = torch.FloatTensor(loader.dataset.data[ind:(ind+1),3:-1]).cuda()
+pos_score = model(pos_data)
+pos_prediction = pos_score.max(dim=1)[1]
+pos_counter = Counter(pos_prediction.detach().cpu().numpy())  
+print("Total Positives: {}.  Predicted as: ".format(pos_data.size(0)), file = fh)
+printmat(np.array([[pos_counter[args.o2n[x]] for x in range(0,args.num_templates+1)]]),file =fh)
+avg_pos_score = pos_score.mean(dim=0)
+avg_pos_feature = pos_data.mean(dim=0)
+pos_score_avg_feat = model(avg_pos_feature.unsqueeze(0))
+print("AVG score POSITIVE ", file = fh)
+printmat(avg_pos_score.detach().cpu().numpy()[args.o2n].reshape(1,-1),file = fh)
+print("score At Avg Features POSITIVE ", file = fh)
+printmat(pos_score_avg_feat.detach().cpu().numpy()[0][args.o2n].reshape(1,-1),file = fh)
+print("AVG FEATUREs when POSITIVE", file = fh)
+printmat(avg_pos_feature.reshape(args.num_templates,args.each_input_size).cpu().numpy(), file= fh)
+
+
+
+
+eti_inv = get_inverse_dict(distdump['entity_to_id'])
+rti_inv = get_inverse_dict(distdump['relation_to_id'])
+
+
+entity_names[eti_inv[dat[0,0]]]
+entity_names[eti_inv[dat[0,2]]]
+
+import sys
+sys.path.insert(0,'..')
+import models as dm
+reload(dm)
+base_model = dm.TypedDM('../dumps/fb15k_distmult_dump_norm.pkl')
+template3 = pickle.load(open('../logs/fb15k/3.pkl','rb'))
+template3['table'][(13864,138)] 
+
+
+
 
 """
 loader = train_loader

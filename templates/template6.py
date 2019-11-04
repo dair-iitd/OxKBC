@@ -329,6 +329,9 @@ class Template6(TemplateBaseClass):
         try:
             #Pdb().set_trace()
             path = self.get_explanation(fact)[1]
+            
+            explainer.check_relation(path[0],fact, source='t6r1')
+            explainer.check_relation(path[2],fact, source='t6r2')
             #self.exp_template = '$html_fact_e1_r1_u1 and $html_fact_u1_r2_e2'
             return string.Template(self.exp_template).substitute(html_fact_e1_r1_u1=explainer.html_fact([fact[0], path[0], path[1]]), html_fact_u1_r2_e2=explainer.html_fact([path[1], path[2], fact[2]]))
         except:
