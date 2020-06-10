@@ -15,33 +15,7 @@ def shuffle_and_split(args):
     length = len(data_with_labels)
     train_length = int(length*args.train_split)
     
-    #----subset supervision-----
-    train_length1 = int(0.33*length*args.train_split)
-    train_length2 = int(0.5*length*args.train_split) 
-    train_length3 = int(0.67*length*args.train_split)
-
-    train_samples1 = data_with_labels[:train_length1]
-    train_samples2 = data_with_labels[:train_length2]
-    train_samples3 = data_with_labels[:train_length3]
-
-    train_x1 = np.array([x[0] for x in train_samples1])
-    train_y1 = [x[1] for x in train_samples1]
-    train_x2 = np.array([x[0] for x in train_samples2])
-    train_y2 = [x[1] for x in train_samples2]
-    train_x3 = np.array([x[0] for x in train_samples3])
-    train_y3 = [x[1] for x in train_samples3]
-
-    pickle.dump(train_x1, open("../logs/yago/subset_supervision/sm_sup_train_with_id_subset1.pkl",'wb'))
-    with open("../logs/yago/subset_supervision/sm_sup_train_multilabels_subset1.txt",'w') as fh:
-        fh.write(''.join(train_y1))
-    pickle.dump(train_x2, open("../logs/yago/subset_supervision/sm_sup_train_with_id_subset2.pkl",'wb'))
-    with open("../logs/yago/subset_supervision/sm_sup_train_multilabels_subset2.txt",'w') as fh:
-        fh.write(''.join(train_y2))
-    pickle.dump(train_x3, open("../logs/yago/subset_supervision/sm_sup_train_with_id_subset3.pkl",'wb'))
-    with open("../logs/yago/subset_supervision/sm_sup_train_multilabels_subset3.txt",'w') as fh:
-        fh.write(''.join(train_y3))
-    #---------------------------
-
+   
 
     train_samples = data_with_labels[:train_length]
     val_samples = data_with_labels[train_length:]
