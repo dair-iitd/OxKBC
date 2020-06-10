@@ -1,3 +1,8 @@
+Todo:
+1. ADD SOME INFO ABOUT THE DATA FOLDER!!! which is present outside
+2. Add some info about the dumps folder
+3. Add some info about template naming convention change.
+
 # Explaining Knowledge base completion
 
 We propose a method, that can be used to explain why an embedding based neural model trained for knowledge base completion gave that specific answer for a query. More specifically, given a knowledge base represented as a list of triples (e<sub>1</sub>, r, e<sub>2</sub>), we train an embedding based neural model to answer the query (e<sub>1</sub>, r, ?) which give the answer as u.
@@ -37,7 +42,6 @@ dump = {
     'tail_rel_type': numpy.ndarray(shape=(number of relations, type embedding dim),dtype=np.float32)
 }
 ```
-ADD SOME INFO ABOUT THE DATA FOLDER!!!  
 Make sure the embeddings are normalized, to do so use `scripts/normalize.py`, just change the file names.
 
 Now, we need to build template tables for these templates.
