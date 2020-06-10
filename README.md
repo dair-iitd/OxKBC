@@ -49,6 +49,8 @@ Now, we need to build template tables for these templates.
 To do so, run the `template_builder.py` file
 
 ```
+mkdir logs
+mkdir logs/fb15k
 python3 template_builder.py -h       ## Get help
 python3 template_builder.py -d fb15k -m distmult -w dumps/fb15k_distmult_dump_norm.pkl -s logs/fb15k -v 1 --t_ids 1 2 3 4 5 6 --data_repo_root ./data
 ```
@@ -80,7 +82,7 @@ For the valid and test data generated with `--y_labels` flag, the column 45 cont
 
 For this valid data, we shuffled it and randomly split into 80-20 ratio used as labelled train and valid data. The files generated were `sm_sup_train_with_id.pkl` and `sm_sup_valid_with_id.pkl` respectively, using the following script in `sm` folder:
 ```
-python create_train_val_split.py --labelled_total_data_path ../logs/fb15k/sm_valid_with_id.data.pkl --total_labels_path ../data/fb15k/labelled_train/labelled_train_y6.txt --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --train_labels_path ../logs/fb15k/sm_sup_train_multilabels.txt --val_data_path ../logs/fb15k/sm_sup_valid_with_id.pkl --val_labels_path ../logs/fb15k/sm_sup_valid_multilabels.txt --train_split 0.8 --seed 242 --num_templates 6
+python3 create_train_val_split.py --labelled_total_data_path ../logs/fb15k/sm_valid_with_id.data.pkl --total_labels_path ../data/fb15k/labelled_train/labelled_train_y6.txt --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --train_labels_path ../logs/fb15k/sm_sup_train_multilabels.txt --val_data_path ../logs/fb15k/sm_sup_valid_with_id.pkl --val_labels_path ../logs/fb15k/sm_sup_valid_multilabels.txt --train_split 0.8 --seed 242 --num_templates 6
 ```
 
 ### Training Selection Module
