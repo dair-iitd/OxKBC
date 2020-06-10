@@ -37,7 +37,7 @@ dump = {
     'tail_rel_type': numpy.ndarray(shape=(number of relations, type embedding dim),dtype=np.float32)
 }
 ```
-ADD SOME INFO ABOUT THE DATA FOLDER!!!
+ADD SOME INFO ABOUT THE DATA FOLDER!!!  
 Make sure the embeddings are normalized, to do so use `scripts/normalize.py`, just change the file names.
 
 Now, we need to build template tables for these templates.
@@ -58,10 +58,10 @@ We need to preprocess the textual data to numeric data for our selection module 
 
 ```
 ## Generate a train file, where we do not have labels of y
-python3 preprocessing.py -d fb15k -m distmult -f ./data/fb15k/train.txt -s logs/fb15k/sm_with_id.data -w dumps/fb15k_distmult_dump_norm.pkl -l logs/fb15k -v 1 --t_ids 1 2 3 4 5 --data_repo_root ./data --negative_count 2
+python3 preprocessing.py -d fb15k -m distmult -f ./data/fb15k/train.txt -s logs/fb15k/sm_with_id.data -w dumps/fb15k_distmult_dump_norm.pkl -l logs/fb15k -v 1 --t_ids 1 2 3 4 5 6 --data_repo_root ./data --negative_count 2
 
 ## Generate a valid/test file, where we do have labels of y
-python3 preprocessing.py -d fb15k -m distmult -f ./data/fb15k/labelled_train/labelled_train_x.txt -s logs/fb15k/sm_vaild_with_id.data -w dumps/fb15k_distmult_dump_norm.pkl -l logs/fb15k -v 1 --t_ids 1 2 3 4 5 --data_repo_root ./data --negative_count 0 --y_labels ./data/fb15k/labelled_train/labelled_train_y.txt
+python3 preprocessing.py -d fb15k -m distmult -f ./data/fb15k/labelled_train/labelled_train_x.txt -s logs/fb15k/sm_vaild_with_id.data -w dumps/fb15k_distmult_dump_norm.pkl -l logs/fb15k -v 1 --t_ids 1 2 3 4 5 6 --data_repo_root ./data --negative_count 0 --y_labels ./data/fb15k/labelled_train/labelled_train_y.txt
 
 ```
 
@@ -69,11 +69,11 @@ This will write a pkl and txt file with the name `logs/fb15k/sm_with_id.data.[pk
 
 ```
 Column 0-2 contains the integer numeric id of e1, r and e2 in order
-Column 3-37 contains the input vector for template 1,2,3,4,5 in order
-Column 38 contains 1 if the fact is positive and 0 if it is negative(randomly sampled hence assumed false)
+Column 3-44 contains the input vector for template 1,2,3,4,5,6 in order
+Column 45 contains 1 if the fact is positive and 0 if it is negative(randomly sampled hence assumed false)
 ```
 
-For the valid and test data generated with `--y_labels` flag, the column 38 contains the template id which produces the best explanation. It is annotated manually.
+For the valid and test data generated with `--y_labels` flag, the column 45 contains the template id which produces the best explanation. It is annotated manually.
 
 For this valid data, we shuffled it and randomly split into 80-20 ratio used as labelled train and valid data. The files generated were `sm_sup_train_with_id.pkl` and `sm_sup_valid_with_id.pkl` respectively.
 
@@ -112,8 +112,8 @@ Similarly test for KL divergence = 1.
 
 We had two experiments on Amazon Mechanical Turk.
 
-* Find out if our explanations are better than using rule mining. (id=1365457)
-* Find out if explanations are infact useful for the task of KB verification. (id=1419750)
+* Find out if our explanations are better than using rule mining. 
+* Find out if explanations are infact useful for the task of KB verification. 
 
 #### Is TeXKBC better?
 
