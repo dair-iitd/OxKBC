@@ -162,6 +162,7 @@ We had a number of scripts written to do small tasks, and it is present in the s
 * **Aman Agrawal** - [http://www.cse.iitd.ernet.in/~cs1150210/](http://www.cse.iitd.ernet.in/~cs1150210/)
 * **Ankesh Gupta** - [https://www.linkedin.com/in/ankesh-gupta-a67423123](https://www.linkedin.com/in/ankesh-gupta-a67423123)
 * **Yatin Nandwani** - [https://www.linkedin.com/in/yatin-nandwani-0804ba9/](https://www.linkedin.com/in/yatin-nandwani-0804ba9/)
+* **Mayank Singh Chauhan** - [https://www.cse.iitd.ac.in/~cs5160394/](https://www.cse.iitd.ac.in/~cs5160394/)
 
 See also the list of [contributors](https://github.com/aman71197/Interpretable-KBC/graphs/contributors) who participated in this project.
 
