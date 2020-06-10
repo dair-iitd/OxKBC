@@ -9,13 +9,12 @@ import string
 import time
 import queue
 import itertools
-
+from explainer import Explainer
 import numpy as np
 import pandas as pd
 import random
 import template_builder
 import utils
-from explainer import Explainer
 
 
 def english_exp_rules(mapped_data, predictions, explainer):
@@ -31,6 +30,7 @@ def english_exp_rules(mapped_data, predictions, explainer):
             else:
                 explaining_fact = explainer.html_fact(
                     [fact[0], pred[0], fact[2]])
+
                 explainer.check_relation(pred[0],fact, 'rules1')
                 explanations.append(explaining_fact)
         else:

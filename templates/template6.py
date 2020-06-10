@@ -95,6 +95,18 @@ class Template6(TemplateBaseClass):
         self.sorted_e1_r_list = list(self.unique_e1_r.keys())
         self.sorted_e1_r_list.sort()
 
+
+        ####################################
+        # can delete was added for debugging
+        # self.r_count={}
+        # for fact in self.kb.facts:
+        # 	if fact[1] not in self.r_count:
+        # 		self.r_count[fact[1]] = 0
+        # 	self.r_count[fact[1]]+=1
+        # import pdb
+        # pdb.set_trace()
+        ####################################
+
     def process(self, key):
         e1, r = key
         #global ctr
@@ -327,7 +339,6 @@ class Template6(TemplateBaseClass):
 
     def get_english_explanation(self, fact, explainer):
         try:
-            #Pdb().set_trace()
             path = self.get_explanation(fact)[1]
             
             explainer.check_relation(path[0],fact, source='t6r1')

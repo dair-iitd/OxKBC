@@ -60,7 +60,7 @@ def get_data_loaders(args):
         raise
 
 
-def change_default_scores(data, start_idx, each_input_size, args, calc_mean):
+def change_default_scores(data, start_idx, each_input_size, args):
     #my_score, max_score, simi, rank, conditional_rank, mean, std
     #only change : my_score
     #when: when my_score == 0
@@ -70,47 +70,39 @@ def change_default_scores(data, start_idx, each_input_size, args, calc_mean):
     num_templates = (data.shape[1] - start_idx -1 )//each_input_size
     all_means = []
     all_stds  = []
-    if(calc_mean):
-        for i in range(num_templates):
-            indx = data[:,SIDX(i)] == 0
-            data[indx,SIDX(i)] = args.default_value
-            if args.exclude_default == 1:
-                this_means = data[np.logical_not(indx), SIDX(i): SIDX(i+1)].mean(axis=0).reshape(1,-1)
-                this_stds = data[np.logical_not(indx), SIDX(i): SIDX(i+1)].std(axis=0).reshape(1,-1)
-                this_max = data[np.logical_not(indx), SIDX(i): SIDX(i+1)].max(axis=0).reshape(1,-1)
-            else:
-                this_means = data[:, SIDX(i): SIDX(i+1)].mean(axis=0).reshape(1,-1)
-                this_stds = data[:, SIDX(i): SIDX(i+1)].std(axis=0).reshape(1,-1)
-                this_max = data[:, SIDX(i): SIDX(i+1)].max(axis=0).reshape(1,-1)
-            #
-            this_means[0,1] = this_means[0,0]
-            this_stds[0, 1] = this_stds[0, 0]
-            for j in [2,4]: 
-            #for j in [3,4]: 
-                this_means[0,j] = 0
-                this_stds[0,j] = 1
-            #
-            this_means[0,3] = 0
-            this_stds[0,3] = this_max[0,3]
-            
-            
-            this_means[0,5] = this_means[0,0]
-            this_stds[0,5] = this_stds[0,0]
-            
-            this_means[0,6] = 0
-            this_stds[0,6] = this_stds[0,0]
-            
-            all_means.append(this_means)
-            all_stds.append(this_stds)
+    for i in range(num_templates):
+        indx = data[:,SIDX(i)] == 0
+        data[indx,SIDX(i)] = args.default_value
+        if args.exclude_default == 1:
+            this_means = data[np.logical_not(indx), SIDX(i): SIDX(i+1)].mean(axis=0).reshape(1,-1)
+            this_stds = data[np.logical_not(indx), SIDX(i): SIDX(i+1)].std(axis=0).reshape(1,-1)
+            this_max = data[np.logical_not(indx), SIDX(i): SIDX(i+1)].max(axis=0).reshape(1,-1)
+        else:
+            this_means = data[:, SIDX(i): SIDX(i+1)].mean(axis=0).reshape(1,-1)
+            this_stds = data[:, SIDX(i): SIDX(i+1)].std(axis=0).reshape(1,-1)
+            this_max = data[:, SIDX(i): SIDX(i+1)].max(axis=0).reshape(1,-1)
         #
-        return data, {'mean': np.concatenate(all_means, axis=1), 'std': np.concatenate(all_stds, axis=1)}
-    else:
-        for i in range(num_templates):
-            indx = data[:,SIDX(i)] == 0
-            # import pdb
-            # pdb.set_trace()
-            data[indx,SIDX(i)] = args.default_value
-        return data, {'mean': None, 'std': None}
+        this_means[0,1] = this_means[0,0]
+        this_stds[0, 1] = this_stds[0, 0]
+        for j in [2,4]: 
+        #for j in [3,4]: 
+            this_means[0,j] = 0
+            this_stds[0,j] = 1
+        #
+        this_means[0,3] = 0
+        this_stds[0,3] = this_max[0,3]
+        
+        
+        this_means[0,5] = this_means[0,0]
+        this_stds[0,5] = this_stds[0,0]
+        
+        this_means[0,6] = 0
+        this_stds[0,6] = this_stds[0,0]
+        
+        all_means.append(this_means)
+        all_stds.append(this_stds)
+    #
+    return data, {'mean': np.concatenate(all_means, axis=1), 'std': np.concatenate(all_stds, axis=1)}
 
 
 class SelectionModuleDataset(torch.utils.data.Dataset):
@@ -136,8 +128,7 @@ class SelectionModuleDataset(torch.utils.data.Dataset):
         self.start_idx = 3
 
         self.raw_data = data.copy()
-        calc_mean = labels==0
-        data,self.stats = change_default_scores(data, self.start_idx, each_input_size, args, calc_mean)
+        data,self.stats = change_default_scores(data, self.start_idx, each_input_size, args)
         #my_score, max_score, simi, rank, conditional_rank, mean, std
         if stats_file_path is None or (not os.path.exists(stats_file_path)):
             pickle.dump(self.stats,

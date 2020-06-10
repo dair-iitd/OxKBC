@@ -169,8 +169,8 @@ if __name__ == "__main__":
     if(args.book_file is not None):
         book = get_book(args.book_file,args)
 
-    if(args.reason):
-        ANSWER_OPTIONS = ANSWER_OPTIONS[:-1]
+    # if(args.reason):
+    #     ANSWER_OPTIONS = ANSWER_OPTIONS[:-1]
 
     df = pd.read_csv(args.result_file)
     df = df[df['AssignmentStatus'] != 'Rejected']
@@ -190,7 +190,7 @@ if __name__ == "__main__":
     reason_list = []
     accuracy = 0
     for k in results:
-        print(results[k])
+        # print(results[k])
         answers_list.extend(results[k]['answers'])
         winner_list.extend(results[k]['winner'])
         avg_time_list.extend(results[k]['time_taken'])

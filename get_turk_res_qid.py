@@ -156,8 +156,8 @@ def get_results(dflist,book):
                 #
                 qid_from_book = int(book.qid[book.fact == fact_text].iloc[0])
                 if qid != -1:
-                    print(qid,qid_from_book)
-                    # assert qid == qid_from_book
+                    # print(qid,qid_from_book)
+                    assert qid == qid_from_book
                 if(fact not in results):
                     results[fact] = {'our_exp': exp_A,'other_exp':exp_B, 'answers' : [],'row_idx':[], 'fact_no':[],'qid': qid_from_book,'explanation':[],'ours_is': []}
                 if qid != -1 and results[fact]['qid'] != -1:

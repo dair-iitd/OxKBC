@@ -91,6 +91,7 @@ def main(args):
     num_epochs = args.num_epochs
     logging.info('Beginning train/validate cycle')
 
+    time1 = time.time()
     if val_loader is not None:
         record, metric_idx, headers = compute.compute(start_epoch-1, model, val_loader, optimizer,
                                                       'eval', eval_fn=my_eval_fn, args=args)
@@ -99,6 +100,7 @@ def main(args):
             print(','.join([str(round(x, 6)) if isinstance(
                 x, float) else str(x) for x in record]), file=handler)
             handler.close()
+    print("Time taken:",time.time()-time1)
     if(args.only_eval):
         logging.info('Ran only eval mode, now exiting')
         exit(0)

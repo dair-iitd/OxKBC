@@ -1,3 +1,58 @@
+#---------------------------------------------------------------------------------------------------------------
+#simple run run fb15k
+train_ml=0
+kl=1.0
+nr=-1.0
+rho=0.125
+supervision=semi
+nt=6
+tp=../logs/fb15k/sm_with_id.data.pkl 
+ltp=../logs/fb15k/subset_supervision/sm_sup_train_with_id_subset3.pkl 
+vp=../logs/fb15k/sm_sup_valid_with_id.pkl
+ldp=../logs/fb15k/subset_supervision/label_distribution_subset3.yml  
+testp=../logs/fb15k/test_hits1_single_label_sm.data.pkl.pkl 
+config=configs/fb15k_config.yml 
+exclude_t_ids=(2 5)
+hidden_unit_list=(90 40)
+testlp=../data/fb15k/test/test_hits_1_ordered_y.txt 
+vlp1=../logs/fb15k/sm_sup_valid_multilabels.txt 
+tlp=../logs/fb15k/subset_supervision/sm_sup_train_multilabels_subset3.txt
+df=-0.05
+exdf=1
+expname=temp/rebuttal/fb15k_correct_subset3_kl_${kl}_ml_${train_ml}_nr_${nr}
+
+#simple run run yago
+train_ml=0
+kl=1.0
+nr=-0.25
+rho=0.25
+supervision=semi
+nt=5
+tp=../logs/yago/sm_with_id.data.pkl 
+ltp=../logs/yago/subset_supervision/sm_sup_train_with_id_subset3.pkl 
+vp=../logs/yago/sm_sup_valid_with_id.pkl
+ldp=../logs/yago/subset_supervision/label_distribution_subset3.yml  
+testp=../logs/yago/test_hits1_sm.data.pkl.pkl 
+config=configs/yago_config.yml 
+exclude_t_ids=(2 5)
+hidden_unit_list=(90 40)
+testlp=../data/yago/test/test_hits1_y.txt 
+vlp1=../logs/yago/sm_sup_valid_multilabels.txt 
+tlp=../logs/yago/subset_supervision/sm_sup_train_multilabels_subset3.txt
+df=-0.05
+exdf=1
+expname=temp/rebuttal/yago_correct_subset3_kl_${kl}_ml_${train_ml}_nr_${nr}
+
+#---------------------------------------------------------------------------------------------------------------
+#real stuff begins
+
+
+
+#run template builder first to save important stuff about the data in dictionaries
+python3 template_builder.py -d fb15k -m distmult -w dumps/fb15k_distmult_dump_norm.pkl -s logs/fb15k -v 1 --t_ids 1 2 3 4 5 --data_repo_root ./data
+#for template 6, since it is too large, we breakup it up into parts, so use the following code
+python template_builder.py -d fb15k -m distmult -w dumps/fb15k_distmult_dump_norm.pkl -s logs/fb15k -v 1 --t_ids 6 --data_repo_root ../data --parts 8 --offset 0 > LOGS_0_8 
+
 #convert vector to ids and names
 python3 map_inverse.py -d fb15k -w ../dumps/fb15k_distmult_dump_norm.pkl -cf ../turk_experiments/turk_which_better_hits10_nothits10_sampled/pred_not_hits_1_test_fb15k_170.txt -of ../turk_experiments/new/pred_not_hits_1_test_fb15k.txt --data_repo_root ../../data
 
@@ -9,6 +64,9 @@ python3 preprocessing.py -d fb15k -m distmult -f data/fb15k/labelled_train/label
 
 #create train val split
 python create_train_val_split.py --labelled_total_data_path ../logs/fb15k/sm_valid_with_id.data.pkl --total_labels_path ../data/fb15k/labelled_train/labelled_train_y6.txt --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --train_labels_path ../logs/fb15k/sm_sup_train_multilabels.txt --val_data_path ../logs/fb15k/sm_sup_valid_with_id.pkl --val_labels_path ../logs/fb15k/sm_sup_valid_multilabels.txt --train_split 0.8 --seed 242 --num_templates 6
+
+#the same for subet supervision
+python create_train_val_split.py --labelled_total_data_path ../logs/fb15k/sm_valid_with_id.data.pkl --total_labels_path ../data/fb15k/labelled_train/labelled_train_y6.txt --labelled_training_data_path ../logs/fb15k/subset_supervision/sm_sup_train_with_id.pkl --train_labels_path ../logs/fb15k/subset_supervision/sm_sup_train_multilabels.txt --val_data_path ../logs/fb15k/subset_supervision/sm_sup_valid_with_id.pkl --val_labels_path ../logs/fb15k/subset_supervision/sm_sup_valid_multilabels.txt --train_split 0.8 --seed 242 --num_templates 6
 
 #create splits for cross val
 python3 cross_validation.py --gen_data --folds 5 --dir cross_val/fb15k/semi --labelled_training_data_path ../logs/fb15k/sm_valid_with_id.data.pkl --supervision semi --train_labels_path ../data/fb15k/labelled_train/labelled_train_y6.txt --seed 142 
@@ -34,6 +92,10 @@ python3 preprocessing.py -d fb15k -m distmult -f data/fb15k/turk_test/hits10_not
 # turk second experiment is useful?
 python3 preprocessing.py -d fb15k -m distmult -f data/fb15k/turk_test/hits1_not_hits1_mixed.txt -s logs/fb15k/turk_test_useful/hits1_not_hits1_single_label_sm.data.pkl -w dumps/fb15k_distmult_dump_norm.pkl -l logs/fb15k -v 1 --t_ids 1 2 3 4 5 6 --data_repo_root ../data --negative_count 0
 
+
+#get all template explanations as a html book
+python3 get_html_explanations.py -d fb15k -w dumps/fb15k_distmult_dump_norm.pkl -l ../Interpretable-KBC-tlp/logs/fb15k/ -o logs/fb15k/all_templates_explanations/delete_this -tf data/fb15k/labelled_train/labelled_train_x.txt --data_repo_root ../data --num 5
+
 ###### Semi Supervised exclude 2.5 ##########
 train_ml=0
 kl=0.0
@@ -56,15 +118,15 @@ exdf=1
 expname=temp/best_fb15k_kl_${kl}_ml_${train_ml}_nr_${nr}
 
 for i in {1..5}; do
-    CUDA_VISIBLE_DEVICES=0 python3 main.py --training_data_path $tp --labelled_training_data_path $ltp --val_data_path $vp --exp_name train --num_epochs 20 --config $config --hidden_unit_list ${hidden_unit_list[@]} --kldiv_lambda $kl --neg_reward $nr --rho $rho --lr 0.001 --cuda --batch_size 2048 --mil --num_templates $nt --each_input_size 7 --supervision semi --output_path ${expname}/run_$i/ --label_distribution_file ${ldp} --exclude_t_ids ${exclude_t_ids[@]} --default_value $df --exclude_default $exdf --train_labels_path $tlp --val_labels_path $vlp1 --eval_ml $train_ml --train_ml $train_ml &;
+    CUDA_VISIBLE_DEVICES=0 python3 main.py --training_data_path $tp --labelled_training_data_path $ltp --val_data_path $vp --exp_name train --num_epochs 20 --config $config --hidden_unit_list ${hidden_unit_list[@]} --kldiv_lambda $kl --neg_reward $nr --rho $rho --lr 0.001 --cuda --batch_size 2048 --mil --num_templates $nt --each_input_size 7 --supervision sup --output_path ${expname}/run_$i/ --label_distribution_file ${ldp} --exclude_t_ids ${exclude_t_ids[@]} --default_value $df --exclude_default $exdf --train_labels_path $tlp --val_labels_path $vlp1 --eval_ml $train_ml --train_ml $train_ml &;
 done
 
 # single label test
 for i in {1..5}; do
-    python3 main.py --training_data_path $tp --labelled_training_data_path $ltp --val_data_path $testp --exp_name test --num_epochs 20 --config $config --hidden_unit_list ${hidden_unit_list[@]} --kldiv_lambda $kl --neg_reward $nr --rho $rho --lr 0.001 --cuda --batch_size 2048 --mil --num_templates $nt --each_input_size 7 --supervision semi --output_path ${expname}/run_$i/ --checkpoint ${expname}/run_$i/train/train_r${rho}_p1_n${nr}_i4_k${kl}_best_checkpoint.pth0 --only_eval --pred_file preds.txt --log_eval ${expname}/train_x_eval_sl.csv  --label_distribution_file ${ldp} --exclude_t_ids ${exclude_t_ids[@]} --default_value $df --exclude_default $exdf --val_labels_path $testlp --eval_ml 0;
+    python3 main.py --training_data_path $tp --labelled_training_data_path $ltp --val_data_path $testp --exp_name test --num_epochs 20 --config $config --hidden_unit_list ${hidden_unit_list[@]} --kldiv_lambda $kl --neg_reward $nr --rho $rho --lr 0.001 --cuda --batch_size 2048 --mil --num_templates $nt --each_input_size 7 --supervision sup --output_path ${expname}/run_$i/ --checkpoint ${expname}/run_$i/train/train_r${rho}_p1_n${nr}_i4_k${kl}_best_checkpoint.pth0 --only_eval --pred_file preds.txt --log_eval ${expname}/train_x_eval_sl.csv  --label_distribution_file ${ldp} --exclude_t_ids ${exclude_t_ids[@]} --default_value $df --exclude_default $exdf --val_labels_path $testlp --eval_ml 0;
 done
 for i in {1..5}; do
-    python3 main.py --training_data_path $tp --labelled_training_data_path $ltp --val_data_path $testp --exp_name test_ml --num_epochs 20 --config $config --hidden_unit_list ${hidden_unit_list[@]} --kldiv_lambda $kl --neg_reward $nr --rho $rho --lr 0.001 --cuda --batch_size 2048 --mil --num_templates $nt --each_input_size 7 --supervision semi --output_path ${expname}/run_$i/ --checkpoint ${expname}/run_$i/train/train_r${rho}_p1_n${nr}_i4_k${kl}_best_checkpoint.pth0 --exclude_t_ids ${exclude_t_ids[@]} --only_eval --pred_file preds.txt --log_eval ${expname}/train_x_eval_ml.csv --val_labels_path $testlp --label_distribution_file $ldp --default_value $df --exclude_default $exdf --eval_ml 1;
+    python3 main.py --training_data_path $tp --labelled_training_data_path $ltp --val_data_path $testp --exp_name test_ml --num_epochs 20 --config $config --hidden_unit_list ${hidden_unit_list[@]} --kldiv_lambda $kl --neg_reward $nr --rho $rho --lr 0.001 --cuda --batch_size 2048 --mil --num_templates $nt --each_input_size 7 --supervision sup --output_path ${expname}/run_$i/ --checkpoint ${expname}/run_$i/train/train_r${rho}_p1_n${nr}_i4_k${kl}_best_checkpoint.pth0 --exclude_t_ids ${exclude_t_ids[@]} --only_eval --pred_file preds.txt --log_eval ${expname}/train_x_eval_ml.csv --val_labels_path $testlp --label_distribution_file $ldp --default_value $df --exclude_default $exdf --eval_ml 1;
 done
 
 
@@ -105,6 +167,9 @@ python3 Answer_triplets.py -o explanation_rule_mining_turk_hits1.pkl -i ../data/
 
 # Running get_turk_data.py
 # python get_turk_data.py -d fb15k -w dumps/fb15k_distmult_dump_norm.pkl -l logs/fb15k -o logs/fb15k/turk_test -tf data/fb15k/turk_test/test_hits_1_id_small.txt -tp logs/fb15k/turk_test/pred_turk_test_hits1.txt -rp Rule-Mining-Distmult/fb15k_rule_mining_tmp/explanation_rule_mining_turk_hits1.pkl --data_repo_root ../data --num 5 --t_ids 1 2 3 4 5 6
+#against gntp
+python3 get_turk_data_gntp.py -d fb15k -w dumps/fb15k_distmult_dump_norm.pkl -l logs/fb15k/ -o logs/fb15k/turk_test/against_gntp -tp logs/fb15k/turk_test/pred_turk_test_hits1.txt -tf data/fb15k/turk_test/test_hits_1_id_small.txt --data_repo_root ../data --num 5 --t_ids 1 2 3 4 5 6
+
 # hits@1
 python get_turk_data.py -d fb15k -w dumps/fb15k_distmult_dump_norm.pkl -l logs/fb15k -o logs/fb15k/turk_test -tf data/fb15k/turk_test/test_hits_1_id_small.txt -tp logs/fb15k/turk_test/pred_turk_test_hits1.txt -rp logs/fb15k/turk_test/explanation_rule_mining_turk_hits1.pkl --data_repo_root ../data --num 5 --t_ids 1 2 3 4 5 6
 
