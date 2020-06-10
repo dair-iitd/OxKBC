@@ -25,6 +25,9 @@ After this, you have the following structure:
 │   │   ├── test_hits10_y.txt
 │   │   ├── test_hits1_x.txt
 │   │   └── test_hits1_y.txt
+│   ├── turk
+│   │   ├── test_hits1.txt
+│   │   └── test_hits10_not_hits1.txt
 │   ├── test.txt
 │   ├── train.txt
 │   └── valid.txt
@@ -33,6 +36,6 @@ After this, you have the following structure:
 
 * The labelled train is a subset from `valid.txt` wich we use for semi-supervised training.
 * The `test` directory contains the subset of `test.txt` for which the model, gave correct answer in the file `test_hits1_[x/y].txt` and where the correct answer lied in the top 10 predictions of model in the file `test_hist10_[x/y].txt`
+* The turk folder contains the 300 hits 1 samples in `test_hits1.txt` and the 150 (ground truth) samples which were in hits10 but not in hits1 in the file `test_hits10_not_hits1.txt`
 
-
-A similar structure is for yago.
+A similar structure is for yago. (No turk files for yago)

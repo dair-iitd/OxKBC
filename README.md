@@ -66,7 +66,6 @@ python3 preprocessing.py -d fb15k -m distmult -f ./data/fb15k/train.txt -s logs/
 
 ## Generate a valid/test file, where we do have labels of y
 python3 preprocessing.py -d fb15k -m distmult -f ./data/fb15k/labelled_train/labelled_train_x.txt -s logs/fb15k/sm_vaild_with_id.data -w dumps/fb15k_distmult_dump_norm.pkl -l logs/fb15k -v 1 --t_ids 1 2 3 4 5 6 --data_repo_root ./data --negative_count 0 --y_labels ./data/fb15k/labelled_train/labelled_train_y6.txt
-
 ```
 
 This will write a pkl and txt file with the name `logs/fb15k/sm_with_id.data.[pkl/txt]`. This file contains the data in the following format:
@@ -127,7 +126,7 @@ We had two experiments on Amazon Mechanical Turk.
 We have an html file `turk_template.html` which is the form, which turkers have to fill. We need to generate a csv file containing information of HITs according to this HTML file. To do this use:
 
 ```
-python3 get_turk_data.py -d fb15k -w dumps/fb15k_distmult_dump_norm.pkl -l logs/fb15k/ -o logs/fb15k/turk_better/ -tf ./data/fb15k/test/test_hits1_x.txt -tp logs/sm/test_semi/preds.txt -rp [rule pred file] --data_repo_root ./data --num 5
+python3 get_turk_data.py -d fb15k -w dumps/fb15k_distmult_dump_norm.pkl -l logs/fb15k/ -o logs/fb15k/turk_better/ -tf ./data/fb15k/turk/test_hits1.txt -tp logs/sm/test_semi/preds.txt -rp [rule pred file] --data_repo_root ./data --num 5
 ```
 It will generate a book file (which is a html file for easy viewing) and a `logs/fb15k/turk_better/turk_better_hits.csv` which is to be uploaded while creating a batch.
 
@@ -146,7 +145,7 @@ It then generates an analysis html file (`logs/fb15k/turk_better/results_analysi
 We have an html file `turk_useful_template.html` which is the form, which turkers have to fill. We need to generate a csv file containing information of HITs according to this HTML file. To do this use:
 
 ```
-python3 get_turk_useful_data.py -d fb15k -w dumps/fb15k_distmult_dump_norm.pkl -l logs/fb15k/ -o logs/fb15k/turk_useful/ -tf ./data/fb15k/test/test_hits1_x.txt -tp logs/sm/test_semi/preds.txt --data_repo_root ./data --num 5
+python3 get_turk_useful_data.py -d fb15k -w dumps/fb15k_distmult_dump_norm.pkl -l logs/fb15k/ -o logs/fb15k/turk_useful/ -tf ./data/fb15k/turk/test_hits1.txt -tp logs/sm/test_semi/preds.txt --data_repo_root ./data --num 5
 ```
 
 Essentially it generates a book file (which is a html file for easy viewing) and a `logs/fb15k/turk_useful/turk_useful_exps_hits.csv` and `logs/fb15k/turk_useful/turk_useful_no_exps_hits.csv`.
