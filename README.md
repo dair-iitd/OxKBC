@@ -37,6 +37,7 @@ dump = {
     'tail_rel_type': numpy.ndarray(shape=(number of relations, type embedding dim),dtype=np.float32)
 }
 ```
+ADD SOME INFO ABOUT THE DATA FOLDER!!!
 Make sure the embeddings are normalized, to do so use `scripts/normalize.py`, just change the file names.
 
 Now, we need to build template tables for these templates.
@@ -45,10 +46,10 @@ To do so, run the `template_builder.py` file
 
 ```
 python3 template_builder.py -h       ## Get help
-python3 template_builder.py -d fb15k -m distmult -w dumps/fb15k_distmult_dump_norm.pkl -s logs/fb15k -v 1 --t_ids 1 2 3 4 5 --data_repo_root ./data
+python3 template_builder.py -d fb15k -m distmult -w dumps/fb15k_distmult_dump_norm.pkl -s logs/fb15k -v 1 --t_ids 1 2 3 4 5 6 --data_repo_root ./data
 ```
 
-This will save `1-5.pkl` in the save_directory which is `logs/fb15k` in the above example.
+This will save `1-6.pkl` in the save_directory which is `logs/fb15k` in the above example.
 
 
 ### Preprocessing
