@@ -1,0 +1,162 @@
+The Pianist	/film/film/written_by	Roman Polanski
+Composer	/people/profession/people_with_this_profession	Danny Elfman
+Atlanta Falcons	/american_football/football_team/current_roster./sports/sports_team_roster/position	Defensive back
+Bryan Singer	/film/producer/film	X-Men
+Sex and the City	/film/film/starring./film/performance/actor	Fergie
+Denis Leary	/people/person/religion	Actor
+Moe Howard	/people/deceased_person/place_of_death	Actor
+Judi Dench	/award/award_winner/awards_won./award/award_honor/award_winner	Judi Dench
+Writers Guild of America Award for Best Original Screenplay	/award/award_category/winners./award/award_honor/honored_for	Being John Malkovich
+Voice Actor	/people/profession/people_with_this_profession	Penn Jillette
+David Cross	/award/award_nominee/award_nominations./award/award_nomination/award_nominee	David Cross
+Arizona	/location/location/contains	United States of America
+Drive	/film/film/release_date_s./film/film_regional_release_date/film_release_region	Mexico
+Sound Mixer	/film/film_job/films_with_this_crew_job./film/film_crew_gig/film	The Motorcycle Diaries
+Patrick Loubert	/award/award_nominee/award_nominations./award/award_nomination/award_nominee	Patrick Loubert
+Anthony Kiedis	/award/award_nominee/award_nominations./award/award_nomination/award_nominee	Anthony Kiedis
+Makeup Artist	/film/film_job/films_with_this_crew_job./film/film_crew_gig/film	End of Days
+Comedy of manners	/film/film_genre/films_in_this_genre	Comedy of manners
+The Siege	/film/film/costume_design_by	Roger Deakins
+6th Screen Actors Guild Awards	/award/award_ceremony/awards_presented./award/award_honor/award_winner	Robert Downey Jr.
+Forward	/sports/sports_position/players./sports/sports_team_roster/team	Central Coast Mariners FC
+Actor	/people/profession/people_with_this_profession	Jim Cummings
+Rock of Ages	/film/film/release_date_s./film/film_regional_release_date/film_release_region	Denmark
+Academy Award for Best Director	/award/award_category/nominees./award/award_nomination/nominated_for	Zero Dark Thirty
+Matt Groening	/award/award_nominee/award_nominations./award/award_nomination/award_nominee	Matt Groening
+Daniel Nestor	/people/person/nationality	Netherlands
+Robbie Robertson	/award/award_nominee/award_nominations./award/award_nomination/award	MTV Video Music Award for Best Male Video
+Jenna Wolfe	/award/award_nominee/award_nominations./award/award_nomination/award_nominee	Jenna Wolfe
+Forward	/soccer/football_position/players	Alou Diarra
+Rob James-Collier	/award/award_winner/awards_won./award/award_honor/award_winner	Rob James-Collier
+Guitar	/music/instrument/instrumentalists	Chris Seefried
+The Secret in Their Eyes	/award/award_nominated_work/award_nominations./award/award_nomination/award	Goya Award for Best Original Screenplay
+Michelle Forbes	/award/award_winner/awards_won./award/award_honor/award_winner	Michelle Forbes
+Keyboard	/music/instrument/instrumentalists	David A. Stewart
+Golden Raspberry Award for Worst Screenplay	/award/award_category/nominees./award/award_nomination/nominated_for	Wyatt Earp
+41st Academy Awards	/award/award_ceremony/awards_presented./award/award_honor/award	Academy Award for Best Original Song
+Dawn French	/people/person/places_lived./people/place_lived/location	Latvia
+National Society of Film Critics Award for Best Actor	/award/award_category/nominees./award/award_nomination/award_nominee	Female
+University of New Hampshire	/education/educational_institution/students_graduates./education/education/degree	Bachelor of Science
+Texas Instruments	/base/schemastaging/organization_extra/phone_number./base/schemastaging/phone_sandbox/service_location	Taiwan
+Screenwriter	/people/profession/people_with_this_profession	Mike Nichols
+Defender	/sports/sports_position/players./soccer/football_roster_position/team	Farnborough F.C.
+Bobby McFerrin	/music/artist/genre	Rock music
+Kate Flannery	/award/award_winner/awards_won./award/award_honor/award_winner	Kate Flannery
+Senna	/film/film/release_date_s./film/film_regional_release_date/film_release_region	Denmark
+Steven Levitan	/award/award_nominee/award_nominations./award/award_nomination/award_nominee	Steven Levitan
+Alex Kurtzman	/film/producer/film	Transformers: Revenge of the Fallen
+Songwriter	/people/profession/people_with_this_profession	Elliot Goldenthal
+Ludwig von Mises	/influence/influence_node/influenced	Ludwig von Mises
+Trip hop	/music/genre/parent_genre	Trip hop
+Batman Forever	/film/film/starring./film/performance/actor	Bono
+A Fish Called Wanda	/award/award_nominated_work/award_nominations./award/award_nomination/award	Academy Award for Best Picture
+New York	/base/aareas/schema/administrative_area/capital	New York
+Makeup Artist	/film/film_job/films_with_this_crew_job./film/film_crew_gig/film	End of Days
+2010 Winter Olympics	/olympics/olympic_games/athletes./olympics/olympic_athlete_affiliation/country	Czech Republic
+Ice Age	/film/film/release_date_s./film/film_regional_release_date/film_release_region	Singapore
+Film Producer	/people/profession/people_with_this_profession	Oprah Winfrey
+Fluminense FC	/sports/sports_team/colors	Blue
+Academy Award for Best Picture	/award/award_category/winners./award/award_honor/honored_for	Brokeback Mountain
+The Ides of March	/film/film/release_date_s./film/film_regional_release_date/film_release_region	Japan
+Reggae	/music/genre/subgenre	Reggae
+Piano	/music/instrument/instrumentalists	David Gilmour
+Aaliyah	/people/person/places_lived./people/place_lived/location	Makeup Artist
+Supervising Sound Editor	/film/film_job/films_with_this_crew_job./film/film_crew_gig/film	Harry Potter and the Chamber of Secrets
+Parody	/film/film_genre/films_in_this_genre	Along Came Polly
+Triathlon	/olympics/olympic_sport/athletes./olympics/olympic_athlete_affiliation/country	Norway
+Transformers: Dark of the Moon	/film/film/release_date_s./film/film_regional_release_date/film_release_region	Romania
+Willie Nelson	/people/person/profession	Vocalist
+Tom Ruegger	/people/person/profession	Actor
+Voice Actor	/people/profession/people_with_this_profession	Penn Jillette
+Dan Castellaneta	/film/actor/film./film/performance/film	The Simpsons
+Sound Mixer	/film/film_job/films_with_this_crew_job./film/film_crew_gig/film	The Motorcycle Diaries
+Grammy Award for Best Album for Children	/award/award_category/nominees./award/award_nomination/award_nominee	Robert Shaw
+Pop rock	/music/genre/artists	Gwen Stefani
+Marriage	/people/marriage_union_type/unions_of_this_type./people/marriage/spouse	Paul Thomas Anderson
+Wyoming	/location/location/containedby	Teton County
+Woody Harrelson	/award/award_nominee/award_nominations./award/award_nomination/award_nominee	Woody Harrelson
+Phyllis Smith	/award/award_winner/awards_won./award/award_honor/award_winner	Phyllis Smith
+Defender	/sports/sports_position/players./sports/sports_team_roster/team	Farnborough F.C.
+1960 Summer Olympics	/olympics/olympic_games/medals_awarded./olympics/olympic_medal_honor/country	Canada
+Alpha Sigma Phi	/education/fraternity_sorority/colleges_and_universities	Alpha Sigma Phi
+Pasta	/food/food/nutrients./food/nutrition_fact/nutrient	Selenium
+Writer	/people/profession/people_with_this_profession	Maya Angelou
+Fordham University	/film/film_location/featured_in_films	Zoolander
+Martin Clunes	/award/award_nominee/award_nominations./award/award_nomination/award_nominee	Martin Clunes
+Carlos Santana	/award/award_winner/awards_won./award/award_honor/ceremony	46th Annual Grammy Awards
+Marlon Wayans	/people/person/sibling_s./people/sibling_relationship/sibling	Marlon Wayans
+Historical period drama	/film/film_genre/films_in_this_genre	Valkyrie
+Aldo Nova	/award/award_nominee/award_nominations./award/award_nomination/award_nominee	Aldo Nova
+Marriage	/people/marriage_union_type/unions_of_this_type./people/marriage/spouse	Paul Thomas Anderson
+Graphic Designer	/film/film_job/films_with_this_crew_job./film/film_crew_gig/film	Planet of the Apes
+Vocalist	/people/profession/people_with_this_profession	Sting
+David Chase	/award/award_nominee/award_nominations./award/award_nomination/award_nominee	David Chase
+Marriage	/people/marriage_union_type/unions_of_this_type./people/marriage/spouse	Paul Thomas Anderson
+Marc Anthony	/people/person/religion	Actor
+Frasier	/award/award_winning_work/awards_won./award/award_honor/award_winner	Dan O'Shannon
+World cinema	/film/film_genre/films_in_this_genre	Fantasy
+Sound Mixer	/film/film_job/films_with_this_crew_job./film/film_crew_gig/film	The Motorcycle Diaries
+MTV Movie Award for Best Fight	/award/award_category/nominees./award/award_nomination/award_nominee	Cameron Diaz
+Kanye West	/award/award_nominee/award_nominations./award/award_nomination/award_nominee	Kanye West
+Bachelor of Arts	/education/educational_degree/people_with_this_degree./education/education/institution	DePaul University
+Antichrist	/film/film/release_date_s./film/film_regional_release_date/film_release_region	Switzerland
+Edgar Rice Burroughs	/people/person/places_lived./people/place_lived/location	Makeup Artist
+MTV Movie Award for Best Villain	/award/award_category/winners./award/award_honor/award_winner	Kiefer Sutherland
+Screen Actors Guild Award for Outstanding Performance by a Cast in a Motion Picture	/award/award_category/nominees./award/award_nomination/award_nominee	Kevin Kline
+Percussion	/music/performance_role/track_performances./music/track_contribution/role	Percussion
+Kung Fu Panda	/film/film/release_date_s./film/film_regional_release_date/film_release_region	Germany
+David Mills	/award/award_nominee/award_nominations./award/award_nomination/award_nominee	David Mills
+Patricia Heaton	/award/award_nominee/award_nominations./award/award_nomination/nominated_for	Amazing Grace
+Michael Sheen	/award/award_nominee/award_nominations./award/award_nomination/award_nominee	Michael Sheen
+EDtv	/film/film/genre	Comedic
+Accordion	/music/performance_role/regular_performances./music/group_membership/role	Accordion
+Thrashcore	/music/genre/parent_genre	Grindcore
+Shopgirl	/film/film/other_crew./film/film_crew_gig/film_crew_role	Sound Mixer
+Old Dogs	/award/award_nominated_work/award_nominations./award/award_nomination/award	Dramatic movie
+Screenwriter	/people/profession/people_with_this_profession	Mike Nichols
+Clive Davis	/award/award_nominee/award_nominations./award/award_nomination/award_nominee	Clive Davis
+Record producer	/people/profession/people_with_this_profession	Ringo Starr
+Bass guitar	/music/performance_role/track_performances./music/track_contribution/role	Bass guitar
+United States of America	/location/country/second_level_divisions	United States of America
+Power forward	/sports/sports_position/players./basketball/basketball_roster_position/team	Toronto Raptors
+Mobile Suit Gundam SEED Destiny	/base/schemastaging/tv_program_extra/regular_dubbing_performances./base/schemastaging/tv_star_dubbing_performance/actor	Tabitha St. Germain
+Cameo appearance	/film/special_film_performance_type/film_performance_type./film/performance/actor	FilmFlex
+Ricky Jay	/award/award_nominee/award_nominations./award/award_nomination/award_nominee	Ricky Jay
+Step Up Revolution	/film/film/release_date_s./film/film_regional_release_date/film_release_region	Canada
+Joshua Jackson	/award/award_nominee/award_nominations./award/award_nomination/award_nominee	Joshua Jackson
+2005 NFL draft	/sports/sports_league_draft/picks./sports/sports_league_draft_pick/team	New York Giants
+Norman Mailer	/people/person/profession	Author
+Assassins	/award/award_winning_work/awards_won./award/award_honor/honored_for	Assassins
+Arif Mardin	/award/award_winner/awards_won./award/award_honor/award_winner	Arif Mardin
+Glen Morgan	/people/person/nationality	Actor
+Vocalist	/people/profession/people_with_this_profession	Sting
+Melbourne	/location/location/people_born_here	Guy Pearce
+The Best Exotic Marigold Hotel	/film/film/release_date_s./film/film_regional_release_date/film_release_region	Canada
+Supervising Sound Editor	/film/film_job/films_with_this_crew_job./film/film_crew_gig/film	Harry Potter and the Chamber of Secrets
+The Queen	/film/film/directed_by	Andy Harries
+Carroll County	/location/location/adjoin_s./location/adjoining_relationship/adjoins	Rockingham County
+Phineas and Ferb	/tv/tv_program/regular_cast./tv/regular_tv_appearance/actor	Hugh Grant
+Golden Raspberry Award for Worst Screenplay	/award/award_category/winners./award/award_honor/honored_for	Rocky IV
+Timor-Leste	/location/country/form_of_government	Thriller
+Anne Arundel County	/location/location/adjoin_s./location/adjoining_relationship/adjoins	Anne Arundel County
+Nikola Tesla	/people/person/places_lived./people/place_lived/location	Europe
+Forward	/sports/sports_position/players./sports/sports_team_roster/team	Central Coast Mariners FC
+Rowan Atkinson	/award/award_nominee/award_nominations./award/award_nomination/award_nominee	Rowan Atkinson
+Tracy Morgan	/base/schemastaging/person_extra/net_worth./measurement_unit/dated_money_value/currency	Actor
+Big Fish	/film/film/release_date_s./film/film_regional_release_date/film_release_region	Canada
+Victor Victoria	/award/award_winning_work/awards_won./award/award_honor/ceremony	DreamWorks Studios
+Jake Gyllenhaal	/award/award_winner/awards_won./award/award_honor/award_winner	Jake Gyllenhaal
+Harmonica	/music/performance_role/regular_performances./music/group_membership/role	Harmonica
+Felicity Huffman	/award/award_nominee/award_nominations./award/award_nomination/award_nominee	Felicity Huffman
+New Castle County	/location/location/adjoin_s./location/adjoining_relationship/adjoins	New Castle County
+PepsiCo	/organization/organization/place_founded	Dallas
+King Kong	/film/film/other_crew./film/film_crew_gig/film_crew_role	Sound Mixer
+Songwriter	/people/profession/people_with_this_profession	Elliot Goldenthal
+Oud	/music/performance_role/regular_performances./music/group_membership/role	Oud
+49th Annual Grammy Awards	/award/award_ceremony/awards_presented./award/award_honor/award_winner	Alicia Keys
+Singer-songwriter	/people/profession/people_with_this_profession	Will i Am
+Tennessee Titans	/american_football/football_team/historical_roster./sports/sports_team_roster/position	Placekicker
+Jayma Mays	/award/award_winner/awards_won./award/award_honor/award_winner	Jayma Mays
+Mandolin	/music/performance_role/track_performances./music/track_contribution/role	Mandolin
+Film Producer	/people/profession/people_with_this_profession	Oprah Winfrey
+Madeline Kahn	/people/deceased_person/place_of_death	Palo Alto

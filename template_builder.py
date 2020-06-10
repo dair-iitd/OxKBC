@@ -8,10 +8,10 @@ from templates import builder
 import kb
 import models
 import utils
-
+from IPython.core.debugger import Pdb
 
 def template_obj_builder(dataset_root, model_weight_file, template_load_dir, template_save_dir,
-         model_type, templates_idlist, introduce_oov, use_hard_scoring=True):
+                         model_type, templates_idlist, introduce_oov, use_hard_scoring=True,parts = 1, offset = 0):
     ktrain = kb.KnowledgeBase(os.path.join(dataset_root, 'train.txt'))
     if introduce_oov:
         ktrain.entity_map["<OOV>"] = len(ktrain.entity_map)
@@ -25,12 +25,13 @@ def template_obj_builder(dataset_root, model_weight_file, template_load_dir, tem
     elif(model_type == "complex"):
         base_model = models.TypedComplex(model_weight_file)
     else:
-        message = 'Invalid Model type choice: {0} (choose from {1})'.format(model_type,["distmult","complex"])
+        message = 'Invalid Model type choice: {0} (choose from {1})'.format(
+            model_type, ["distmult", "complex"])
         logging.error(message)
         raise argparse.ArgumentTypeError(message)
 
-    templates_obj = builder.build_templates(templates_idlist, [ktrain,kvalid,ktest], base_model,
-                                            use_hard_scoring, template_load_dir, template_save_dir)
+    templates_obj = builder.build_templates(templates_idlist, [ktrain, kvalid, ktest], base_model,
+                                            use_hard_scoring, template_load_dir, template_save_dir,parts, offset)
     return templates_obj
 
 
@@ -57,11 +58,21 @@ if __name__ == "__main__":
                         type=utils._log_level_string_to_int,
                         nargs='?',
                         help='Set the logging output level. {0}'.format(utils._LOG_LEVEL_STRINGS))
+
+    parser.add_argument('-o', '--offset', default=0, type=int,
+                        help='Build templates only for: [o*floor(N/p), (o+1)*floor(N/p))')
+    
+    parser.add_argument('-p', '--parts', default=1, type=int,
+                        help='The job is dividied into p parts. Run only for offset o')
+
     args = parser.parse_args()
 
     logging.basicConfig(format='%(levelname)s :: %(asctime)s - %(message)s',
                         level=args.log_level, datefmt='%d/%m/%Y %I:%M:%S %p')
 
+    #Pdb().set_trace()
+    assert args.offset < args.parts,"args.offset should be less than args.parts"
+
     dataset_root = os.path.join(args.data_repo_root, args.dataset)
     template_obj_builder(dataset_root, args.model_weights, args.template_load_dir,
-         args.template_save_dir, args.model_type, args.t_ids, args.oov_entity)
+                         args.template_save_dir, args.model_type, args.t_ids, args.oov_entity, parts = args.parts, offset = args.offset)

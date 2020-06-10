@@ -16,7 +16,7 @@ from sklearn.neighbors import NearestNeighbors
 import utils
 from collections import Counter
 import matplotlib.pyplot as plt
-
+from IPython.core.debugger import Pdb
 
 # In[4]:
 
@@ -99,6 +99,8 @@ for r1 in range(relation_count):
         print(r1)
     if(count_r[r1]<support):
         continue
+
+    Pdb().set_trace()
     combined_rel=model.relation_matrix[r1].reshape((1,-1))
     distances, indices = nbrs.kneighbors(combined_rel)
     indices=indices[0]

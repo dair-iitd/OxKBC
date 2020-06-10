@@ -23,8 +23,8 @@ def main(args):
 
     # Store name of experiment
     exp_name = args.exp_name
-    exp_name = '{}_r{}_p{}_n{}_i{}'.format(
-        exp_name, args.rho, args.pos_reward, args.neg_reward, args.class_imbalance)
+    exp_name = '{}_r{}_p{}_n{}_i{}_k{}'.format(
+        exp_name, args.rho, args.pos_reward, args.neg_reward, args.class_imbalance, args.kldiv_lambda)
 
     # Create an directory for output path
     args.output_path = os.path.join(args.output_path, args.exp_name)
@@ -49,6 +49,8 @@ def main(args):
     logging.info('Beginning code for experiment {} and storing stuff in {}'.format(
         exp_name, args.output_path))
     logging.info('Loaded arguments as \n{}'.format(str(pprint.pformat(args))))
+
+
 
     # Begin of main code
 
@@ -89,6 +91,7 @@ def main(args):
     num_epochs = args.num_epochs
     logging.info('Beginning train/validate cycle')
 
+    time1 = time.time()
     if val_loader is not None:
         record, metric_idx, headers = compute.compute(start_epoch-1, model, val_loader, optimizer,
                                                       'eval', eval_fn=my_eval_fn, args=args)
@@ -97,6 +100,7 @@ def main(args):
             print(','.join([str(round(x, 6)) if isinstance(
                 x, float) else str(x) for x in record]), file=handler)
             handler.close()
+    print("Time taken:",time.time()-time1)
     if(args.only_eval):
         logging.info('Ran only eval mode, now exiting')
         exit(0)
@@ -152,6 +156,8 @@ if __name__ == '__main__':
     parser.add_argument(
         '--val_labels_path', help="Validation data Labels path for multi-label evaluation", type=str, default=None)
 
+    parser.add_argument(
+        '--train_labels_path', help="Training data Labels path for multi-label training", type=str, default=None)
 
     parser.add_argument('--exp_name', help='Experiment name',
                         type=str, default='default_exp')
@@ -169,11 +175,14 @@ if __name__ == '__main__':
     parser.add_argument('--each_input_size',
                         help='Input size of each template', type=int, default=7)
     parser.add_argument(
-        '--num_templates', help='number of templates excluding other', type=int, default=5)
+        '--num_templates', help='number of templates excluding other', type=int, default=6)
     parser.add_argument('--use_ids', help='Use embeddings of entity and relations while training',
                         action='store_true', default=False)
     parser.add_argument('--mil', help='Use MIL model',
                         action='store_true', default=False)
+    parser.add_argument('--exclude_t_ids', nargs='*', type=int, required=False,default=[], help='List of templates to be excluded while making predictions')
+    
+    parser.add_argument('--hidden_unit_list', nargs='*', type=int, required=False,default=[], help='number of hidden neurons in each layer')
 
     # Optimizer parameters
     parser.add_argument(
@@ -207,6 +216,17 @@ if __name__ == '__main__':
     parser.add_argument('--kldiv_lambda', help='relative wt of kl div loss', default=0.0,type=float)
     parser.add_argument('--label_distribution_file',help='yaml file containing target distribution', default= 'label_distrubution.yml' , type=str)
 
+    #other loss hyperparameters:
+    parser.add_argument('--neg_reward', help='negative reward', default=-1, type=float)
+    parser.add_argument('--rho', help='rho ', default=0.125, type=float)
+
+    #multi label train/eval is done when: eval_labels_file is not None and eval_ml = 1. Hence default behaviour is: single label as default value of eval_labels_file is None
+    parser.add_argument('--train_ml',help='should use multi label loss?', default = 1, type=int)
+    parser.add_argument('--eval_ml',help='should eval multi label ?', default = 1, type=int)
+    
+    parser.add_argument('--default_value',help='default value of template score when it is undefined?', default = 0, type=float)
+    parser.add_argument('--exclude_default',help='should default value be excluded while computing stats?', default = 0, type=int)
+
 
     args = parser.parse_args()
     config = {}
@@ -216,6 +236,14 @@ if __name__ == '__main__':
     config.update({'embed_size': utils.get_embed_size(
         args.base_model_file, args.use_ids)})
     args = utils.Map(config)
-    settings.set_settings(args)
+    o2n , n2o = utils.get_template_id_maps(args.num_templates, args.exclude_t_ids)
+    args.o2n = o2n
+    args.n2o = n2o
 
+    for key in ['train_labels_path','val_labels_path']:
+        if args[key]  == 'None':
+            args[key] = None
+
+    
+    settings.set_settings(args)
     main(args)

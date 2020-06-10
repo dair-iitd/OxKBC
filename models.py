@@ -59,6 +59,40 @@ class TypedDM():
         tail_type_compatibility=np.sum(tail_type_compatibility)
         return utils.sigmoid(score)*utils.sigmoid(head_type_compatibility)*utils.sigmoid(tail_type_compatibility)
 
+    def get_hadamard_product(self,r1,r2):
+        v1 = self.dump['rel_real'][r1]
+        v2 = self.dump['rel_real'][r2] 
+        relation_product =  (v1 * v2)
+        if(np.linalg.norm(relation_product)!=0):
+            relation_product /= np.linalg.norm(relation_product)
+
+        v1 = self.dump['head_rel_type'][r1]
+        v2 = self.dump['head_rel_type'][r2]
+        type_compatibility_head_product = (v1 * v2)
+        if(np.linalg.norm(type_compatibility_head_product)!=0):
+            type_compatibility_head_product /= np.linalg.norm(type_compatibility_head_product)
+        
+        v1 = self.dump['tail_rel_type'][r1] 
+        v2 = self.dump['tail_rel_type'][r2] 
+        type_compatibility_tail_product = (v1 * v2)
+        if(np.linalg.norm(type_compatibility_tail_product)!=0):
+            type_compatibility_tail_product /= np.linalg.norm(type_compatibility_tail_product)
+
+        return [relation_product, type_compatibility_head_product, type_compatibility_tail_product]
+    
+    def get_relation_similarity_from_embedding(self,r1_emb, r2_emb):
+        sim = 1.0
+        for i,j in zip(r1_emb, r2_emb):
+            sim = sim*np.dot(i,j)
+        #if(sim>=0):
+        #    return pow(sim,1/3)
+        #return -pow(-sim,1/3)
+        return (sim)
+
+    def get_relation_embedding(self,r):
+        return [self.dump['rel_real'][r], self.dump['head_rel_type'][r], self.dump['tail_rel_type'][r]]
+
+
 class TypedComplex():
 
     def init(self, pickle_dump_file):

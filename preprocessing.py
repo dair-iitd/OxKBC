@@ -104,11 +104,11 @@ if __name__ == "__main__":
     y_labels = [1 for _ in range(k_preprocess.facts.shape[0])]
 
     if(args.y_labels != ''):
-        y_labels = np.loadtxt(args.y_labels)
+        #y_labels = np.loadtxt(args.y_labels)
+        y_labels,y_multilabels = utils.read_multilabel(args.y_labels)
         if(y_labels.shape[0] != k_preprocess.facts.shape[0]):
             logging.error('Number of facts and their y labels do not match')
             exit(-1)
 
     new_facts = preprocess(k_preprocess, template_objs, args.negative_count, not args.del_ids, y_labels)
-
     write_to_file(new_facts, args.sm_data_write)

@@ -6,11 +6,77 @@ import shutil
 
 import settings
 import torch
-
+import numpy as np
+from IPython.core.debugger import Pdb
 LOG_FILE = 'log.txt'
 
 _LOG_LEVEL_STRINGS = ['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG']
 EPSILON = 0.0000001
+
+def clean_label_list(ylist):
+    #remove duplicates without changing order
+    #remove intermittent zeros. We cant have 0 with others
+    #remove zeros
+    ylist = [x for x in ylist if x != 0]
+    if len(ylist) == 0:
+        return [0]
+    else:
+        #return duplicates
+        already_added = set()
+        ry = []
+        for y in ylist:
+            if y not in already_added:
+                ry.append(y)
+                already_added.add(y)
+
+        return ry
+
+
+
+
+
+def read_multilabel(filename, num_labels = 0): 
+    lines = []
+    with open(filename) as fh: 
+        lines = fh.readlines()
+        lines = [list(map(int,line.strip().split(','))) for line in lines]
+        if num_labels == 0:
+            num_labels = max([max(line) for line in lines])+1
+        #   
+        y_multi = np.zeros((len(lines),num_labels))
+        y_single = np.zeros(len(lines))
+        for i,line in enumerate(lines):
+            y_single[i] = line[0]
+            for j in line:
+                y_multi[i,j] = 1 
+            #   
+        #   
+        return y_single, y_multi
+
+
+def compute_performance(gt_file, pred_file):
+    preds = np.loadtxt(pred_file)
+    y_single, y_multi = read_multilabel(gt_file)
+    acc = (y_single == preds).sum()/preds.shape[0]
+    multi_acc = y_multi[np.arange(preds.shape[0]), preds.astype(int)].sum()/preds.shape[0]
+    return acc, multi_acc
+
+
+def get_template_id_maps(num_templates, exclude_t_ids):
+    old_to_new = [0]*(num_templates+1)
+    new_to_old = [0]*(num_templates+1 - len(exclude_t_ids))
+    cnt  = 0
+    for i in range(num_templates+1):
+        if i in exclude_t_ids:
+            old_to_new[i] = 0
+        else:
+            new_to_old[cnt] = i
+            old_to_new[i] = cnt
+            cnt += 1
+    
+    #Pdb().set_trace()
+    return old_to_new, new_to_old
+
 
 
 def _log_level_string_to_int(log_level_string):

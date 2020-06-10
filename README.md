@@ -1,3 +1,8 @@
+Todo:
+1. ADD SOME INFO ABOUT THE DATA FOLDER!!! which is present outside
+2. Add some info about the dumps folder
+3. Add some info about template naming convention change.
+
 # Explaining Knowledge base completion
 
 We propose a method, that can be used to explain why an embedding based neural model trained for knowledge base completion gave that specific answer for a query. More specifically, given a knowledge base represented as a list of triples (e<sub>1</sub>, r, e<sub>2</sub>), we train an embedding based neural model to answer the query (e<sub>1</sub>, r, ?) which give the answer as u.
@@ -45,10 +50,10 @@ To do so, run the `template_builder.py` file
 
 ```
 python3 template_builder.py -h       ## Get help
-python3 template_builder.py -d fb15k -m distmult -w dumps/fb15k_distmult_dump_norm.pkl -s logs/fb15k -v 1 --t_ids 1 2 3 4 5 --data_repo_root ./data
+python3 template_builder.py -d fb15k -m distmult -w dumps/fb15k_distmult_dump_norm.pkl -s logs/fb15k -v 1 --t_ids 1 2 3 4 5 6 --data_repo_root ./data
 ```
 
-This will save `1-5.pkl` in the save_directory which is `logs/fb15k` in the above example.
+This will save `1-6.pkl` in the save_directory which is `logs/fb15k` in the above example.
 
 
 ### Preprocessing
@@ -57,25 +62,26 @@ We need to preprocess the textual data to numeric data for our selection module 
 
 ```
 ## Generate a train file, where we do not have labels of y
-python3 preprocessing.py -d fb15k -m distmult -f ./data/fb15k/train.txt -s logs/fb15k/sm_with_id.data -w dumps/fb15k_distmult_dump_norm.pkl -l logs/fb15k -v 1 --t_ids 1 2 3 4 5 --data_repo_root ./data --negative_count 2
+python3 preprocessing.py -d fb15k -m distmult -f ./data/fb15k/train.txt -s logs/fb15k/sm_with_id.data -w dumps/fb15k_distmult_dump_norm.pkl -l logs/fb15k -v 1 --t_ids 1 2 3 4 5 6 --data_repo_root ./data --negative_count 2
 
 ## Generate a valid/test file, where we do have labels of y
-python3 preprocessing.py -d fb15k -m distmult -f ./data/fb15k/labelled_train/labelled_train_x.txt -s logs/fb15k/sm_valid_with_id.data -w dumps/fb15k_distmult_dump_norm.pkl -l logs/fb15k -v 1 --t_ids 1 2 3 4 5 --data_repo_root ./data --negative_count 0 --y_labels ./data/fb15k/labelled_train/labelled_train_y.txt
-
+python3 preprocessing.py -d fb15k -m distmult -f ./data/fb15k/labelled_train/labelled_train_x.txt -s logs/fb15k/sm_vaild_with_id.data -w dumps/fb15k_distmult_dump_norm.pkl -l logs/fb15k -v 1 --t_ids 1 2 3 4 5 6 --data_repo_root ./data --negative_count 0 --y_labels ./data/fb15k/labelled_train/labelled_train_y6.txt
 ```
 
 This will write a pkl and txt file with the name `logs/fb15k/sm_with_id.data.[pkl/txt]`. This file contains the data in the following format:
 
 ```
 Column 0-2 contains the integer numeric id of e1, r and e2 in order
-Column 3-37 contains the input vector for template 1,2,3,4,5 in order
-Column 38 contains 1 if the fact is positive and 0 if it is negative(randomly sampled hence assumed false)
+Column 3-44 contains the input vector for template 1,2,3,4,5,6 in order
+Column 45 contains 1 if the fact is positive and 0 if it is negative(randomly sampled hence assumed false)
 ```
 
-For the valid and test data generated with `--y_labels` flag, the column 38 contains the template id which produces the best explanation. It is annotated manually.
+For the valid and test data generated with `--y_labels` flag, the column 45 contains the template id which produces the best explanation. It is annotated manually.
 
-For this valid data, we shuffled it and randomly split into 80-20 ratio used as labelled train and valid data. The files generated were `sm_sup_train_with_id.pkl` and `sm_sup_valid_with_id.pkl` respectively.
-
+For this valid data, we shuffled it and randomly split into 80-20 ratio used as labelled train and valid data. The files generated were `sm_sup_train_with_id.pkl` and `sm_sup_valid_with_id.pkl` respectively, using the following script in `sm` folder:
+```
+python create_train_val_split.py --labelled_total_data_path ../logs/fb15k/sm_valid_with_id.data.pkl --total_labels_path ../data/fb15k/labelled_train/labelled_train_y6.txt --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --train_labels_path ../logs/fb15k/sm_sup_train_multilabels.txt --val_data_path ../logs/fb15k/sm_sup_valid_with_id.pkl --val_labels_path ../logs/fb15k/sm_sup_valid_multilabels.txt --train_split 0.8 --seed 242 --num_templates 6
+```
 
 ### Training Selection Module
 Next to train the selection module run the file `sm/main.py` as given below:
@@ -83,13 +89,14 @@ Next to train the selection module run the file `sm/main.py` as given below:
 ```
 ## Semi supervised training with KL Divergence = 0
 
-python3 main.py --training_data_path ../logs/fb15k/sm_with_id.data.pkl --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --val_data_path ../logs/fb15k/sm_sup_valid_with_id.pkl --exp_name train_semi --num_epochs 20 --config ./configs/fb15k_semi.yml --lr 0.001 --cuda --batch_size 2048 --mil --num_templates 5 --each_input_size 7 --supervision semi --output_path ../logs/sm
+python3 main.py --training_data_path ../logs/fb15k/sm_with_id.data.pkl --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --val_data_path ../logs/fb15k/sm_sup_valid_with_id.pkl --exp_name train_semi_kl1 --num_epochs 20 --config ./configs/fb15k_config.yml --hidden_unit_list 90 40 --lr 0.001 --cuda --batch_size 2048 --mil --num_templates 6 --each_input_size 7 --supervision semi --output_path ../logs/sm --train_labels_path ../logs/fb15k/sm_sup_train_multilabels.txt --val_labels_path ../logs/fb15k/sm_sup_valid_multilabels.txt
 
 ## Semi supervised training with KL Divergence = 1
 
-python3 main.py --training_data_path ../logs/fb15k/sm_with_id.data.pkl --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --val_data_path ../logs/fb15k/sm_sup_valid_with_id.pkl --exp_name train_semi_kl1 --num_epochs 20 --config ./configs/fb15k_semi.yml --lr 0.001 --cuda --batch_size 2048 --mil --num_templates 5 --each_input_size 7 --supervision semi --output_path ../logs/sm --kldiv_lambda 1 --label_distribution_file ./configs/fb15k_label_distribution.yml
+python3 main.py --training_data_path ../logs/fb15k/sm_with_id.data.pkl --labelled_training_data_path ../logs/fb15k/sm_sup_train_with_id.pkl --val_data_path ../logs/fb15k/sm_sup_valid_with_id.pkl --exp_name train_semi_kl1 --num_epochs 20 --config ./configs/fb15k_config.yml --hidden_unit_list 90 40 --lr 0.001 --cuda --batch_size 2048 --mil --num_templates 6 --each_input_size 7 --supervision semi --output_path ../logs/sm --kldiv_lambda 1 --label_distribution_file ../logs/fb15k/label_distribution.yml  --train_labels_path ../logs/fb15k/sm_sup_train_multilabels.txt --val_labels_path ../logs/fb15k/sm_sup_valid_multilabels.txt
 
 ```
+Refer to `sm/e2e.sh` for different settings of training.
 
 This will save the best model (_best_checkpoint.pth0), a `learning_curve.txt` and a `log.txt` in the output folder named `[output_path]/[exp_name]`.
 
@@ -111,8 +118,8 @@ Similarly test for KL divergence = 1.
 
 We had two experiments on Amazon Mechanical Turk.
 
-* Find out if our explanations are better than using rule mining. (id=1365457)
-* Find out if explanations are infact useful for the task of KB verification. (id=1419750)
+* Find out if our explanations are better than using rule mining. 
+* Find out if explanations are infact useful for the task of KB verification. 
 
 #### Is TeXKBC better?
 
@@ -161,6 +168,7 @@ We had a number of scripts written to do small tasks, and it is present in the s
 * **Aman Agrawal** - [http://www.cse.iitd.ernet.in/~cs1150210/](http://www.cse.iitd.ernet.in/~cs1150210/)
 * **Ankesh Gupta** - [https://www.linkedin.com/in/ankesh-gupta-a67423123](https://www.linkedin.com/in/ankesh-gupta-a67423123)
 * **Yatin Nandwani** - [https://www.linkedin.com/in/yatin-nandwani-0804ba9/](https://www.linkedin.com/in/yatin-nandwani-0804ba9/)
+* **Mayank Singh Chauhan** - [https://www.cse.iitd.ac.in/~cs5160394/](https://www.cse.iitd.ac.in/~cs5160394/)
 
 See also the list of [contributors](https://github.com/aman71197/Interpretable-KBC/graphs/contributors) who participated in this project.
 

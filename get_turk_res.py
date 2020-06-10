@@ -12,7 +12,7 @@ import string
 import os
 import bs4 as bs
 import itertools
-
+from collections import Counter
 ANSWER_OPTIONS = ['our','other','both','none']
 
 def get_key_answer(key,id):
@@ -47,6 +47,8 @@ def get_invalid_hits(df,outfilename):
             print('Invalid HIT at {} with message ==> {} '.format(index, message))
             df_new['Reject'][index] = message
             invalid_hits[row['WorkerId']].append(row['AssignmentId'])
+        else:
+            df_new['Approve'][index] = 'X'
     if(len(invalid_hits)!=0):
         df_new.to_csv(outfilename,index=False,sep=',')
     return invalid_hits
@@ -65,7 +67,32 @@ def get_book(book_filename):
             data.append([ele for ele in cols if ele])
     return pd.DataFrame(data,columns=['fact','our','other'])
 
+
+
+
+def get_winner_majority(answers):
+    count_choices = Counter(answers)
+    ordered_choices = count_choices.most_common()
+    rv =  ordered_choices[0][0]
+    total = sum(count_choices.values())
+    if rv in ['both','none']:
+        rv = 'tie'
+    #
+    if 1.0*ordered_choices[0][1]/total < args.threshold:
+        rv = 'undec'
+    #
+    return [rv]
+
+
 def get_winner(answers):
+    if args.selection_type == 'voting':
+        return get_winner_voting(answers)
+    elif args.selection_type == 'majority':
+        return get_winner_majority(answers)
+    else:
+        raise
+
+def get_winner_voting(answers):
     our_ct = 0
     other_ct = 0
     for el in answers:
@@ -134,6 +161,8 @@ if __name__ == "__main__":
     parser.add_argument('-rf', '--result_file', help="Name of the result csv downloaded from mturk", required=True)
     parser.add_argument('-op', '--output_path', help="Output path for rejected people and results", required=True)
     parser.add_argument('-bf', '--book_file', help="Original HTML (Book) written by get_turk_data", required=True)
+    parser.add_argument('-st', '--selection_type', help="How to select the winner? Through voting or majority?",type=str, default = 'voting')
+    parser.add_argument('-thr', '--threshold', help="threhold for selecting winner.",type=float, default = 0)
     args = parser.parse_args()
 
     df = pd.read_csv(args.result_file)
@@ -162,9 +191,10 @@ if __name__ == "__main__":
 
     ctr_winner = collections.Counter(winner_list)
     analysis_str += ('Total number of facts = {}\n'.format(len(results)))
-    analysis_str += ('Total number of winning facts = {}\n'.format(len(winner_list)-winner_list.count('tie')))
+    #analysis_str += ('Total number of winning facts = {}\n'.format(len(winner_list)-winner_list.count('tie')))
+    analysis_str += ('Total number of winning facts = {}\n'.format(winner_list.count('other') + winner_list.count('our')))
     for el in ctr_winner:
         ctr_winner[el] /= len(winner_list)*0.01
     analysis_str += '{}\n\n'.format(ctr_winner)
     print(analysis_str)
-    write_results(results,os.path.join(args.output_path,res_file_last_part+'_analysis.html'),analysis_str)
+    write_results(results,os.path.join(args.output_path,res_file_last_part+'_st{}_thr{}_analysis.html'.format(args.selection_type,args.threshold)),analysis_str)

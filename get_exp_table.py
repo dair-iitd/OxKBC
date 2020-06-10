@@ -92,6 +92,8 @@ def get_header(t_type):
     elif(t_type == 5):
         return ['e1', 'r', 'e2', 'my_score', 'my_best_e', 'my_best_r', 'best_score',
                 'best_answer', 'best_answer_best_e', 'best_answer_best_r', 'z_score']
+    elif (t_type == 6):
+        return ['e1','r','e2','my_score','my_path','best_score','best_answer','best_answer_path','z_score']
     else:
         raise "Invalid Type"
 
@@ -134,10 +136,28 @@ def get_word_exp(exp, t_type, entity_id_inverse_map, relation_id_inverse_map, en
             entity_id_inverse_map.get(exp[4][0], "None"), "None"))
         exp_word_list.append(relation_inverse_map.get(exp[4][1], "None"))
         exp_word_list.append(exp[5])
+    elif(t_type == 6):
+        exp_word_list.append(exp[0])
+        exp_word_list.append(get_tlp(exp[1], entity_id_inverse_map, relation_id_inverse_map, entity_name_map))
+        exp_word_list.append(exp[2])
+        exp_word_list.append(entity_name_map.get(
+            entity_id_inverse_map.get(exp[3], "None"), "None"))
+        exp_word_list.append(get_tlp(exp[4], entity_id_inverse_map, relation_id_inverse_map, entity_name_map))
+        exp_word_list.append(exp[5])
+
     else:
         raise "Invalid Template ID"
 
     return exp_word_list
+
+def get_tlp(path,entity_id_inverse_map, relation_id_inverse_map, entity_name_map):
+    my_path = []
+    my_path.append(relation_inverse_map.get(path[0], "None"))
+    my_path.append(entity_name_map.get(
+         entity_id_inverse_map.get(path[1], "None"), "None"))
+    my_path.append(relation_inverse_map.get(path[2], "None"))
+    return '@@'.join(my_path)
+
 
 
 def generate_exp(data, template_obj_list, entity_id_inverse_map, relation_id_inverse_map, entity_name_map):
@@ -180,7 +200,7 @@ def write_word_exps(word_exps, output_root_path):
     if(len(word_exps.keys()) > 1):
         result = reduce(lambda left, right: pd.merge(left, right, how='inner', left_on=[
                         'e1', 'r', 'e2'], right_on=['e1', 'r', 'e2']), word_exps.values())
-        result.to_csv(os.path.join(output_root_path, "merged.txt"),
+        result.to_csv(os.path.join(output_root_path, "merged.tsv"),
                       encoding='utf-8', index=False, sep='\t')
 
 

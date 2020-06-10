@@ -91,3 +91,27 @@ def chunks(l, n):
         yield l[i:i + n]
 
 
+def read_multilabel(filename, num_labels = 0):
+    lines = []
+    with open(filename) as fh:
+        lines = fh.readlines()
+        lines = [list(map(int,line.strip().split(','))) for line in lines]
+        if num_labels == 0:
+            num_labels = max([max(line) for line in lines])+1
+        #
+        y_multi = np.zeros((len(lines),num_labels))
+        y_single = np.zeros(len(lines))
+        for i,line in enumerate(lines):
+            y_single[i] = line[0]
+            for j in line:
+                y_multi[i,j] = 1
+            #
+        #
+        return y_single, y_multi
+     
+    
+
+        
+
+        
+

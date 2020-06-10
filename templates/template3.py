@@ -15,7 +15,7 @@ class Template3(TemplateBaseClass):
     Template: r~r' ^ e1 r' e2
     """
 
-    def __init__(self, kblist, base_model, use_hard_triple_scoring=True, load_table=None, dump_file=None):
+    def __init__(self, kblist, base_model, use_hard_triple_scoring=True, load_table=None, dump_file=None, parts = 1, offset = 0):
         super().__init__()
         self.kb = kblist[0]
         self.kb_val = kblist[1]
@@ -217,6 +217,7 @@ class Template3(TemplateBaseClass):
     def get_english_explanation(self, fact, explainer):
         try:
             rprime_num = self.get_explanation(fact)[1]
+            explainer.check_relation(rprime_num,fact, source='t3')
             return string.Template(self.exp_template).substitute(html_fact_rprime=explainer.html_fact([fact[0], rprime_num, fact[2]]))
         except:
             logging.error("Some error occured in template 3 while getting explanation\n{}".format(
