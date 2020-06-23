@@ -1,4 +1,3 @@
-ADD DUMPS LINK AFTER YATIN UPLOADS
 # Explaining Knowledge base completion
 
 We propose a method, that can be used to explain why an embedding based neural model trained for knowledge base completion gave that specific answer for a query. More specifically, given a knowledge base represented as a list of triples (e<sub>1</sub>, r, e<sub>2</sub>), we train an embedding based neural model to answer the query (e<sub>1</sub>, r, ?) which give the answer as u.
@@ -30,7 +29,7 @@ argparse
 
 ### Project Structure
 1. Clone this repository and `cd` into the project.
-2. Run `mkdir dumps` and download this dump file here. ADD LINK
+2. Run `mkdir dumps` and download this dump file here [https://drive.google.com/drive/folders/1kX3V9QRTPGSpF0c8Fh3LCoyFtxgM3pT6?usp=sharing](https://drive.google.com/drive/folders/1kX3V9QRTPGSpF0c8Fh3LCoyFtxgM3pT6?usp=sharing)
 3. Download and extract the `fb15k` dataset into `data/fb15k` folder, such that you have `data/fb15k/train.txt`, `data/fb15k/valid.txt` and `data/fb15k/test.txt`.
 
 ### Template Builder
