@@ -1,8 +1,8 @@
-# Explaining Knowledge base completion
+# OxKBC: Outcome Explanation for Factorization Based Knowledge Base Completion
 
-We propose a method, that can be used to explain why an embedding based neural model trained for knowledge base completion gave that specific answer for a query. More specifically, given a knowledge base represented as a list of triples (e<sub>1</sub>, r, e<sub>2</sub>), we train an embedding based neural model to answer the query (e<sub>1</sub>, r, ?) which give the answer as u.
+Code accompanying AKBC'20 paper of the same title. Paper link: https://openreview.net/forum?id=nqYhFwaUj
 
-We try to give reasoning for that answer for an arbitrary embedding based neural model. Presently, we are using a near state of the art model [TypeDM](https://github.com/dair-iitd/KBI/tree/master/kbi-pytorch)
+We propose a method, that can be used to explain why an embedding based neural model trained for knowledge base completion gave that specific answer for a query. More specifically, given a knowledge base represented as a list of triples (e<sub>1</sub>, r, e<sub>2</sub>), we train an embedding based neural model to answer the query (e<sub>1</sub>, r, ?) which give the answer as u. We try to give reasoning for that answer for an arbitrary embedding based neural model. Presently, we are using a near state of the art model [TypeDM](https://github.com/dair-iitd/KBI/tree/master/kbi-pytorch)
 
 
 ## Getting Started
@@ -30,7 +30,7 @@ argparse
 ### Project Structure
 1. Clone this repository and `cd` into the project.
 2. Run `mkdir dumps` and download this dump file here [https://drive.google.com/drive/folders/1kX3V9QRTPGSpF0c8Fh3LCoyFtxgM3pT6?usp=sharing](https://drive.google.com/drive/folders/1kX3V9QRTPGSpF0c8Fh3LCoyFtxgM3pT6?usp=sharing)
-3. Download and extract the `fb15k` dataset into `data/fb15k` folder, such that you have `data/fb15k/train.txt`, `data/fb15k/valid.txt` and `data/fb15k/test.txt`.
+3. Download and extract the `fb15k` dataset into `data/fb15k` folder, such that you have `data/fb15k/train.txt`, `data/fb15k/valid.txt` and `data/fb15k/test.txt`. See [data section](data/README.md).
 
 ### Template Builder
 
@@ -173,16 +173,31 @@ We had a number of scripts written to do small tasks, and it is present in the s
 
 ## Authors
 
-* **Aman Agrawal** - [http://www.cse.iitd.ernet.in/~cs1150210/](http://www.cse.iitd.ernet.in/~cs1150210/)
+* **Aman Agrawal** - [https://www.linkedin.com/in/aman71197/](https://www.linkedin.com/in/aman71197/)
 * **Ankesh Gupta** - [https://www.linkedin.com/in/ankesh-gupta-a67423123](https://www.linkedin.com/in/ankesh-gupta-a67423123)
 * **Yatin Nandwani** - [https://www.linkedin.com/in/yatin-nandwani-0804ba9/](https://www.linkedin.com/in/yatin-nandwani-0804ba9/)
 * **Mayank Singh Chauhan** - [https://www.cse.iitd.ac.in/~cs5160394/](https://www.cse.iitd.ac.in/~cs5160394/)
 
-See also the list of [contributors](https://github.com/aman71197/Interpretable-KBC/graphs/contributors) who participated in this project.
+See also the list of contributors who participated in this project.
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+## BibTeX Citation
+
+If you use OxKBC in any publication, we would appreciate the following citation:
+
+```
+@inproceedings{
+nandwani2020oxkbc,
+title={Ox{\{}KBC{\}}: Outcome Explanation for Factorization Based Knowledge Base Completion},
+author={Yatin Nandwani and Ankesh Gupta and Aman Agrawal and Mayank Singh Chauhan and Parag Singla and Mausam},
+booktitle={Automated Knowledge Base Construction},
+year={2020},
+url={https://openreview.net/forum?id=nqYhFwaUj}
+}
+```
 
 ## Acknowledgments
 
